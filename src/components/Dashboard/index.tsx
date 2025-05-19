@@ -1,117 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import Main from "@/components/General/Layout/Main";
-import Modal from "@/components/General/Modal/Modal";
-import { brandsData } from "@/constants/dummydata";
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import AddBrandForm from "./add";
 
 export default function HomePage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setActiveDropdown(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <div>
       <Main>
         <h1 className="text-3xl text-black font-bold mb-10">Hi, Group A!</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-          {brandsData.map((data) => (
-            <div key={data.id} className="relative w-full max-w-sm">
-              <Link
-                href={`home/${data.id}`}
-                className="p-4 cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-              >
-                <img
-                  src="/static/images/ex_brand.png"
-                  alt={data.name}
-                  className="w-50 h-50 mb-3"
-                />
-                <p className="font-bold text-black">{data.name}</p>
-              </Link>
-
-              <div
-                className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setActiveDropdown(
-                    activeDropdown === data.id ? null : data.id
-                  );
-                }}
-              >
-                <span className="material-symbols-outlined">more_vert</span>
-              </div>
-
-              {activeDropdown === data.id && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
-                >
-                  <button
-                    onClick={() => {
-                      setActiveDropdown(null);
-                      console.log("Edit", data.name);
-                    }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-black"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveDropdown(null);
-                      console.log("Delete", data.name);
-                    }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Tombol Add Brand */}
-          <button
-            onClick={openModal}
-            className="w-full max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-          >
-            <div
-              className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
-              style={{
-                background:
-                  "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
-              }}
-            >
-              <span className="material-symbols-outlined">add</span>
-            </div>
-            <p className="font-bold text-black">Add Brand</p>
-          </button>
-        </div>
       </Main>
-
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <AddBrandForm />
-      </Modal>
     </div>
   );
 }

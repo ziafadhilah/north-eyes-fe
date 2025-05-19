@@ -3,7 +3,7 @@ export interface BrandData {
   name: string;
   image: string;
   address: string;
-  outlet: Array<string>;
+  outlet: Array<{ id: number; name: string }>;
   kitchen: Array<{ id: number; name: string }>;
 }
 
@@ -13,7 +13,14 @@ export const brandsData: BrandData[] = [
     name: "Brand A",
     image: "/static/images/ex_brand.png",
     address: "Jl. Antapani",
-    outlet: ["Outlet A", "Outlet B", "Outlet C"],
+    outlet: [
+      {
+        id: 1,
+        name: "Outlet A",
+      },
+      { id: 2, name: "Outlet B" },
+      { id: 1, name: "Outlet C" },
+    ],
     kitchen: [
       {
         id: 1,
@@ -34,7 +41,14 @@ export const brandsData: BrandData[] = [
     name: "Brand B",
     image: "/static/images/ex_brand.png",
     address: "Jl. Antafunky",
-    outlet: ["Outlet A", "Outlet B", "Outlet C"],
+    outlet: [
+      {
+        id: 1,
+        name: "Outlet A",
+      },
+      { id: 2, name: "Outlet B" },
+      { id: 1, name: "Outlet C" },
+    ],
     kitchen: [
       {
         id: 1,
@@ -55,7 +69,14 @@ export const brandsData: BrandData[] = [
     name: "Brand C",
     image: "/static/images/ex_brand.png",
     address: "Jl. Antaantum",
-    outlet: ["Outlet A", "Outlet B", "Outlet C"],
+    outlet: [
+      {
+        id: 1,
+        name: "Outlet A",
+      },
+      { id: 2, name: "Outlet B" },
+      { id: 1, name: "Outlet C" },
+    ],
     kitchen: [
       {
         id: 1,

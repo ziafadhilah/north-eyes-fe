@@ -7,7 +7,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside
-      className="w-64 text-white p-8 rounded-3xl shadow-lg min-h-screen border-5"
+      className="w-70 text-white p-8 rounded-3xl shadow-lg min-h-screen border-5"
       style={{
         background:
           "linear-gradient(187.7deg, rgba(7, 61, 170, 0.3) 11.88%, rgba(26, 42, 108, 0.3)88.12%)",
@@ -23,10 +23,16 @@ export default function Sidebar() {
               <Link
                 href={menu.url}
                 className={`flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-blue-900 ${
-                  isActive ? "bg-blue-900" : ""
+                  isActive ? "is-active-menu" : ""
                 }`}
               >
-                <span className="text-white">{menu.icon}</span>
+                <span
+                  className={`${
+                    isActive ? "is-active-menu-text" : "text-white-100"
+                  }`}
+                >
+                  {menu.icon}
+                </span>
                 <span>{menu.name}</span>
               </Link>
             </li>

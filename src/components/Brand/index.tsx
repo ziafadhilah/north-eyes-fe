@@ -1,22 +1,29 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { brandsData } from "@/constants/dummydata";
-import { useParams } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import Main from "@/components/General/Layout/Main";
-import AddOutletForm from "./add_area";
-import Modal from "../General/Modal/Modal";
+import Modal from "@/components/General/Modal/Modal";
+import { brandsData } from "@/constants/dummydata";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import AddBrandForm from "./add_brand";
 
-export default function OIndex() {
-  const params = useParams();
-  const id = parseInt(params?.id as string);
-  const brand = brandsData.find((data) => data.id === id);
+export default function BrandPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const today = new Date();
+  const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
+  const dateTimeString = today.toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -38,76 +45,35 @@ export default function OIndex() {
       <Main>
         <div className="flex items-start justify-between mb-3 w-full">
           <div className="flex items-center">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center text-black"
-            >
-              <span
-                className="material-symbols-outlined mr-5"
-                style={{ fontSize: "32px" }}
-              >
-                arrow_back
-              </span>
-            </button>
-
+            <div></div>
             <div className="mb-3">
-              <h1 className="text-3xl font-bold text-title-color mb-2">Area</h1>
-              <nav
-                className="text-sm text-gray-500 mt-1"
-                aria-label="breadcrumb"
-              >
-                <ol className="flex items-center space-x-2">
-                  <li>
-                    <Link href="/brand" className="hover:underline">
-                      Brand
-                    </Link>
-                  </li>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <li>
-                    <Link
-                      href={`/brand/${brand?.id}`}
-                      className="hover:underline"
-                    >
-                      {brand?.name}
-                    </Link>
-                  </li>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <li className="text-gray-700 font-medium">
-                    {brand?.outlet[1].name}
-                  </li>
-                </ol>
-              </nav>
+              <h1 className="text-3xl font-bold text-title-color mb-2">
+                Group Name
+              </h1>
             </div>
           </div>
           <div className="text-right">
             <span className="text-white text-md font-medium px-2.5 py-0.5 rounded-md ne-accent">
-              Wednesday
+              {dayName}
             </span>
             <p className="text-md font-medium text-black mt-4">
-              10:00 AM, 04 April 2025
+              {dateTimeString}
             </p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-          {brand?.kitchen.map((kitchen, index) => (
-            <div key={kitchen.id} className="relative w-full max-w-sm">
+          {brandsData.map((data) => (
+            <div key={data.id} className="relative w-full max-w-sm">
               <Link
-                key={index}
-                href={`/brand/live-preview/${brand.id}`}
-                passHref
-                className="w-full max-w-sm p-4 rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue"
+                href={`brand/${data.id}`}
+                className="p-4 cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
               >
                 <img
-                  src={brand.image}
-                  alt={brand.name}
+                  src="/static/images/ex_brand.png"
+                  alt={data.name}
                   className="w-50 h-50 mb-3"
                 />
-                <p className="font-bold text-black">{kitchen.name}</p>
-                <p className="text-gray-600">{brand.address}</p>
+                <p className="font-bold text-black">{data.name}</p>
               </Link>
 
               <div
@@ -116,14 +82,14 @@ export default function OIndex() {
                   e.preventDefault();
                   e.stopPropagation();
                   setActiveDropdown(
-                    activeDropdown === kitchen.id ? null : kitchen.id
+                    activeDropdown === data.id ? null : data.id
                   );
                 }}
               >
                 <span className="material-symbols-outlined">more_vert</span>
               </div>
 
-              {activeDropdown === kitchen.id && (
+              {activeDropdown === data.id && (
                 <div
                   ref={dropdownRef}
                   className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
@@ -131,19 +97,21 @@ export default function OIndex() {
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
-                      console.log("Edit", kitchen.name);
+                      console.log("Edit", data.name);
                     }}
                     className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-black"
                   >
-                    <span className="material-symbols-outlined">edit</span>
+                    <span className="material-symbols-outlined">
+                      draft_orders
+                    </span>
                     Edit
                   </button>
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
-                      console.log("Delete", kitchen.name);
+                      console.log("Delete", data.name);
                     }}
-                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-black"
+                    className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
                   >
                     <span className="material-symbols-outlined">delete</span>
                     Delete
@@ -152,6 +120,8 @@ export default function OIndex() {
               )}
             </div>
           ))}
+
+          {/* Tombol Add Brand */}
           <button
             onClick={openModal}
             className="w-full max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
@@ -165,12 +135,13 @@ export default function OIndex() {
             >
               <span className="material-symbols-outlined">add</span>
             </div>
-            <p className="font-bold text-black">Add Area</p>
+            <p className="font-bold text-black">Add Brand</p>
           </button>
         </div>
       </Main>
+
       <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <AddOutletForm />
+        <AddBrandForm />
       </Modal>
     </div>
   );
