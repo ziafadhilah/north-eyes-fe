@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Main from "@/components/General/Layout/Main";
@@ -5,9 +6,11 @@ import Modal from "@/components/General/Modal/Modal";
 import { brandsData } from "@/constants/dummydata";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import AddBrandForm from "./add_brand";
 
 export default function BrandPage() {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -24,6 +27,19 @@ export default function BrandPage() {
     month: "long",
     year: "numeric",
   });
+
+  const [companyName, setCompanyName] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const companyData = localStorage.getItem("company");
+
+    if (!token) {
+      router.push("/login");
+    }
+
+    setCompanyName(companyData || "Group Name");
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,7 +64,7 @@ export default function BrandPage() {
             <div></div>
             <div className="mb-3">
               <h1 className="text-3xl font-bold text-title-color mb-2">
-                Group Name
+                {companyName || "Group Name"}
               </h1>
             </div>
           </div>

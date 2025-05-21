@@ -1,12 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { loginUser } from "@/service/login/authService";
 
 export default function LoginPage() {
   const router = useRouter();
   const [currentText, setCurrentText] = useState(0);
   const [isRegister, setIsRegister] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const carouselTexts = [
     "Empowering your decisions through AI-driven insights.",
@@ -35,13 +40,32 @@ export default function LoginPage() {
     setCurrentText((prev) => (prev + 1) % carouselTexts.length);
   };
 
-  const handleSubmit = () => {
-    if (isRegister) {
-      // Handle register logic here
-      console.log("Registering user...");
-    } else {
-      // Handle login logic here
-      router.push("/brand");
+  const handleLogin = async () => {
+    if (!identifier || !password) {
+      alert("Identifier dan Password harus diisi");
+      return;
+    }
+
+    try {
+      const result = await loginUser(identifier, password);
+
+      if (result.status === "success") {
+        console.log("Login berhasil:", result.data);
+
+        localStorage.setItem("token", result.data?.token ?? "");
+        localStorage.setItem("user_id", result.data?.user_id ?? "");
+        localStorage.setItem("company", result.data?.company_name ?? "");
+
+        router.push("/brand");
+      } else {
+        alert("Login gagal: " + result.message);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg("Unexpected error occurred");
+      }
     }
   };
 
@@ -88,24 +112,21 @@ export default function LoginPage() {
               </>
             )}
 
-            <label className="text-gray-700 text-sm">Email:</label>
+            <label className="text-gray-700 text-sm">Username:</label>
             <input
               type="text"
-              placeholder="Enter your email here"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Input your username"
               className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
             />
 
-            <label className="text-gray-700 text-sm">Phone:</label>
+            <label className="text-gray-700 text-sm">Password:</label>
             <input
               type="password"
-              placeholder="Enter your phone number here"
-              className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-4"
-            />
-
-            <label className="text-gray-700 text-sm">Message:</label>
-            <input
-              type="password"
-              placeholder="Enter message here"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Input your password"
               className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-4"
             />
 
@@ -118,11 +139,13 @@ export default function LoginPage() {
             )}
 
             <button
-              onClick={handleSubmit}
+              onClick={handleLogin}
               className="mt-2 mb-3 p-2 text-white rounded-md w-full bg-blue-700 hover:bg-blue-800"
             >
               {isRegister ? "Register" : "Login"}
             </button>
+
+            {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
 
             <p className="text-sm text-gray-400 mb-4 text-center">
               {isRegister

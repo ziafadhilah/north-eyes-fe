@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: `/api/users/login`,
+        destination: `${apiUrl}/users/login`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
