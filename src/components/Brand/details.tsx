@@ -15,7 +15,7 @@ export default function BrandDetails() {
   const brand = brandsData.find((data) => data.id === id);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null); // ✅ changed from number to string
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null); //
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const openModal = () => setIsModalOpen(true);

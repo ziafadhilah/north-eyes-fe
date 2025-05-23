@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
 
 const nextConfig: NextConfig = {
+  trailingSlash: false,
   async rewrites() {
     return [
       {

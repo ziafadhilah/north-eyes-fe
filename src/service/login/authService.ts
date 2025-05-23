@@ -7,6 +7,7 @@ export interface LoginResponse {
     token: string;
     user_id: string;
     company_name: string;
+    company_id: string;
   };
 }
 

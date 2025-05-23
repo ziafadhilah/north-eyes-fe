@@ -4,6 +4,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { loginUser } from "@/service/login/authService";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,15 +52,16 @@ export default function LoginPage() {
       const result = await loginUser(identifier, password);
 
       if (result.status === "success") {
-        console.log("Login berhasil:", result.data);
+        toastr.success("Login berhasil");
 
         localStorage.setItem("token", result.data?.token ?? "");
         localStorage.setItem("user_id", result.data?.user_id ?? "");
         localStorage.setItem("company", result.data?.company_name ?? "");
+        localStorage.setItem("company_id", result.data?.company_id ?? "");
 
         router.push("/brand");
       } else {
-        alert("Login gagal: " + result.message);
+        toastr.error("Login gagal : " + result.message);
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -112,38 +115,48 @@ export default function LoginPage() {
               </>
             )}
 
-            <label className="text-gray-700 text-sm">Username:</label>
-            <input
-              type="text"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Input your username"
-              className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
-            />
-
-            <label className="text-gray-700 text-sm">Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Input your password"
-              className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-4"
-            />
-
-            {!isRegister && (
-              <div className="text-center mb-3">
-                <a href="#" className="text-red-600 font-medium">
-                  Reset password
-                </a>
-              </div>
-            )}
-
-            <button
-              onClick={handleLogin}
-              className="mt-2 mb-3 p-2 text-white rounded-md w-full bg-blue-700 hover:bg-blue-800"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleLogin();
+              }}
             >
-              {isRegister ? "Register" : "Login"}
-            </button>
+              <label className="text-gray-700 text-sm">Username:</label>
+              <input
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="Input your username"
+                className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+              />
+
+              <label className="text-gray-700 text-sm">Password:</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Input your password"
+                className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-4"
+              />
+
+              {!isRegister && (
+                <div className="text-center mb-3">
+                  <a href="#" className="text-red-600 font-medium">
+                    Reset password
+                  </a>
+                </div>
+              )}
+
+              <button
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleLogin();
+                }}
+                className="mt-2 mb-3 p-2 text-white rounded-md w-full bg-blue-700 hover:bg-blue-800"
+              >
+                {isRegister ? "Register" : "Login"}
+              </button>
+            </form>
 
             {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
 

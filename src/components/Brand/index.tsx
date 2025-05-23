@@ -3,16 +3,17 @@
 "use client";
 import Main from "@/components/General/Layout/Main";
 import Modal from "@/components/General/Modal/Modal";
-import { brandsData } from "@/constants/dummydata";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import AddBrandForm from "./add_brand";
+import { BrandData } from "@/constants/brandData";
+import { fetchBrands } from "@/service/brand/brandService";
 
 export default function BrandPage() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const openModal = () => setIsModalOpen(true);
@@ -29,16 +30,26 @@ export default function BrandPage() {
   });
 
   const [companyName, setCompanyName] = useState("");
+  const [brands, setBrands] = useState<BrandData[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const companyData = localStorage.getItem("company");
-
-    if (!token) {
+    const companyIdData = localStorage.getItem("company_id");
+    const token = localStorage.getItem("token");
+    if (!companyData || !token) {
       router.push("/login");
+      return;
     }
 
     setCompanyName(companyData || "Group Name");
+
+    fetchBrands(companyIdData || "", token)
+      .then((response) => {
+        setBrands(response.data?.data?.data || []);
+      })
+      .catch((error) => {
+        console.error("Error saat mengambil brand:", error);
+      });
   }, []);
 
   useEffect(() => {
@@ -63,7 +74,7 @@ export default function BrandPage() {
           <div className="flex items-center">
             <div></div>
             <div className="mb-3">
-              <h1 className="text-3xl font-bold text-title-color mb-2">
+              <h1 className="text-3xl font-bold text-title-color mb-2 uppercase">
                 {companyName || "Group Name"}
               </h1>
             </div>
@@ -78,18 +89,22 @@ export default function BrandPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-          {brandsData.map((data) => (
-            <div key={data.id} className="relative w-full max-w-sm">
+          {brands.map((data) => (
+            <div key={data.brand_id} className="relative w-full max-w-sm">
               <Link
-                href={`brand/${data.id}`}
+                href={`brand/${data.brand_id}`}
                 className="p-4 cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
               >
                 <img
-                  src="/static/images/ex_brand.png"
-                  alt={data.name}
+                  src={
+                    data.logo_url
+                      ? data.logo_url
+                      : "/static/images/ex_brand.png"
+                  }
+                  alt={data.brand_name}
                   className="w-50 h-50 mb-3"
                 />
-                <p className="font-bold text-black">{data.name}</p>
+                <p className="font-bold text-black">{data.brand_name}</p>
               </Link>
 
               <div
@@ -98,14 +113,14 @@ export default function BrandPage() {
                   e.preventDefault();
                   e.stopPropagation();
                   setActiveDropdown(
-                    activeDropdown === data.id ? null : data.id
+                    activeDropdown === data.brand_id ? null : data.brand_id
                   );
                 }}
               >
                 <span className="material-symbols-outlined">more_vert</span>
               </div>
 
-              {activeDropdown === data.id && (
+              {activeDropdown === data.brand_id && (
                 <div
                   ref={dropdownRef}
                   className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
@@ -113,7 +128,7 @@ export default function BrandPage() {
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
-                      console.log("Edit", data.name);
+                      console.log("Edit", data.brand_name);
                     }}
                     className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-black"
                   >
@@ -125,7 +140,7 @@ export default function BrandPage() {
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
-                      console.log("Delete", data.name);
+                      console.log("Delete", data.brand_name);
                     }}
                     className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
                   >
