@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBrands } from "@/service/brand/brandService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import axios from "axios";
 
 type AddBrandFormProps = {
   onClose: () => void;
@@ -66,9 +67,17 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
       toastr.success("Data Brand Berhasil Ditambahkan.");
       onClose();
       router.refresh();
-    } catch (error: any) {
-      console.error(error);
-      toastr.error("Gagal menambahkan brand:", error);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response?.data || error.message);
+        toastr.error(
+          "Gagal menambahkan brand.",
+          error.response?.data?.message || error.message
+        );
+      } else {
+        console.error("Unexpected error:", error);
+        toastr.error("Gagal menambahkan brand.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -80,28 +89,34 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
         <h2 className="text-xl font-bold text-black mb-4">Add New Brand</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { label: "Brand Name", name: "brand_name" },
-              {
-                label: "Employee Daily Point",
-                name: "employee_daily_point",
-                type: "number",
-              },
-              { label: "Logo URL", name: "logo_url" },
-              { label: "Description", name: "description" },
-              { label: "Website URL", name: "website_url" },
-              { label: "Email", name: "email" },
-              { label: "Phone", name: "phone" },
-              { label: "Industry", name: "industry" },
-              { label: "Founded Year", name: "founded_year", type: "date" },
-              { label: "Headquarter City", name: "headquarter_city" },
-              { label: "Address", name: "address" },
-              { label: "City", name: "city" },
-              { label: "Province", name: "province" },
-              { label: "Postal Code", name: "postal_code" },
-              { label: "Country", name: "country" },
-              { label: "Owner Name", name: "owner_name" },
-            ].map(({ label, name, type = "text" }) => (
+            {(
+              [
+                { label: "Brand Name", name: "brand_name" },
+                {
+                  label: "Employee Daily Point",
+                  name: "employee_daily_point",
+                  type: "number",
+                },
+                { label: "Logo URL", name: "logo_url" },
+                { label: "Description", name: "description" },
+                { label: "Website URL", name: "website_url" },
+                { label: "Email", name: "email" },
+                { label: "Phone", name: "phone" },
+                { label: "Industry", name: "industry" },
+                { label: "Founded Year", name: "founded_year", type: "date" },
+                { label: "Headquarter City", name: "headquarter_city" },
+                { label: "Address", name: "address" },
+                { label: "City", name: "city" },
+                { label: "Province", name: "province" },
+                { label: "Postal Code", name: "postal_code" },
+                { label: "Country", name: "country" },
+                { label: "Owner Name", name: "owner_name" },
+              ] as {
+                label: string;
+                name: keyof typeof formData;
+                type?: string;
+              }[]
+            ).map(({ label, name, type = "text" }) => (
               <div key={name}>
                 <label className="block text-sm font-medium text-gray-700">
                   {label}
@@ -109,7 +124,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                 <input
                   type={type}
                   name={name}
-                  value={(formData as any)[name]}
+                  value={formData[name]}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                   placeholder={`Input ${label}`}

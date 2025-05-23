@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from "next/link";
 import Main from "../General/Layout/Main";
