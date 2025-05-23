@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrands } from "@/service/brand/brandService";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
-export default function AddBrandForm() {
+type AddBrandFormProps = {
+  onClose: () => void;
+};
+
+export default function AddBrandForm({ onClose }: AddBrandFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState({
     brand_name: "",
-    logo_url: "", // bisa diganti dengan upload handling jika perlu
+    logo_url: "",
     description: "",
     website_url: "",
     email: "",
@@ -35,6 +42,7 @@ export default function AddBrandForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const token = localStorage.getItem("token");
     const company_id = localStorage.getItem("company_id");
@@ -52,12 +60,17 @@ export default function AddBrandForm() {
         company_id: parseInt(company_id),
       };
 
-      await createBrands(payload, token);
-      alert("Brand berhasil ditambahkan!");
-      router.push("/brand");
+      const response = await createBrands(payload, token);
+      console.log("Response dari server:", response.data);
+      console.log("Payload yang dikirim:", payload);
+      toastr.success("Data Brand Berhasil Ditambahkan.");
+      onClose();
+      router.refresh();
     } catch (error: any) {
-      console.error("Gagal menambahkan brand:", error);
-      alert("Gagal menambahkan brand");
+      console.error(error);
+      toastr.error("Gagal menambahkan brand:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,14 +82,18 @@ export default function AddBrandForm() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { label: "Brand Name", name: "brand_name" },
-              { label: "Employee Daily Point", name: "employee_daily_point" },
+              {
+                label: "Employee Daily Point",
+                name: "employee_daily_point",
+                type: "number",
+              },
               { label: "Logo URL", name: "logo_url" },
               { label: "Description", name: "description" },
               { label: "Website URL", name: "website_url" },
               { label: "Email", name: "email" },
               { label: "Phone", name: "phone" },
               { label: "Industry", name: "industry" },
-              { label: "Founded Year", name: "founded_year", type: "number" },
+              { label: "Founded Year", name: "founded_year", type: "date" },
               { label: "Headquarter City", name: "headquarter_city" },
               { label: "Address", name: "address" },
               { label: "City", name: "city" },
@@ -95,7 +112,7 @@ export default function AddBrandForm() {
                   value={(formData as any)[name]}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                  placeholder={`Enter ${label}`}
+                  placeholder={`Input ${label}`}
                   required
                 />
               </div>
@@ -105,12 +122,13 @@ export default function AddBrandForm() {
             <button
               type="submit"
               className="text-white px-4 py-2 rounded-2xl hover:bg-blue-700"
+              disabled={isLoading}
               style={{
                 background:
                   "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
               }}
             >
-              Add Brand
+              {isLoading ? "Menyimpan..." : "Simpan"}
             </button>
           </div>
         </form>

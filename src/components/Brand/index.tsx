@@ -172,7 +172,7 @@ export default function BrandPage() {
       </Main>
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <AddBrandForm />
+        <AddBrandForm onClose={closeModal} />
       </Modal>
     </div>
   );

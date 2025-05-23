@@ -16,8 +16,6 @@ export function fetchBrands(companyId: string, token: string) {
 }
 
 export function createBrands(data: any, token: string) {
-  // console.log("ini data:", data);
-  // console.log("ini token:", token);
   return axios.post(fullUrl, data, {
     headers: {
       "x-authorized-key": token,
