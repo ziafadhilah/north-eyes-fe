@@ -2,6 +2,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export default function Header() {
   const router = useRouter();
@@ -9,8 +11,12 @@ export default function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // sesuaikan key jika beda
-    router.push("/login"); // arahkan ke halaman login
+    localStorage.removeItem("token");
+    localStorage.removeItem("company");
+    localStorage.removeItem("company_id");
+    localStorage.removeItem("user_id");
+    toastr.success("Logout Successful");
+    router.replace("/login");
   };
 
   useEffect(() => {

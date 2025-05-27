@@ -1,7 +1,9 @@
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
-const extension_url = "/brands";
-const fullUrl = `${baseUrl}${extension_url}`;
+const extension_brand_url = "/brands";
+const extension_outlet_url = "/outlet";
+const brandUrl = `${baseUrl}${extension_brand_url}`;
+const outletUrl = `${baseUrl}${extension_outlet_url}`;
 
 export interface BrandPayload {
   brand_name: string;
@@ -26,7 +28,18 @@ export interface BrandPayload {
 export function fetchBrands(companyId: string, token: string) {
   const params = new URLSearchParams({ company_id: companyId });
 
-  return axios.get(fullUrl, {
+  return axios.get(brandUrl, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+    params: params,
+  });
+}
+
+export function fetchBrandsById(token: string, id: string) {
+  const params = new URLSearchParams({ brand_id: id });
+  return axios.get(outletUrl, {
     headers: {
       "x-authorized-key": token,
       "Content-Type": "application/json",
@@ -36,7 +49,7 @@ export function fetchBrands(companyId: string, token: string) {
 }
 
 export function createBrands(data: BrandPayload, token: string) {
-  return axios.post(fullUrl, data, {
+  return axios.post(brandUrl, data, {
     headers: {
       "x-authorized-key": token,
       "Content-Type": "application/json",
