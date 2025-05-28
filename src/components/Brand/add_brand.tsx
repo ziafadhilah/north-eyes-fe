@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -48,6 +49,19 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const maxSizeInMB = 2;
+    if (file.size > maxSizeInMB * 1024 * 1024) {
+      toastr.error(`Ukuran logo tidak boleh lebih dari ${maxSizeInMB}MB.`);
+      return;
+    }
+
+    // Validasi tipe file
+    // const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    // if (!allowedTypes.includes(file.type)) {
+    //   toastr.error("Format file harus JPG atau PNG.");
+    //   return;
+    // }
 
     setPreviewLogo(URL.createObjectURL(file));
     setLogoFile(file);
@@ -155,6 +169,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                 alt="Preview Logo"
                 className="mt-2 h-24 object-contain border rounded"
               />
+            )}
+            {logoFile && (
+              <p className="text-sm text-gray-600 mt-1">
+                File: {logoFile.name} ({(logoFile.size / 1024).toFixed(2)} KB)
+              </p>
             )}
           </div>
 

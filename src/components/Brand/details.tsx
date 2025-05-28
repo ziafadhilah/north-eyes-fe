@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import Sidebar from "../General/Layout/Sidebar";
 import { useParams } from "next/navigation";
-import Link from "next/link";
+// import Link from "next/link";
 import Main from "../General/Layout/Main";
 import Modal from "../General/Modal/Modal";
 import { useState, useEffect, useRef } from "react";
@@ -13,10 +12,10 @@ import { BrandData } from "@/constants/brandData";
 export default function BrandDetails() {
   const params = useParams();
   const id = params?.id as string;
-  const [brand, setBrand] = useState<BrandData[]>([]);
+  const [brand] = useState<BrandData[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null); //
+  const [, setActiveDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const openModal = () => setIsModalOpen(true);
