@@ -82,8 +82,10 @@ export default function LoginPage() {
       }}
     >
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-100 to-purple-800 opacity-80"></div>
+
       <div className="relative z-10 flex w-full h-full flex-col md:flex-row">
-        <div className="w-full md:w-1/2 flex items-center justify-center p-4">
+        {/* Left Side - Form */}
+        <div className="w-full md:w-1/2 flex items-center justify-center min-h-screen p-4">
           <div className="w-full max-w-xl p-8 rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-center mb-8">
               <span className="text-xl font-bold text-gray-800 mr-2">
@@ -148,10 +150,7 @@ export default function LoginPage() {
               )}
 
               <button
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleLogin();
-                }}
+                type="submit"
                 className="mt-2 mb-3 p-2 text-white rounded-md w-full bg-blue-700 hover:bg-blue-800"
               >
                 {isRegister ? "Register" : "Login"}
@@ -175,6 +174,7 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* Right Side - Carousel */}
         <div className="hidden md:flex w-full md:w-1/2 items-center justify-center text-white">
           <div className="text-center text-white">
             <h1 className="text-5xl font-semibold mb-4">North Eyes AI</h1>

@@ -5,16 +5,17 @@ import { useState, useRef, useEffect } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 
-export default function Header() {
+export default function Header({
+  onToggleSidebar,
+}: {
+  onToggleSidebar?: () => void;
+}) {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("company");
-    localStorage.removeItem("company_id");
-    localStorage.removeItem("user_id");
+    localStorage.clear();
     toastr.success("Logout Successful");
     router.replace("/login");
   };
@@ -33,39 +34,36 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-transparent p-1 flex justify-between items-center mb-4">
-      <div className="text-xl font-semibold text-black"></div>
-      <div className="flex items-center gap-4">
+    <header className="flex justify-between items-center mb-4">
+      {/* Hamburger for mobile */}
+      <button
+        className="md:hidden text-white text-3xl"
+        onClick={onToggleSidebar}
+      >
+        ☰
+      </button>
+
+      <div className="flex items-center gap-4 ml-auto">
+        {/* Icons */}
         <div
-          className="relative flex items-center justify-center w-10 h-10 rounded-md hover:bg-blue-300 transition duration-300 ease-in-out cursor-pointer"
+          className="w-10 h-10 rounded-md flex justify-center items-center cursor-pointer"
           style={{ backgroundColor: "rgba(0, 128, 128, 1)" }}
         >
-          <span
-            className="material-symbols-outlined"
-            style={{
-              color: "white",
-              fontSize: "30px",
-            }}
-          >
+          <span className="material-symbols-outlined text-white text-xl">
             circle_notifications
           </span>
         </div>
         <div
-          className="relative flex items-center justify-center w-10 h-10 rounded-md hover:bg-blue-300 transition duration-300 ease-in-out cursor-pointer"
+          className="w-10 h-10 rounded-md flex justify-center items-center cursor-pointer"
           style={{ backgroundColor: "rgba(212, 175, 55, 1)" }}
         >
-          <span
-            className="material-symbols-outlined"
-            style={{
-              color: "white",
-              fontSize: "28px",
-            }}
-          >
+          <span className="material-symbols-outlined text-white text-xl">
             settings
           </span>
         </div>
-        <div className="flex items-center gap-4 relative" ref={dropdownRef}>
-          {/* Avatar + Info */}
+
+        {/* User Info */}
+        <div className="relative" ref={dropdownRef}>
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -75,10 +73,10 @@ export default function Header() {
               alt="User Avatar"
               className="w-10 h-10 rounded-full border"
             />
-            <div className="flex flex-col">
+            <div className="hidden md:flex flex-col">
               <span className="text-gray-800 font-medium">User</span>
               <span
-                className="bg-blue-100 text-white text-xs font-medium px-2.5 py-0.5 rounded-md"
+                className="text-xs px-2 py-0.5 rounded-md text-white"
                 style={{ backgroundColor: "rgba(0, 128, 128, 1)" }}
               >
                 Super Admin
@@ -86,7 +84,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Dropdown */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-14 w-40 bg-white border rounded-md shadow-lg z-50">
               <button
