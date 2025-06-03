@@ -3,10 +3,10 @@
 
 import { useState } from "react";
 import { createBrands } from "@/service/brand/brandService";
+import { uploadLogoBrand } from "@/service/upload/uploadBrandService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
-import { uploadLogo } from "@/service/upload/uploadService";
 
 type AddBrandFormProps = {
   onClose: () => void;
@@ -54,18 +54,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
       return;
     }
 
-    // Validasi tipe file
-    // const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    // if (!allowedTypes.includes(file.type)) {
-    //   toastr.error("Format file harus JPG atau PNG.");
-    //   return;
-    // }
-
     setPreviewLogo(URL.createObjectURL(file));
     setLogoFile(file);
 
     try {
-      const result = await uploadLogo(file);
+      const result = await uploadLogoBrand(file);
       const uploadedUrl = result.logo_url || result.path;
       setFormData((prev) => ({
         ...prev,
@@ -100,7 +93,6 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
       };
 
       await createBrands(payload, token);
-      console.log(payload);
       toastr.success("Data Brand Berhasil Ditambahkan.");
       onClose();
       setTimeout(() => window.location.reload(), 500);

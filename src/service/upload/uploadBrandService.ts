@@ -5,7 +5,7 @@ export interface BrandPayload {
   logo_url: string;
 }
 
-export const uploadLogo = async (file: File) => {
+export const uploadLogoBrand = async (file: File) => {
   const formDataUpload = new FormData();
   formDataUpload.append("file", file);
 

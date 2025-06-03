@@ -89,6 +89,32 @@ export default function BrandPage() {
     };
   }, [isModalOpen]);
 
+  if (!brands) {
+    return (
+      <div>
+        <Main>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+            <button
+              onClick={openModal}
+              className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+            >
+              <div
+                className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
+                style={{
+                  background:
+                    "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
+                }}
+              >
+                <span className="material-symbols-outlined">add</span>
+              </div>
+              <p className="font-bold text-black">Add Brand</p>
+            </button>
+          </div>
+        </Main>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Main>
