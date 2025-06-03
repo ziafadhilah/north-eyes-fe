@@ -9,16 +9,19 @@ import { useRouter } from "next/navigation";
 import AddBrandForm from "./add_brand";
 import { BrandData } from "@/constants/brandData";
 import { fetchBrands } from "@/service/brand/brandService";
+import Pagination from "../General/Pagination/Pagination";
 
 export default function BrandPage() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
+  const [companyName, setCompanyName] = useState("");
+  const [brands, setBrands] = useState<BrandData[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
   const today = new Date();
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
   const dateTimeString = today.toLocaleString("en-US", {
@@ -29,28 +32,35 @@ export default function BrandPage() {
     year: "numeric",
   });
 
-  const [companyName, setCompanyName] = useState("");
-  const [brands, setBrands] = useState<BrandData[]>([]);
+  const loadBrands = (page: number) => {
+    const companyIdData = localStorage.getItem("company_id");
+    const token = localStorage.getItem("token");
+
+    fetchBrands(companyIdData || "", token || "", page)
+      .then((response) => {
+        if (response.data.status === "success") {
+          const responseData = response.data?.data;
+          setBrands(responseData?.data || []);
+          setTotalPages(responseData?.total || 1);
+        } else {
+          toastr.error("Error fetching brands");
+        }
+      })
+      .catch((error) => {
+        toastr.error("Error while fetching brands data:", error);
+      });
+  };
 
   useEffect(() => {
     const companyData = localStorage.getItem("company");
-    const companyIdData = localStorage.getItem("company_id");
     const token = localStorage.getItem("token");
     if (!companyData || !token) {
       router.push("/login");
       return;
     }
-
     setCompanyName(companyData || "Group Name");
-
-    fetchBrands(companyIdData || "", token)
-      .then((response) => {
-        setBrands(response.data?.data?.data || []);
-      })
-      .catch((error) => {
-        console.error("Error saat mengambil brand:", error);
-      });
-  }, []);
+    loadBrands(currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -101,11 +111,27 @@ export default function BrandPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+          {/* Tombol Add Brand */}
+          <button
+            onClick={openModal}
+            className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+          >
+            <div
+              className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
+              style={{
+                background:
+                  "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
+              }}
+            >
+              <span className="material-symbols-outlined">add</span>
+            </div>
+            <p className="font-bold text-black">Add Brand</p>
+          </button>
           {brands.map((data) => (
             <div key={data.brand_id} className="relative w-full max-w-sm">
               <Link
                 href={`brand/${data.brand_id}`}
-                className="p-4 cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
               >
                 <img
                   src={
@@ -163,24 +189,12 @@ export default function BrandPage() {
               )}
             </div>
           ))}
-
-          {/* Tombol Add Brand */}
-          <button
-            onClick={openModal}
-            className="w-full max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-          >
-            <div
-              className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
-              style={{
-                background:
-                  "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
-              }}
-            >
-              <span className="material-symbols-outlined">add</span>
-            </div>
-            <p className="font-bold text-black">Add Brand</p>
-          </button>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </Main>
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>

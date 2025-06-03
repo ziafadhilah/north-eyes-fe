@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createBrands } from "@/service/brand/brandService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -15,7 +14,6 @@ type AddBrandFormProps = {
 
 export default function AddBrandForm({ onClose }: AddBrandFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
@@ -105,7 +103,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
       console.log(payload);
       toastr.success("Data Brand Berhasil Ditambahkan.");
       onClose();
-      router.refresh();
+      setTimeout(() => window.location.reload(), 500);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toastr.error(

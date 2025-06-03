@@ -1,4 +1,4 @@
-import BrandDetails from "@/components/Brand/details";
+import BrandDetails from "@/components/Outlet";
 
 const Details: React.FC = () => {
   return <BrandDetails />;

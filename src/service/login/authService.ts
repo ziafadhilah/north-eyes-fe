@@ -8,6 +8,7 @@ export interface LoginResponse {
     user_id: string;
     company_name: string;
     company_id: string;
+    photo_url: string;
   };
 }
 

@@ -58,6 +58,7 @@ export default function LoginPage() {
         localStorage.setItem("user_id", result.data?.user_id ?? "");
         localStorage.setItem("company", result.data?.company_name ?? "");
         localStorage.setItem("company_id", result.data?.company_id ?? "");
+        localStorage.setItem("photo_url", result.data?.photo_url ?? "");
 
         router.push("/brand");
       } else {

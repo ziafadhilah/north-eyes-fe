@@ -25,8 +25,15 @@ export interface BrandPayload {
   company_id: number;
 }
 
-export function fetchBrands(companyId: string, token: string) {
-  const params = new URLSearchParams({ company_id: companyId });
+export function fetchBrands(
+  companyId: string,
+  token: string,
+  page: number = 1
+) {
+  const params = new URLSearchParams({
+    company_id: companyId,
+    page: page.toString(),
+  });
 
   return axios.get(brandUrl, {
     headers: {

@@ -1,4 +1,4 @@
-import OIndex from "@/components/Outlet/index";
+import OIndex from "@/components/Area/index";
 
 const OutletIndex: React.FC = () => {
   return <OIndex />;

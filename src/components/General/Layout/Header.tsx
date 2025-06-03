@@ -13,6 +13,13 @@ export default function Header({
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
+  const [, setCompanyPhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCompanyName(localStorage.getItem("company"));
+    setCompanyPhoto(localStorage.getItem("photo_url"));
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -35,7 +42,6 @@ export default function Header({
 
   return (
     <header className="flex justify-between items-center mb-4">
-      {/* Hamburger for mobile */}
       <button
         className="md:hidden text-white text-3xl"
         onClick={onToggleSidebar}
@@ -74,9 +80,11 @@ export default function Header({
               className="w-10 h-10 rounded-full border"
             />
             <div className="hidden md:flex flex-col">
-              <span className="text-gray-800 font-medium">User</span>
+              <span className="text-gray-800 font-medium uppercase">
+                {companyName}
+              </span>
               <span
-                className="text-xs px-2 py-0.5 rounded-md text-white"
+                className="text-center text-xs px-2 py-0.5 rounded-md text-white"
                 style={{ backgroundColor: "rgba(0, 128, 128, 1)" }}
               >
                 Super Admin
@@ -85,7 +93,7 @@ export default function Header({
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-14 w-40 bg-white border rounded-md shadow-lg z-50">
+            <div className="absolute right-0 w-40 bg-white border rounded-md shadow-lg z-50">
               <button
                 onClick={handleLogout}
                 className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
