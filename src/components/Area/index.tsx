@@ -133,7 +133,7 @@ export default function OIndex() {
             >
               <span className="material-symbols-outlined">add</span>
             </div>
-            <p className="font-bold text-black">Add Outlet</p>
+            <p className="font-bold text-black">Add Area</p>
           </button>
           {areas.map((data) => (
             <div key={data.area_id} className="relative w-full max-w-sm">
