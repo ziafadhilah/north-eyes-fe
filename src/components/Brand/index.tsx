@@ -156,7 +156,10 @@ export default function BrandPage() {
           {brands.map((data) => (
             <div key={data.brand_id} className="relative w-full max-w-sm">
               <Link
-                href={`brand/${data.brand_id}`}
+                href={{
+                  pathname: `/brand/${data.brand_id}`,
+                  query: { brand_name: data.brand_name },
+                }}
                 className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
               >
                 <img

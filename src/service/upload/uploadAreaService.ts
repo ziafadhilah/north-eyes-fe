@@ -1,11 +1,11 @@
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_UPLOAD_API_URL;
 
-export interface uploadOutletPayload {
+export interface uploadAreaPayload {
   logo_url: string;
 }
 
-export const uploadLogoOutlet = async (file: File) => {
+export const uploadLogoArea = async (file: File) => {
   const formDataUpload = new FormData();
   formDataUpload.append("file", file);
 
