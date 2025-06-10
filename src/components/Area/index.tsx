@@ -9,7 +9,7 @@ import { AreaData } from "@/constants/areaData";
 import { fetchareaByOutletId } from "@/service/area/areaService";
 import AddAreaForm from "./add_area";
 
-export default function OIndex() {
+export default function AreaPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const id = params?.id as string;
@@ -138,7 +138,14 @@ export default function OIndex() {
           {areas.map((data) => (
             <div key={data.area_id} className="relative w-full max-w-sm">
               <Link
-                href={`outlet/${data.area_id}`}
+                href={{
+                  pathname: `/brand/live-preview/${data.area_id}`,
+                  query: {
+                    outlet_name: outlet_name,
+                    brand_name: brand_name,
+                    area_name: data.area_name,
+                  },
+                }}
                 className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
               >
                 <img
@@ -170,6 +177,15 @@ export default function OIndex() {
                   ref={dropdownRef}
                   className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
                 >
+                  <Link
+                    href={`/area/${data.area_id}`}
+                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                  >
+                    <span className="material-symbols-outlined">
+                      visibility
+                    </span>
+                    Detail
+                  </Link>
                   <button
                     onClick={() => {
                       setActiveDropdown(null);

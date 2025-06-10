@@ -1,4 +1,4 @@
-import { CreateBrandData } from "@/constants/brandData";
+import { CreateBrandData, EditBrandData } from "@/constants/brandData";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
 const extension_brand_url = "/brands";
@@ -23,11 +23,33 @@ export function fetchBrands(
   });
 }
 
+export function detailBrands(token: string, id: string) {
+  return axios.get(`${brandUrl}/${id}`, {
+    headers: { "x-authorized-key": token, "Content-Type": "application/json" },
+  });
+}
+
 export function createBrands(data: CreateBrandData, token: string) {
   return axios.post(brandUrl, data, {
     headers: {
       "x-authorized-key": token,
       "Content-Type": "application/json",
+    },
+  });
+}
+
+export function updateBrands(data: EditBrandData, token: string, id: string) {
+  return axios.put(`${brandUrl}/${id}`, data, {
+    headers: {
+      "x-authorized-key": token,
+    },
+  });
+}
+
+export function deleteBrands(token: string, id: string) {
+  return axios.delete(`${brandUrl}/${id}`, {
+    headers: {
+      "x-authorized-key": token,
     },
   });
 }

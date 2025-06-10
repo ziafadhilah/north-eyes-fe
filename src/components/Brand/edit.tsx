@@ -1,47 +1,35 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-
 import { useState } from "react";
-import { createBrands } from "@/service/brand/brandService";
-import { uploadLogoBrand } from "@/service/upload/uploadBrandService";
+import { uploadLogoBrand } from "@/service/brand/uploadBrandService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
+import { EditBrandData } from "@/constants/brandData";
+import { updateBrands } from "@/service/brand/brandService";
 
-type AddBrandFormProps = {
+type EditBrandFormProps = {
+  brandData: EditBrandData;
   onClose: () => void;
 };
 
-export default function AddBrandForm({ onClose }: AddBrandFormProps) {
+export default function EditBrandForm({
+  brandData,
+  onClose,
+}: EditBrandFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [previewLogo, setPreviewLogo] = useState<string | null>(null);
+  const [previewLogo, setPreviewLogo] = useState<string | null>(
+    brandData.logo_url || null
+  );
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const [formData, setFormData] = useState({
-    brand_name: "",
-    logo_url: "",
-    description: "",
-    website_url: "",
-    email: "",
-    phone: "",
-    industry: "",
-    founded_year: "",
-    headquarter_city: "",
-    address: "",
-    city: "",
-    province: "",
-    postal_code: "",
-    country: "",
-    owner_name: "",
-    employee_daily_point: "",
-  });
+  const [formData, setFormData] = useState({ ...brandData });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,33 +65,34 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
-    const company_id = localStorage.getItem("company_id");
-
-    if (!token || !company_id) {
-      alert("Token atau Company ID tidak ditemukan.");
+    if (!token) {
+      alert("Token tidak ditemukan.");
       return;
     }
 
     try {
       const payload = {
         ...formData,
-        founded_year: parseInt(formData.founded_year),
-        employee_daily_point: parseInt(formData.employee_daily_point),
-        company_id: parseInt(company_id),
+        founded_year: formData.founded_year,
+        employee_daily_point: formData.employee_daily_point,
       };
 
-      await createBrands(payload, token);
-      toastr.success("Data Brand Berhasil Ditambahkan.");
-      onClose();
-      setTimeout(() => window.location.reload(), 500);
+      const res = await updateBrands(payload, token, brandData.brand_id);
+      if (res.data.status === "success") {
+        toastr.success("Brand data has been updated.");
+        onClose();
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        toastr.error("Failed to update brands. Please try again.");
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toastr.error(
-          "Gagal menambahkan brand.",
+          "Failed to update brand.",
           error.response?.data?.message || error.message
         );
       } else {
-        toastr.error("Gagal menambahkan brand.");
+        toastr.error("Failed to update brand.");
       }
     } finally {
       setIsLoading(false);
@@ -111,8 +100,8 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
   };
 
   return (
-    <div className="relative z-10">
-      <h2 className="text-xl font-bold text-black mb-4">Add New Brand</h2>
+    <div className="relative z-10 overflow-y-auto max-h-[90vh] p-4">
+      <h2 className="text-xl font-bold text-black mb-4">Edit Brand</h2>
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -129,6 +118,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Employee Daily Point
@@ -139,19 +129,23 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               value={formData.employee_daily_point}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-              placeholder="Input Employee Daily Point"
               required
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Logo
+            <label
+              htmlFor="logo-upload"
+              className="cursor-pointer px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 inline-block"
+            >
+              Choose Logo
             </label>
             <input
+              id="logo-upload"
               type="file"
               accept="image/*"
               onChange={handleLogoChange}
-              className="mt-1 block w-full"
+              className="hidden"
             />
             {previewLogo && (
               <img
@@ -171,23 +165,33 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
             <label className="block text-sm font-medium text-gray-700">
               Description
             </label>
-            <input
-              type="text"
+            <textarea
               name="description"
               value={formData.description}
-              onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              rows={4}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               placeholder="Input Description"
               required
             />
           </div>
+
           {(
             [
               { label: "Website URL", name: "website_url" },
               { label: "Email", name: "email" },
               { label: "Phone", name: "phone" },
               { label: "Industry", name: "industry" },
-              { label: "Founded Year", name: "founded_year", type: "date" },
+              {
+                label: "Founded Year",
+                name: "founded_year",
+                type: "year-select",
+              },
               { label: "Headquarter City", name: "headquarter_city" },
               { label: "Address", name: "address" },
               { label: "City", name: "city" },
@@ -201,15 +205,35 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               <label className="block text-sm font-medium text-gray-700">
                 {label}
               </label>
-              <input
-                type={type}
-                name={name}
-                value={formData[name]}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                placeholder={`Input ${label}`}
-                required
-              />
+              {type === "year-select" ? (
+                <select
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  required
+                >
+                  <option value="">Pilih Tahun</option>
+                  {Array.from({ length: 100 }, (_, i) => {
+                    const year = new Date().getFullYear() - i;
+                    return (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    );
+                  })}
+                </select>
+              ) : (
+                <input
+                  type={type}
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  placeholder={`Input ${label}`}
+                  required
+                />
+              )}
             </div>
           ))}
         </div>
@@ -224,7 +248,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                 "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
             }}
           >
-            {isLoading ? "Menyimpan..." : "Simpan"}
+            {isLoading ? "Menyimpan..." : "Update"}
           </button>
         </div>
       </form>

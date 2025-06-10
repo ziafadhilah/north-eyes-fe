@@ -1,7 +1,7 @@
-import LIndex from "@/components/Live-preview/index";
+import LivePreviewIndex from "@/components/Live-preview/index";
 
 const LiveIndex: React.FC = () => {
-  return <LIndex />;
+  return <LivePreviewIndex />;
 };
 
 export default LiveIndex;

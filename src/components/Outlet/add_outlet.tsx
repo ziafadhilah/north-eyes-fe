@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { createOutlet } from "@/service/outlet/outletService";
-import { uploadLogoOutlet } from "@/service/upload/uploadOutletService";
+import { uploadLogoOutlet } from "@/service/outlet/uploadOutletService";
 import { useState, useEffect } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -9,7 +9,7 @@ import axios from "axios";
 
 type AddOutletFormProps = {
   onClose: () => void;
-  brandId: string; // Tambahkan prop brandId
+  brandId: string;
 };
 
 export default function AddOutletForm({

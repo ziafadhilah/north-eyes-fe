@@ -9,11 +9,11 @@ import AddOutletForm from "./add_outlet";
 import Link from "next/link";
 import { OutletData } from "@/constants/outletData";
 
-export default function BrandDetails() {
+export default function OutletPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const id = params?.id as string;
-  const brand_name = searchParams.get("brand_name") as string;
+  const brand_name = searchParams.get("name") as string;
   const [outlets, setOutlets] = useState<OutletData[]>([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -129,7 +129,7 @@ export default function BrandDetails() {
             <div key={data.outlet_id} className="relative w-full max-w-sm">
               <Link
                 href={{
-                  pathname: `outlet/${data.outlet_id}`,
+                  pathname: `/brand/area/${data.outlet_id}`,
                   query: {
                     outlet_name: data.outlet_name,
                     brand_name: brand_name,
@@ -154,18 +154,27 @@ export default function BrandDetails() {
                   e.preventDefault();
                   e.stopPropagation();
                   setActiveDropdown(
-                    activeDropdown === data.brand_id ? null : data.brand_id
+                    activeDropdown === data.outlet_id ? null : data.outlet_id
                   );
                 }}
               >
                 <span className="material-symbols-outlined">more_vert</span>
               </div>
 
-              {activeDropdown === data.brand_id && (
+              {activeDropdown === data.outlet_id && (
                 <div
                   ref={dropdownRef}
                   className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
                 >
+                  <Link
+                    href={`/outlet/${data.outlet_id}`}
+                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                  >
+                    <span className="material-symbols-outlined">
+                      visibility
+                    </span>
+                    Detail
+                  </Link>
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
@@ -195,7 +204,6 @@ export default function BrandDetails() {
         </div>
       </Main>
 
-      {/* Modal Add Outlet */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <AddOutletForm onClose={closeModal} brandId={id} />
       </Modal>

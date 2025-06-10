@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { createArea } from "@/service/area/areaService";
-import { uploadLogoArea } from "@/service/upload/uploadAreaService";
+import { uploadLogoArea } from "@/service/area/uploadAreaService";
 import { useState, useEffect } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";

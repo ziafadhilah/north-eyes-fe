@@ -1,7 +1,7 @@
-import OIndex from "@/components/Area/index";
+import OutletPage from "@/components/Outlet";
 
 const OutletIndex: React.FC = () => {
-  return <OIndex />;
+  return <OutletPage />;
 };
 
 export default OutletIndex;

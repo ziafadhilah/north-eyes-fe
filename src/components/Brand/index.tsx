@@ -1,27 +1,58 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
+
 import Main from "@/components/General/Layout/Main";
 import Modal from "@/components/General/Modal/Modal";
+import Pagination from "@/components/General/Pagination/Pagination";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import AddBrandForm from "./add_brand";
+import AddBrandForm from "./add";
 import { BrandData } from "@/constants/brandData";
-import { fetchBrands } from "@/service/brand/brandService";
-import Pagination from "../General/Pagination/Pagination";
+import { deleteBrands, fetchBrands } from "@/service/brand/brandService";
+import BrandDetailPage from "./detail";
+import EditBrandForm from "./edit";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export default function BrandPage() {
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<BrandData | null>(null);
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+
   const [companyName, setCompanyName] = useState("");
   const [brands, setBrands] = useState<BrandData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+
+  const openAddModal = () => setIsAddModalOpen(true);
+  const closeAddModal = () => setIsAddModalOpen(false);
+
+  const openDetailModal = () => setIsDetailModalOpen(true);
+  const closeDetailModal = () => setIsDetailModalOpen(false);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [brandToEdit, setBrandToEdit] = useState<BrandData | null>(null);
+
+  const [brandToDelete, setBrandToDelete] = useState<BrandData | null>(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+
+  const openEditModal = (brand: BrandData) => {
+    setBrandToEdit(brand);
+    setActiveDropdown(null);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setBrandToEdit(null);
+  };
+
   const today = new Date();
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
   const dateTimeString = today.toLocaleString("en-US", {
@@ -41,7 +72,7 @@ export default function BrandPage() {
         if (response.data.status === "success") {
           const responseData = response.data?.data;
           setBrands(responseData?.data || []);
-          setTotalPages(responseData?.total || 1);
+          setTotalPages(responseData?.pages || 1);
         } else {
           toastr.error("Error fetching brands");
         }
@@ -49,6 +80,24 @@ export default function BrandPage() {
       .catch((error) => {
         toastr.error("Error while fetching brands data:", error);
       });
+  };
+
+  const handleDelete = async (brandId: string) => {
+    const token = localStorage.getItem("token") || "";
+
+    try {
+      const res = await deleteBrands(token, brandId);
+      if (res.data.status === "success") {
+        toastr.success("Brand deleted successfully");
+        setTimeout(() => window.location.reload(), 500);
+        loadBrands(currentPage);
+      } else {
+        toastr.error("Failed to delete brand");
+      }
+    } catch (error) {
+      toastr.error("Error occurred while deleting brand");
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -78,7 +127,7 @@ export default function BrandPage() {
   }, []);
 
   useEffect(() => {
-    if (isModalOpen) {
+    if (isAddModalOpen || isDetailModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -87,33 +136,13 @@ export default function BrandPage() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isModalOpen]);
+  }, [isAddModalOpen, isDetailModalOpen]);
 
-  if (!brands) {
-    return (
-      <div>
-        <Main>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-            <button
-              onClick={openModal}
-              className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-            >
-              <div
-                className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
-                style={{
-                  background:
-                    "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
-                }}
-              >
-                <span className="material-symbols-outlined">add</span>
-              </div>
-              <p className="font-bold text-black">Add Brand</p>
-            </button>
-          </div>
-        </Main>
-      </div>
-    );
-  }
+  const handleOpenDetail = (brand: BrandData) => {
+    setSelectedBrand(brand);
+    setActiveDropdown(null);
+    openDetailModal();
+  };
 
   return (
     <div>
@@ -136,10 +165,11 @@ export default function BrandPage() {
             </p>
           </div>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
           {/* Tombol Add Brand */}
           <button
-            onClick={openModal}
+            onClick={openAddModal}
             className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
           >
             <div
@@ -153,12 +183,13 @@ export default function BrandPage() {
             </div>
             <p className="font-bold text-black">Add Brand</p>
           </button>
+
           {brands.map((data) => (
             <div key={data.brand_id} className="relative w-full max-w-sm">
               <Link
                 href={{
-                  pathname: `/brand/${data.brand_id}`,
-                  query: { brand_name: data.brand_name },
+                  pathname: `brand/outlet/${data.brand_id}`,
+                  query: { name: data.brand_name },
                 }}
                 className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
               >
@@ -172,6 +203,7 @@ export default function BrandPage() {
                   className="w-50 h-50 mb-3"
                 />
                 <p className="font-bold text-black">{data.brand_name}</p>
+                <p className="text-black">{data.address}</p>
               </Link>
 
               <div
@@ -193,11 +225,17 @@ export default function BrandPage() {
                   className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
                 >
                   <button
-                    onClick={() => {
-                      setActiveDropdown(null);
-                      console.log("Edit", data.brand_name);
-                    }}
-                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-black"
+                    onClick={() => handleOpenDetail(data)}
+                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                  >
+                    <span className="material-symbols-outlined">
+                      visibility
+                    </span>
+                    Detail
+                  </button>
+                  <button
+                    onClick={() => openEditModal(data)}
+                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
                   >
                     <span className="material-symbols-outlined">
                       draft_orders
@@ -207,7 +245,8 @@ export default function BrandPage() {
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
-                      console.log("Delete", data.brand_name);
+                      setBrandToDelete(data);
+                      setIsConfirmDeleteOpen(true);
                     }}
                     className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
                   >
@@ -219,6 +258,7 @@ export default function BrandPage() {
             </div>
           ))}
         </div>
+
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -226,8 +266,56 @@ export default function BrandPage() {
         />
       </Main>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <AddBrandForm onClose={closeModal} />
+      <Modal isOpen={isAddModalOpen} onClose={closeAddModal}>
+        <AddBrandForm onClose={closeAddModal} />
+      </Modal>
+
+      <Modal isOpen={isDetailModalOpen} onClose={closeDetailModal}>
+        {selectedBrand ? (
+          <BrandDetailPage
+            brandId={selectedBrand.brand_id}
+            onClose={closeDetailModal}
+          />
+        ) : (
+          <p>Loading...</p>
+        )}
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+        {brandToEdit ? (
+          <EditBrandForm brandData={brandToEdit} onClose={closeEditModal} />
+        ) : (
+          <p>Loading...</p>
+        )}
+      </Modal>
+
+      <Modal
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+      >
+        <div className="p-2">
+          <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
+          <p className="mb-4">Are you sure you want to delete this brand?</p>
+          <div className="flex justify-end gap-4">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded-xl"
+              onClick={() => setIsConfirmDeleteOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-xl"
+              onClick={() => {
+                if (brandToDelete) {
+                  handleDelete(brandToDelete.brand_id);
+                  setIsConfirmDeleteOpen(false);
+                }
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
