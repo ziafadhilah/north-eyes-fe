@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { fetchOutletByBrandId } from "@/service/outlet/outletService";
+import {
+  deleteOutlet,
+  fetchOutletByBrandId,
+} from "@/service/outlet/outletService";
 import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Main from "../General/Layout/Main";
@@ -8,6 +11,10 @@ import Modal from "../General/Modal/Modal";
 import AddOutletForm from "./add_outlet";
 import Link from "next/link";
 import { OutletData } from "@/constants/outletData";
+import OutletDetailPage from "./detail";
+import EditOutletForm from "./edit";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export default function OutletPage() {
   const params = useParams();
@@ -16,12 +23,24 @@ export default function OutletPage() {
   const brand_name = searchParams.get("name") as string;
   const [outlets, setOutlets] = useState<OutletData[]>([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const openAddModal = () => setIsAddModalOpen(true);
+  const closeAddModal = () => setIsAddModalOpen(false);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const openDetailModal = () => setIsDetailModalOpen(true);
+  const closeDetailModal = () => setIsDetailModalOpen(false);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [outletToEdit, setOutletToEdit] = useState<OutletData | null>(null);
+
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [outletToDelete, setOutletToDelete] = useState<OutletData | null>(null);
+
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [selectedOutlet, setSelectedOutlet] = useState<OutletData | null>(null);
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const today = new Date();
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
@@ -55,11 +74,59 @@ export default function OutletPage() {
     if (token && companyId && id) {
       fetchOutletByBrandId(token, id)
         .then((res) => {
+          console.log(res.data.data.data);
           setOutlets(res.data?.data?.data || []);
         })
         .catch((err) => console.error("Error fetching brand:", err));
     }
   }, [id]);
+
+  useEffect(() => {
+    if (isAddModalOpen || isDetailModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isAddModalOpen, isDetailModalOpen]);
+
+  const handleDelete = async (outletId: string) => {
+    const token = localStorage.getItem("token") || "";
+
+    try {
+      const res = await deleteOutlet(token, outletId);
+      if (res.data.status === "success") {
+        toastr.success("Brand deleted successfully");
+        setTimeout(() => window.location.reload(), 1000);
+        // loadBrands(currentPage);
+      } else {
+        toastr.error("Failed to delete brand");
+      }
+    } catch (error) {
+      toastr.error("Error occurred while deleting brand");
+      console.error(error);
+    }
+  };
+
+  const openEditModal = (outlet: OutletData) => {
+    setOutletToEdit(outlet);
+    setActiveDropdown(null);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setOutletToEdit(null);
+  };
+
+  const handleOpenDetail = (outlet: OutletData) => {
+    setSelectedOutlet(outlet);
+    setActiveDropdown(null);
+    openDetailModal();
+  };
 
   return (
     <div>
@@ -111,7 +178,7 @@ export default function OutletPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
           <button
-            onClick={openModal}
+            onClick={openAddModal}
             className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
           >
             <div
@@ -166,21 +233,18 @@ export default function OutletPage() {
                   ref={dropdownRef}
                   className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
                 >
-                  <Link
-                    href={`/outlet/${data.outlet_id}`}
+                  <button
+                    onClick={() => handleOpenDetail(data)}
                     className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
                   >
                     <span className="material-symbols-outlined">
                       visibility
                     </span>
                     Detail
-                  </Link>
+                  </button>
                   <button
-                    onClick={() => {
-                      setActiveDropdown(null);
-                      console.log("Edit", data.outlet_name);
-                    }}
-                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-black"
+                    onClick={() => openEditModal(data)}
+                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
                   >
                     <span className="material-symbols-outlined">
                       draft_orders
@@ -190,7 +254,8 @@ export default function OutletPage() {
                   <button
                     onClick={() => {
                       setActiveDropdown(null);
-                      console.log("Delete", data.outlet_name);
+                      setOutletToDelete(data);
+                      setIsConfirmDeleteOpen(true);
                     }}
                     className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
                   >
@@ -204,8 +269,60 @@ export default function OutletPage() {
         </div>
       </Main>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <AddOutletForm onClose={closeModal} brandId={id} />
+      <Modal isOpen={isAddModalOpen} onClose={closeAddModal}>
+        <AddOutletForm onClose={closeAddModal} brandId={id} />
+      </Modal>
+
+      <Modal isOpen={isDetailModalOpen} onClose={closeDetailModal}>
+        {selectedOutlet ? (
+          <OutletDetailPage
+            outletId={selectedOutlet.outlet_id}
+            onClose={closeDetailModal}
+          />
+        ) : (
+          <p>Loading...</p>
+        )}
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+        {outletToEdit ? (
+          <EditOutletForm
+            outletData={outletToEdit}
+            onClose={closeEditModal}
+            brandId={id}
+          />
+        ) : (
+          <p>Loading...</p>
+        )}
+      </Modal>
+
+      <Modal
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+      >
+        <div className="p-2">
+          <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
+          <p className="mb-4">Are you sure you want to delete this outlet?</p>
+          <div className="flex justify-end gap-4">
+            <button
+              className="px-4 py-2 bg-gray-300 rounded-xl"
+              onClick={() => setIsConfirmDeleteOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-xl"
+              onClick={() => {
+                if (outletToDelete) {
+                  handleDelete(outletToDelete.outlet_id);
+                  setIsConfirmDeleteOpen(false);
+                }
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
