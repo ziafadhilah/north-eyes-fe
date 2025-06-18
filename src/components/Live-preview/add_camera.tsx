@@ -15,7 +15,7 @@ export default function AddCameraForm({ onClose, areaId }: AddCameraFormProps) {
   const [formData, setFormData] = useState({
     camera_name: "",
     camera_code: "",
-    rstv: "",
+    url: "",
     description: "",
     area_id: areaId,
   });
@@ -105,8 +105,8 @@ export default function AddCameraForm({ onClose, areaId }: AddCameraFormProps) {
               </label>
               <input
                 type="text"
-                name="rstv"
-                value={formData.rstv}
+                name="url"
+                value={formData.url}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Enter RTSP"

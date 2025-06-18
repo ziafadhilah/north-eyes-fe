@@ -68,7 +68,7 @@ export default function OutletPage() {
           <div className="flex items-center">
             <button
               onClick={() => window.history.back()}
-              className="flex items-center text-black"
+              className="flex items-center text-black transition-transform duration-300 ease-in-out hover:scale-120"
             >
               <span
                 className="material-symbols-outlined mr-5"

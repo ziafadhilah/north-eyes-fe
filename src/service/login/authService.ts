@@ -29,6 +29,6 @@ export const loginUser = async (
     return result;
   } catch (error) {
     console.error("Login error:", error);
-    throw new Error("Gagal terhubung ke server");
+    throw new Error("Failed to connect to server. Please try again.");
   }
 };

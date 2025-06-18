@@ -8,6 +8,7 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [currentText, setCurrentText] = useState(0);
   const [isRegister, setIsRegister] = useState(false);
@@ -49,6 +50,7 @@ export default function LoginPage() {
     }
 
     try {
+      setIsLoading(true);
       const result = await loginUser(identifier, password);
 
       if (result.status === "success") {
@@ -60,7 +62,9 @@ export default function LoginPage() {
         localStorage.setItem("company_id", result.data?.company_id ?? "");
         localStorage.setItem("photo_url", result.data?.photo_url ?? "");
 
-        router.push("/brand");
+        setTimeout(() => {
+          router.push("/brand");
+        }, 1000);
       } else {
         toastr.error("Login gagal : " + result.message);
       }
@@ -70,6 +74,7 @@ export default function LoginPage() {
       } else {
         setErrorMsg("Unexpected error occurred");
       }
+      setIsLoading(false);
     }
   };
 
@@ -85,7 +90,6 @@ export default function LoginPage() {
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-100 to-purple-800 opacity-80"></div>
 
       <div className="relative z-10 flex w-full h-full flex-col md:flex-row">
-        {/* Left Side - Form */}
         <div className="w-full md:w-1/2 flex items-center justify-center min-h-screen p-4">
           <div className="w-full max-w-xl p-8 rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-center mb-8">
@@ -150,28 +154,39 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <button
-                type="submit"
-                className="mt-2 mb-3 p-2 text-white rounded-md w-full bg-blue-700 hover:bg-blue-800"
-              >
-                {isRegister ? "Register" : "Login"}
-              </button>
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center mt-6">
+                  <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-sm text-gray-600 mt-3">
+                    Logging in, please wait...
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="submit"
+                    className="mt-2 mb-3 p-2 text-white rounded-md w-full bg-blue-700 hover:bg-blue-800"
+                  >
+                    {isRegister ? "Register" : "Login"}
+                  </button>
+
+                  {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
+
+                  <p className="text-sm text-gray-400 mb-4 text-center">
+                    {isRegister
+                      ? "Already have an account?"
+                      : "Don’t have an account?"}{" "}
+                    <button
+                      type="button"
+                      className="text-red-600 font-medium"
+                      onClick={() => setIsRegister(!isRegister)}
+                    >
+                      {isRegister ? "Login here" : "Register here"}
+                    </button>
+                  </p>
+                </>
+              )}
             </form>
-
-            {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
-
-            <p className="text-sm text-gray-400 mb-4 text-center">
-              {isRegister
-                ? "Already have an account?"
-                : "Don’t have an account?"}{" "}
-              <button
-                type="button"
-                className="text-red-600 font-medium"
-                onClick={() => setIsRegister(!isRegister)}
-              >
-                {isRegister ? "Login here" : "Register here"}
-              </button>
-            </p>
           </div>
         </div>
 

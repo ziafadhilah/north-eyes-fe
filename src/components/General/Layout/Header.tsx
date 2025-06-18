@@ -43,16 +43,15 @@ export default function Header({
   return (
     <header className="flex justify-between items-center mb-4">
       <button
-        className="md:hidden text-white text-3xl"
+        className="md:hidden text-white text-3xl transition-transform duration-300 ease-in-out hover:scale-120"
         onClick={onToggleSidebar}
       >
         ☰
       </button>
 
       <div className="flex items-center gap-4 ml-auto">
-        {/* Icons */}
         <div
-          className="w-10 h-10 rounded-md flex justify-center items-center cursor-pointer"
+          className="w-10 h-10 rounded-md flex justify-center items-center cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110"
           style={{ backgroundColor: "rgba(0, 128, 128, 1)" }}
         >
           <span className="material-symbols-outlined text-white text-xl">
@@ -60,7 +59,7 @@ export default function Header({
           </span>
         </div>
         <div
-          className="w-10 h-10 rounded-md flex justify-center items-center cursor-pointer"
+          className="w-10 h-10 rounded-md flex justify-center items-center cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110"
           style={{ backgroundColor: "rgba(212, 175, 55, 1)" }}
         >
           <span className="material-symbols-outlined text-white text-xl">
@@ -96,7 +95,7 @@ export default function Header({
             <div className="absolute right-0 w-40 bg-white border rounded-md shadow-lg z-50">
               <button
                 onClick={handleLogout}
-                className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
+                className="block w-full px-4 py-2 text-left text-sm text-red-600 rounded-md hover:bg-gray-100"
               >
                 Logout
               </button>

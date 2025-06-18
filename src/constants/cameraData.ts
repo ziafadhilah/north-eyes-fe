@@ -3,7 +3,7 @@ export interface CameraData {
   camera_name: string;
   camera_code: string;
   area_id: string;
-  rstv: string;
+  url: string;
   description: string;
   // tambahan bisa di comment nanti
   thumbnail: string;
@@ -19,6 +19,6 @@ export interface CreateCameraData {
   camera_name: string;
   camera_code: string;
   area_id: string;
-  rstv: string;
+  url: string;
   description: string;
 }

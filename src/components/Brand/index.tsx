@@ -17,6 +17,7 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 
 export default function BrandPage() {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -63,7 +64,8 @@ export default function BrandPage() {
     year: "numeric",
   });
 
-  const loadBrands = (page: number) => {
+  const loadBrands = async (page: number) => {
+    setIsLoading(true);
     const companyIdData = localStorage.getItem("company_id");
     const token = localStorage.getItem("token");
 
@@ -71,14 +73,19 @@ export default function BrandPage() {
       .then((response) => {
         if (response.data.status === "success") {
           const responseData = response.data?.data;
-          setBrands(responseData?.data || []);
-          setTotalPages(responseData?.pages || 1);
+          setTimeout(() => {
+            setBrands(responseData?.data || []);
+            setTotalPages(responseData?.pages || 1);
+          }, 2000);
         } else {
           toastr.error("Error fetching brands");
         }
       })
       .catch((error) => {
         toastr.error("Error while fetching brands data:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -145,7 +152,7 @@ export default function BrandPage() {
   };
 
   return (
-    <div>
+    <>
       <Main>
         <div className="flex items-start justify-between mb-3 w-full">
           <div className="flex items-center">
@@ -167,7 +174,6 @@ export default function BrandPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-          {/* Tombol Add Brand */}
           <button
             onClick={openAddModal}
             className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
@@ -184,79 +190,88 @@ export default function BrandPage() {
             <p className="font-bold text-black">Add Brand</p>
           </button>
 
-          {brands.map((data) => (
-            <div key={data.brand_id} className="relative w-full max-w-sm">
-              <Link
-                href={{
-                  pathname: `brand/outlet/${data.brand_id}`,
-                  query: { name: data.brand_name },
-                }}
-                className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-              >
-                <img
-                  src={
-                    data.logo_url
-                      ? data.logo_url
-                      : "/static/images/ex_brand.png"
-                  }
-                  alt={data.brand_name}
-                  className="w-50 h-50 mb-3"
-                />
-                <p className="font-bold text-black">{data.brand_name}</p>
-                <p className="text-black">{data.address}</p>
-              </Link>
-
-              <div
-                className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setActiveDropdown(
-                    activeDropdown === data.brand_id ? null : data.brand_id
-                  );
-                }}
-              >
-                <span className="material-symbols-outlined">more_vert</span>
-              </div>
-
-              {activeDropdown === data.brand_id && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
-                >
-                  <button
-                    onClick={() => handleOpenDetail(data)}
-                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
-                  >
-                    <span className="material-symbols-outlined">
-                      visibility
-                    </span>
-                    Detail
-                  </button>
-                  <button
-                    onClick={() => openEditModal(data)}
-                    className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
-                  >
-                    <span className="material-symbols-outlined">
-                      draft_orders
-                    </span>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveDropdown(null);
-                      setBrandToDelete(data);
-                      setIsConfirmDeleteOpen(true);
-                    }}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
-                  >
-                    <span className="material-symbols-outlined">delete</span>
-                    Delete
-                  </button>
-                </div>
-              )}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center mt-6">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-sm text-gray-600 mt-3">
+                Loading ... Please wait
+              </p>
             </div>
-          ))}
+          ) : (
+            brands.map((data) => (
+              <div key={data.brand_id} className="relative w-full max-w-sm">
+                <Link
+                  href={{
+                    pathname: `brand/outlet/${data.brand_id}`,
+                    query: { name: data.brand_name },
+                  }}
+                  className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                >
+                  <img
+                    src={
+                      data.logo_url
+                        ? data.logo_url
+                        : "/static/images/ex_brand.png"
+                    }
+                    alt={data.brand_name}
+                    className="w-50 h-50 mb-3"
+                  />
+                  <p className="font-bold text-black">{data.brand_name}</p>
+                  <p className="text-black">{data.address}</p>
+                </Link>
+
+                <div
+                  className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveDropdown(
+                      activeDropdown === data.brand_id ? null : data.brand_id
+                    );
+                  }}
+                >
+                  <span className="material-symbols-outlined">more_vert</span>
+                </div>
+
+                {activeDropdown === data.brand_id && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
+                  >
+                    <button
+                      onClick={() => handleOpenDetail(data)}
+                      className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                    >
+                      <span className="material-symbols-outlined">
+                        visibility
+                      </span>
+                      Detail
+                    </button>
+                    <button
+                      onClick={() => openEditModal(data)}
+                      className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
+                    >
+                      <span className="material-symbols-outlined">
+                        draft_orders
+                      </span>
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveDropdown(null);
+                        setBrandToDelete(data);
+                        setIsConfirmDeleteOpen(true);
+                      }}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+                    >
+                      <span className="material-symbols-outlined">delete</span>
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
 
         <Pagination
@@ -317,6 +332,6 @@ export default function BrandPage() {
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }

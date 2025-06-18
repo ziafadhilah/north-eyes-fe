@@ -131,19 +131,35 @@ export default function AddAreaForm({ onClose, outletId }: AddAreaFormProps) {
               <label className="block text-sm font-medium text-gray-700">
                 Image Cover
               </label>
+
               <input
+                id="logo-upload"
                 type="file"
                 accept="image/*"
                 onChange={handleLogoChange}
-                className="mt-1 block w-full"
+                className="hidden"
               />
-              {previewLogo && (
-                <img
-                  src={previewLogo}
-                  alt="Preview Logo"
-                  className="mt-2 h-24 object-contain border rounded"
-                />
-              )}
+
+              <label
+                htmlFor="logo-upload"
+                className="mt-1 flex items-center justify-center h-30 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 transition"
+              >
+                {previewLogo ? (
+                  <img
+                    src={previewLogo}
+                    alt="Preview Logo"
+                    className="object-contain max-h-full max-w-full"
+                  />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <span className="material-symbols-outlined text-5xl text-gray-400">
+                      add_photo_alternate
+                    </span>
+                    <p className="text-sm mt-1">Upload Cover</p>
+                  </div>
+                )}
+              </label>
+
               {logoFile && (
                 <p className="text-sm text-gray-600 mt-1">
                   File: {logoFile.name} ({(logoFile.size / 1024).toFixed(2)} KB)

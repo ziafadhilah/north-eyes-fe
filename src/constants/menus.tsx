@@ -10,7 +10,7 @@ export const menus: Menu[] = [
     id: "dashboard",
     name: "Dashboard",
     icon: <span className="material-symbols-outlined">dashboard</span>,
-    url: "/home",
+    url: "/dashboard",
   },
   {
     id: "brand",

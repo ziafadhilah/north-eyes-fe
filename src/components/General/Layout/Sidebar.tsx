@@ -29,7 +29,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
             <li key={menu.id} className="mb-2">
               <Link
                 href={menu.url}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-blue-900 ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-blue-900 transition-transform duration-300 ease-in-out hover:scale-110 ${
                   isActive ? "is-active-menu" : ""
                 }`}
                 onClick={onClose}
