@@ -3,7 +3,7 @@ export interface AreaData {
   logo_url: string;
   outlet_id: string;
   description: string;
-  area_id: number;
+  area_id: string;
 }
 
 export interface CreateAreaData {
@@ -11,4 +11,12 @@ export interface CreateAreaData {
   logo_url: string;
   outlet_id: string;
   description: string;
+}
+
+export interface EditAreaData {
+  area_name: string;
+  logo_url: string;
+  outlet_id: string;
+  description: string;
+  area_id: string;
 }

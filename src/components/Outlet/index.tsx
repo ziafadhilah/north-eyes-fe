@@ -99,14 +99,14 @@ export default function OutletPage() {
     try {
       const res = await deleteOutlet(token, outletId);
       if (res.data.status === "success") {
-        toastr.success("Brand deleted successfully");
+        toastr.success("Outlet deleted successfully");
         setTimeout(() => window.location.reload(), 1000);
         // loadBrands(currentPage);
       } else {
-        toastr.error("Failed to delete brand");
+        toastr.error("Failed to delete outlet");
       }
     } catch (error) {
-      toastr.error("Error occurred while deleting brand");
+      toastr.error("Error occurred while deleting outlet");
       console.error(error);
     }
   };

@@ -1,4 +1,4 @@
-import { CreateAreaData } from "@/constants/areaData";
+import { CreateAreaData, EditAreaData } from "@/constants/areaData";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
 const extension_area_url = "/area";
@@ -20,6 +20,28 @@ export function createArea(data: CreateAreaData, token: string) {
     headers: {
       "x-authorized-key": token,
       "Content-Type": "application/json",
+    },
+  });
+}
+
+export function detailAreas(token: string, id: string) {
+  return axios.get(`${areaUrl}/${id}`, {
+    headers: { "x-authorized-key": token, "Content-Type": "application/json" },
+  });
+}
+
+export function updateAreas(data: EditAreaData, token: string, id: string) {
+  return axios.put(`${areaUrl}/${id}`, data, {
+    headers: {
+      "x-authorized-key": token,
+    },
+  });
+}
+
+export function deleteArea(token: string, id: string) {
+  return axios.delete(`${areaUrl}/${id}`, {
+    headers: {
+      "x-authorized-key": token,
     },
   });
 }
