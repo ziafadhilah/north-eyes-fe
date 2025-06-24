@@ -53,7 +53,7 @@ export default function LIndex() {
   useLiveStream(
     mainCamera ? mainCamera.camera_id : "0",
     drawImage,
-    "https://northeyes-be.ide.asia"
+    "http://northeyes-be.ide.asia"
   );
 
   useEffect(() => {
