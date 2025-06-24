@@ -3,10 +3,13 @@ import Link from "next/link";
 import Main from "@/components/General/Layout/Main";
 import Modal from "@/components/General/Modal/Modal";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AddCameraForm from "./add_camera";
 import { CameraData } from "@/constants/cameraData";
-import { fetchCameraByAreaId } from "@/service/camera/cameraService";
+import {
+  fetchCameraByAreaId,
+  useLiveStream,
+} from "@/service/camera/cameraService";
 
 export default function LIndex() {
   const params = useParams();
@@ -32,6 +35,26 @@ export default function LIndex() {
     month: "long",
     year: "numeric",
   });
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const drawImage = useCallback((imgData: string) => {
+    const ctx = canvasRef.current?.getContext("2d");
+    if (ctx) {
+      const img = new Image();
+      img.src = "data:image/jpeg;base64," + imgData;
+      img.onload = () => {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+      };
+    }
+  }, []);
+
+  useLiveStream(
+    mainCamera ? mainCamera.camera_id : "0",
+    drawImage,
+    "https://northeyes-be.ide.asia"
+  );
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -140,20 +163,16 @@ export default function LIndex() {
             <p className="font-bold text-black mb-3 text-2xl">
               {mainCamera.camera_name}
             </p>
-            <div
-              className="rounded-xl shadow-xl w-full h-[400px]"
-              style={{
-                backgroundImage: `url('${
-                  mainCamera.thumbnail || "/static/images/bg_login.png"
-                }')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
+            <div className="rounded-xl shadow-xl w-full h-[400px] relative">
+              <canvas
+                ref={canvasRef}
+                width={800}
+                height={400}
+                className="rounded-xl w-full h-full"
+              ></canvas>
               <Link
                 href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
-                className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 flex items-center justify-center"
-                style={{ background: "rgba(0, 128, 128, 1)" }}
+                className="absolute top-3 right-3 bg-teal-600 p-2 rounded-full shadow-md hover:bg-teal-500 flex items-center justify-center"
                 title="Settings"
               >
                 <span className="material-symbols-outlined text-white">

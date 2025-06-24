@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
@@ -6,6 +7,8 @@ import { useEffect, useState } from "react";
 import { loginUser } from "@/service/login/authService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import { registerUser } from "@/service/login/registerService";
+import { RegisterData } from "@/constants/registerData";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +18,9 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const carouselTexts = [
     "Empowering your decisions through AI-driven insights.",
@@ -78,6 +84,41 @@ export default function LoginPage() {
     }
   };
 
+  const handleRegister = async () => {
+    if (!fullName || !email || !identifier || !password || !phoneNumber) {
+      toastr.error("All field must be filled for registration");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const payload: RegisterData = {
+        full_name: fullName,
+        email: email,
+        username: identifier,
+        password_hash: password,
+        phone_number: phoneNumber,
+        profile_picture_url: "test",
+      };
+      const res = await registerUser(payload);
+
+      if (res.data.status === "success") {
+        toastr.success("Register success. Please Login.");
+        setFullName("");
+        setEmail("");
+        setPhoneNumber("");
+        setPassword("");
+        setIdentifier("");
+        setIsRegister(false);
+      } else {
+        toastr.error(res.data.message || "Failed to register.");
+      }
+    } catch (error) {
+      toastr.error("An error occurred while registering");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div
       className="relative h-screen flex flex-col md:flex-row bg-cover bg-center"
@@ -119,13 +160,33 @@ export default function LoginPage() {
                   placeholder="Enter your full name here"
                   className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
                 />
+                <label className="text-gray-700 text-sm">Email:</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                />
+                <label className="text-gray-700 text-sm">Phone Number:</label>
+                <input
+                  type="text"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="Input phone number"
+                  className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                />
               </>
             )}
 
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleLogin();
+                if (isRegister) {
+                  handleRegister();
+                } else {
+                  handleLogin();
+                }
               }}
             >
               <label className="text-gray-700 text-sm">Username:</label>
@@ -178,7 +239,7 @@ export default function LoginPage() {
                       : "Don’t have an account?"}{" "}
                     <button
                       type="button"
-                      className="text-red-600 font-medium"
+                      className="text-red-600 font-medium cursor-pointer"
                       onClick={() => setIsRegister(!isRegister)}
                     >
                       {isRegister ? "Login here" : "Register here"}
