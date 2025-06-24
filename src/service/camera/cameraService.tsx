@@ -31,39 +31,31 @@ export function useLiveStream(
   drawImage: (imgData: string) => void,
   cameraUrl1: string
 ) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // console.log(camera_id);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    const ctx = canvasRef.current?.getContext("2d");
-    const socket = io(cameraUrl1);
+    if (!camera_id || camera_id === "0") return;
 
+    const socket = io(cameraUrl1);
     socketRef.current = socket;
 
     socket.on("connect", () => {
-      socket.emit("event", { cmd: "request_streaming", camera_id });
+      socket.emit("event", { cmd: "request_streaming", channel: camera_id });
     });
 
-    socket.on("vms_data", (data) => {
+    socket.on("vms_data", (data: string) => {
       const res = JSON.parse(data);
-      console.log(res);
-      const img = new Image();
-      img.src = res?.image;
-      img.onload = () => {
-        ctx?.clearRect(0, 0, 500, 300); // optional
-        ctx?.drawImage(img, 0, 0, 500, 300);
-      };
-      // if (res[0]?.idcamera === camera_id) {
-      // }
+      if (res[0]?.idcamera == camera_id) {
+        drawImage(res[0].img); // pakai callback drawImage
+      }
     });
 
     return () => {
       if (socket.connected) {
-        socket.emit("event", { cmd: "stop_streaming", camera_id });
+        socket.emit("event", { cmd: "stop_streaming", channel: camera_id });
       }
       socket.disconnect();
     };
-  }, [cameraUrl1, camera_id, drawImage]);
-
-  return canvasRef;
+  }, [camera_id, cameraUrl1, drawImage]);
 }
