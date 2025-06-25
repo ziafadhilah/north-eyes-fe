@@ -28,16 +28,16 @@ export function createCamera(data: CreateCameraData, token: string) {
 
 export function useLiveStream(
   camera_id: string,
-  drawImage: (imgData: string) => void,
-  cameraUrl1: string
+  drawImage: (imgData: string) => void
 ) {
   // console.log(camera_id);
   const socketRef = useRef<Socket | null>(null);
+  const webUrl = "http://68.183.239.230:5001";
 
   useEffect(() => {
     if (!camera_id || camera_id === "0") return;
 
-    const socket = io(cameraUrl1);
+    const socket = io(webUrl);
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -57,5 +57,5 @@ export function useLiveStream(
       }
       socket.disconnect();
     };
-  }, [camera_id, cameraUrl1, drawImage]);
+  }, [camera_id, drawImage]);
 }

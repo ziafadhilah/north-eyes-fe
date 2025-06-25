@@ -50,11 +50,7 @@ export default function LIndex() {
     }
   }, []);
 
-  useLiveStream(
-    mainCamera ? mainCamera.camera_id : "0",
-    drawImage,
-    "http://68.183.239.230:5001"
-  );
+  useLiveStream(mainCamera ? mainCamera.camera_id : "0", drawImage);
 
   useEffect(() => {
     const token = localStorage.getItem("token");

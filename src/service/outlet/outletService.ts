@@ -4,8 +4,12 @@ const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
 const extension_outlet_url = "/outlet";
 const outletUrl = `${baseUrl}${extension_outlet_url}`;
 
-export function fetchOutletByBrandId(token: string, id: string) {
-  const params = new URLSearchParams({ brand_id: id });
+export function fetchOutletByBrandId(
+  token: string,
+  id: string,
+  page: number = 1
+) {
+  const params = new URLSearchParams({ brand_id: id, page: page.toString() });
   return axios.get(outletUrl, {
     headers: {
       "x-authorized-key": token,

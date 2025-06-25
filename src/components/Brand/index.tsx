@@ -76,15 +76,15 @@ export default function BrandPage() {
           setTimeout(() => {
             setBrands(responseData?.data || []);
             setTotalPages(responseData?.pages || 1);
+            setIsLoading(false);
           }, 2000);
         } else {
           toastr.error("Error fetching brands");
+          setIsLoading(false);
         }
       })
       .catch((error) => {
         toastr.error("Error while fetching brands data:", error);
-      })
-      .finally(() => {
         setIsLoading(false);
       });
   };
