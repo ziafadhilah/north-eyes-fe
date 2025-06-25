@@ -22,7 +22,15 @@ export default function AddSlugForm({ onClose }: AddSlugFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "slug") {
+      let newValue = value.replace(/\s+/g, "-");
+      newValue = newValue.replace(/[^a-zA-Z0-9\-./]/g, "");
+      newValue = newValue.toLowerCase();
+
+      setFormData((prev) => ({ ...prev, slug: newValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,8 +84,8 @@ export default function AddSlugForm({ onClose }: AddSlugFormProps) {
                 type="text"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Enter Slug Name"
-                name="slug"
-                value={formData.slug}
+                name="slug_name"
+                value={formData.slug_name}
                 onChange={handleChange}
               />
             </div>
@@ -89,8 +97,8 @@ export default function AddSlugForm({ onClose }: AddSlugFormProps) {
                 type="text"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Enter Slug URL"
-                name="slug_name"
-                value={formData.slug_name}
+                name="slug"
+                value={formData.slug}
                 onChange={handleChange}
               />
             </div>
