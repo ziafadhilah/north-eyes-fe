@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { loginUser } from "@/service/login/authService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -13,6 +13,7 @@ import { RegisterData } from "@/constants/registerData";
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const userNameRef = useRef<HTMLInputElement>(null);
   const [currentText, setCurrentText] = useState(0);
   const [isRegister, setIsRegister] = useState(false);
   const [identifier, setIdentifier] = useState("");
@@ -33,6 +34,12 @@ export default function LoginPage() {
       setCurrentText((prev) => (prev + 1) % carouselTexts.length);
     }, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (userNameRef.current) {
+      userNameRef.current.focus();
+    }
   }, []);
 
   const goToSlide = (index: number) => {
@@ -69,7 +76,7 @@ export default function LoginPage() {
         localStorage.setItem("photo_url", result.data?.photo_url ?? "");
 
         setTimeout(() => {
-          router.push("/brand");
+          router.push("/dashboard");
         }, 1000);
       } else {
         toastr.error("Login gagal : " + result.message);
@@ -191,6 +198,7 @@ export default function LoginPage() {
             >
               <label className="text-gray-700 text-sm">Username:</label>
               <input
+                ref={userNameRef}
                 type="text"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}

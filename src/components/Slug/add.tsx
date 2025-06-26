@@ -1,7 +1,7 @@
 "use client";
 
 import { createSlug } from "@/service/slug/slugService";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
@@ -11,6 +11,7 @@ type AddSlugFormProps = {
 };
 
 export default function AddSlugForm({ onClose }: AddSlugFormProps) {
+  const slugNameRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -70,6 +71,12 @@ export default function AddSlugForm({ onClose }: AddSlugFormProps) {
     }
   };
 
+  useEffect(() => {
+    if (slugNameRef.current) {
+      slugNameRef.current.focus();
+    }
+  }, []);
+
   return (
     <>
       <div className="relative z-10">
@@ -81,6 +88,7 @@ export default function AddSlugForm({ onClose }: AddSlugFormProps) {
                 Slug Name
               </label>
               <input
+                ref={slugNameRef}
                 type="text"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Enter Slug Name"

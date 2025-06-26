@@ -1,5 +1,5 @@
 "use client";
-import Main from "@/components/General/Layout/Main";
+// import Main from "@/components/General/Layout/Main";
 import {
   BarChart,
   Bar,
@@ -12,6 +12,8 @@ import {
   Cell,
 } from "recharts";
 import { useEffect, useState } from "react";
+import Sidebar from "@/components/General/Layout/Sidebar";
+import Header from "@/components/General/Layout/Header";
 
 type BarDataItem = {
   name: string;
@@ -59,6 +61,7 @@ const pieColors = ["#B0D8D8", "#FFDD6D", "#B8BDD1"];
 const ITEMS_PER_PAGE = 10;
 
 export default function DashboardPage() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [employeeData, setEmployeeData] = useState<
     Record<string, { name: string; point: number }[]>
   >({});
@@ -96,13 +99,42 @@ export default function DashboardPage() {
     .slice(startIndex, endIndex);
 
   return (
-    <div>
-      <Main>
-        <h1 className="text-3xl text-black font-bold mb-10">Hi, Group A!</h1>
+    <div
+      className="flex flex-col md:flex-row min-h-screen"
+      style={{
+        background: "linear-gradient(180deg, #A7CBF0 0%, #1A2A6C 100%)",
+      }}
+    >
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? "block" : "hidden"} md:block`}>
+        <Sidebar onClose={() => setSidebarOpen(false)} />
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col p-4">
+        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl text-white font-bold">Hi, Group A!</h1>
+            <h2 className="text-xl text-white">This the Dashboard of you</h2>
+          </div>
+          <div className="flex gap-4">
+            <button className="border border-blue-500 bg-white text-blue-600 px-4 py-2 rounded-xl hover:bg-blue-600 transition flex items-center justify-center">
+              Download&nbsp;
+              <span className="material-symbols-outlined">download</span>
+            </button>
+            <button className="bg-white text-blue-600 px-4 py-2 border border-blue-500 rounded-xl hover:bg-gray-100 transition flex items-center justify-center">
+              Date&nbsp;
+              <span className="material-symbols-outlined">event_available</span>
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Bar Chart */}
           <div className="bg-white rounded-2xl shadow-md p-6 h-100">
-            <h2 className="text-xl font-semibold mb-4">Violation Chart</h2>
+            <h2 className="text-xl font-semibold text-center mb-4 bg-title-chart">
+              Violation Chart
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
                 data={barData}
@@ -124,7 +156,9 @@ export default function DashboardPage() {
 
           {/* Pie Chart */}
           <div className="bg-white rounded-2xl shadow-md p-6 h-100">
-            <h2 className="text-xl font-semibold mb-4">Violation Diagram</h2>
+            <h2 className="text-xl font-semibold text-center mb-4 bg-title-diagram">
+              Violation Diagram
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart margin={{ top: 20, right: 30, left: 20, bottom: 0 }}>
                 <Pie
@@ -149,7 +183,9 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="bg-white rounded-2xl shadow-md p-6 mt-6">
-          <h2 className="text-xl font-semibold mb-4">Top 10 Employee Point</h2>
+          <h2 className="text-2xl text-center font-bold mb-4 bg-top-10">
+            Top 10 Employee Points
+          </h2>
           <div className="flex gap-4 mb-4">
             {brands.map((brand) => (
               <button
@@ -202,7 +238,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </Main>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createBrands } from "@/service/brand/brandService";
 import { uploadLogoBrand } from "@/service/brand/uploadBrandService";
 import toastr from "toastr";
@@ -13,6 +13,7 @@ type AddBrandFormProps = {
 };
 
 export default function AddBrandForm({ onClose }: AddBrandFormProps) {
+  const autoFocusRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -110,6 +111,12 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     }
   };
 
+  useEffect(() => {
+    if (autoFocusRef.current) {
+      autoFocusRef.current.focus();
+    }
+  }, []);
+
   return (
     <div className="relative z-10 overflow-y-auto max-h-[90vh] p-4">
       <h2 className="text-xl font-bold text-black mb-4">Add New Brand</h2>
@@ -120,6 +127,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               Brand Name
             </label>
             <input
+              ref={autoFocusRef}
               type="text"
               name="brand_name"
               value={formData.brand_name}

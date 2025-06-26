@@ -2,7 +2,7 @@
 "use client";
 import { createArea } from "@/service/area/areaService";
 import { uploadLogoArea } from "@/service/area/uploadAreaService";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
@@ -13,6 +13,7 @@ type AddAreaFormProps = {
 };
 
 export default function AddAreaForm({ onClose, outletId }: AddAreaFormProps) {
+  const autoFocusRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -96,6 +97,12 @@ export default function AddAreaForm({ onClose, outletId }: AddAreaFormProps) {
     setFormData((prev) => ({ ...prev, outlet_id: outletId }));
   }, [outletId]);
 
+  useEffect(() => {
+    if (autoFocusRef.current) {
+      autoFocusRef.current.focus();
+    }
+  }, []);
+
   return (
     <>
       <div className="relative z-10">
@@ -117,6 +124,7 @@ export default function AddAreaForm({ onClose, outletId }: AddAreaFormProps) {
                   {label}
                 </label>
                 <input
+                  ref={name === "area_name" ? autoFocusRef : undefined}
                   type={type}
                   name={name}
                   value={formData[name]}

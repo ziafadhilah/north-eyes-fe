@@ -63,3 +63,18 @@
 .is-active-menu-text {
   color: var(--ne-primary-blue, rgba(26, 42, 108, 1));
 }
+
+.bg-top-10 {
+  background: #e6f2f2;
+  border-radius: 10px;
+}
+
+.bg-title-chart {
+  background: #ebf2ff;
+  border-radius: 10px;
+}
+
+.bg-title-diagram {
+  background: #e8eaf0;
+  border-radius: 10px;
+}

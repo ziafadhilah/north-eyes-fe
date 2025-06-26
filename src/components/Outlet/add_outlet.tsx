@@ -2,7 +2,7 @@
 "use client";
 import { createOutlet } from "@/service/outlet/outletService";
 import { uploadLogoOutlet } from "@/service/outlet/uploadOutletService";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
@@ -16,6 +16,7 @@ export default function AddOutletForm({
   onClose,
   brandId,
 }: AddOutletFormProps) {
+  const autoFocusRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -108,6 +109,12 @@ export default function AddOutletForm({
     setFormData((prev) => ({ ...prev, brand_id: brandId }));
   }, [brandId]);
 
+  useEffect(() => {
+    if (autoFocusRef.current) {
+      autoFocusRef.current.focus();
+    }
+  }, []);
+
   return (
     <>
       <div className="relative z-10">
@@ -135,6 +142,7 @@ export default function AddOutletForm({
                   {label}
                 </label>
                 <input
+                  ref={name === "outlet_name" ? autoFocusRef : undefined}
                   type={type}
                   name={name}
                   value={formData[name]}

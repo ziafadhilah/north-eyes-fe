@@ -2,7 +2,7 @@
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createCamera } from "@/service/camera/cameraService";
 
 type AddCameraFormProps = {
@@ -11,6 +11,7 @@ type AddCameraFormProps = {
 };
 
 export default function AddCameraForm({ onClose, areaId }: AddCameraFormProps) {
+  const autoFocusRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     camera_name: "",
@@ -65,6 +66,12 @@ export default function AddCameraForm({ onClose, areaId }: AddCameraFormProps) {
     setFormData((prev) => ({ ...prev, area_id: areaId }));
   }, [areaId]);
 
+  useEffect(() => {
+    if (autoFocusRef.current) {
+      autoFocusRef.current.focus();
+    }
+  }, []);
+
   return (
     <>
       <div className="relative z-10">
@@ -76,6 +83,7 @@ export default function AddCameraForm({ onClose, areaId }: AddCameraFormProps) {
                 Camera Name
               </label>
               <input
+                ref={autoFocusRef}
                 type="text"
                 name="camera_name"
                 value={formData.camera_name}
