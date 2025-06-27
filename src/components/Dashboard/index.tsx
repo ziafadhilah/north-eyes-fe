@@ -14,6 +14,9 @@ import {
 import { useEffect, useState } from "react";
 import Sidebar from "@/components/General/Layout/Sidebar";
 import Header from "@/components/General/Layout/Header";
+import { useRouter } from "next/navigation";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 type BarDataItem = {
   name: string;
@@ -61,6 +64,7 @@ const pieColors = ["#B0D8D8", "#FFDD6D", "#B8BDD1"];
 const ITEMS_PER_PAGE = 10;
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [employeeData, setEmployeeData] = useState<
     Record<string, { name: string; point: number }[]>
@@ -87,6 +91,57 @@ export default function DashboardPage() {
     };
     setEmployeeData(generateData());
   }, []);
+
+  useEffect(() => {
+    // const TIMEOUT = 2000;
+    const TIMEOUT = 10 * 60 * 1000;
+    let timeoutId: NodeJS.Timeout;
+
+    const logout = () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("company");
+      localStorage.removeItem("company_id");
+      localStorage.removeItem("photo_url");
+      localStorage.removeItem("lastActivity");
+
+      toastr.options = {
+        timeOut: 10000,
+        extendedTimeOut: 2000,
+        closeButton: true,
+        progressBar: true,
+      };
+
+      toastr.info("You've been logged out due to 10 minutes of inactivity.");
+      router.push("/login");
+    };
+
+    const resetTimer = () => {
+      localStorage.setItem("lastActivity", Date.now().toString());
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(logout, TIMEOUT);
+    };
+
+    const last = localStorage.getItem("lastActivity");
+    if (last && Date.now() - parseInt(last, 10) > TIMEOUT) {
+      logout();
+      return;
+    }
+
+    const activityEvents = ["mousemove", "keydown", "click", "scroll"];
+    activityEvents.forEach((event) =>
+      window.addEventListener(event, resetTimer)
+    );
+
+    timeoutId = setTimeout(logout, TIMEOUT);
+
+    return () => {
+      activityEvents.forEach((event) =>
+        window.removeEventListener(event, resetTimer)
+      );
+      clearTimeout(timeoutId);
+    };
+  }, [router]);
 
   if (Object.keys(employeeData).length === 0) return null;
 

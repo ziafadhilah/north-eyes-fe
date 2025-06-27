@@ -74,6 +74,7 @@ export default function LoginPage() {
         localStorage.setItem("company", result.data?.company_name ?? "");
         localStorage.setItem("company_id", result.data?.company_id ?? "");
         localStorage.setItem("photo_url", result.data?.photo_url ?? "");
+        localStorage.setItem("lastActivity", Date.now().toString());
 
         setTimeout(() => {
           router.push("/dashboard");

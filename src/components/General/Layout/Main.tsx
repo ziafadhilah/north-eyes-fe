@@ -1,10 +1,65 @@
 "use client";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { useRouter } from "next/navigation";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export default function Main({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // const TIMEOUT = 2000;
+    const TIMEOUT = 10 * 60 * 1000;
+    let timeoutId: NodeJS.Timeout;
+
+    const logout = () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("company");
+      localStorage.removeItem("company_id");
+      localStorage.removeItem("photo_url");
+      localStorage.removeItem("lastActivity");
+
+      toastr.options = {
+        timeOut: 10000,
+        extendedTimeOut: 2000,
+        closeButton: true,
+        progressBar: true,
+      };
+
+      toastr.info("You've been logged out due to 10 minutes of inactivity.");
+      router.push("/login");
+    };
+
+    const resetTimer = () => {
+      localStorage.setItem("lastActivity", Date.now().toString());
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(logout, TIMEOUT);
+    };
+
+    const last = localStorage.getItem("lastActivity");
+    if (last && Date.now() - parseInt(last, 10) > TIMEOUT) {
+      logout();
+      return;
+    }
+
+    const activityEvents = ["mousemove", "keydown", "click", "scroll"];
+    activityEvents.forEach((event) =>
+      window.addEventListener(event, resetTimer)
+    );
+
+    timeoutId = setTimeout(logout, TIMEOUT);
+
+    return () => {
+      activityEvents.forEach((event) =>
+        window.removeEventListener(event, resetTimer)
+      );
+      clearTimeout(timeoutId);
+    };
+  }, [router]);
 
   return (
     <div
