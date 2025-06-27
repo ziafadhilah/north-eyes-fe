@@ -12,6 +12,8 @@ import {
 } from "@/service/camera/cameraService";
 
 export default function LIndex() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isStreamingActive, setIsStreamingActive] = useState(false);
   const params = useParams();
   const searchParams = useSearchParams();
   const id = params?.id as string;
@@ -46,11 +48,15 @@ export default function LIndex() {
       img.onload = () => {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+        setIsLoading(false);
       };
     }
   }, []);
 
-  useLiveStream(mainCamera ? mainCamera.camera_id : "0", drawImage);
+  useLiveStream(
+    isStreamingActive && mainCamera ? mainCamera.camera_id : "0",
+    drawImage
+  );
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -60,6 +66,7 @@ export default function LIndex() {
       fetchCameraByAreaId(token, id)
         .then((res) => {
           const cameras = res.data?.data?.data || [];
+          console.log(res);
           if (cameras.length > 0) {
             setMainCamera(cameras[0]);
             setCamera(cameras.slice(1));
@@ -78,6 +85,8 @@ export default function LIndex() {
     ];
     setMainCamera(clickedCamera);
     setCamera(updatedCameraList);
+    setIsLoading(true);
+    setIsStreamingActive(true);
   };
 
   return (
@@ -155,51 +164,177 @@ export default function LIndex() {
         </div>
 
         {mainCamera && (
-          <div className="ml-10 mb-10">
+          <div>
             <p className="font-bold text-black mb-3 text-2xl">
               {mainCamera.camera_name}
             </p>
-            <div className="rounded-xl shadow-xl w-full h-[400px] relative">
-              <canvas
-                ref={canvasRef}
-                width={800}
-                height={400}
-                className="rounded-xl w-full h-full"
-              ></canvas>
-              <Link
-                href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
-                className="absolute top-3 right-3 bg-teal-600 p-2 rounded-full shadow-md hover:bg-teal-500 flex items-center justify-center"
-                title="Settings"
-              >
-                <span className="material-symbols-outlined text-white">
-                  settings
-                </span>
-              </Link>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+              <div className="rounded-xl shadow-xl w-full h-[450px] relative">
+                {isLoading ? (
+                  <div className="w-full h-full flex justify-center items-center bg-gray-200 rounded-xl">
+                    <span className="material-symbols-outlined animate-spin text-4xl text-blue-600">
+                      progress_activity
+                    </span>
+                    <span className="ml-2 text-blue-600 font-medium">
+                      Loading live stream...
+                    </span>
+                  </div>
+                ) : (
+                  <canvas
+                    ref={canvasRef}
+                    width={800}
+                    height={400}
+                    className="rounded-xl w-full h-full"
+                  ></canvas>
+                )}
+                <Link
+                  href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
+                  className="absolute top-3 right-3 bg-teal-600 p-2 rounded-full shadow-md hover:bg-teal-500 flex items-center justify-center"
+                  title="Settings"
+                >
+                  <span className="material-symbols-outlined text-white">
+                    settings
+                  </span>
+                </Link>
+              </div>
+              <div className="flex flex-col gap-5">
+                <div className="flex gap-3">
+                  <Link
+                    href={`/brand/live-preview/${mainCamera.camera_id}/suspect`}
+                    className="w-full"
+                  >
+                    <div className="h-[180px] p-4 rounded-xl border-4 flex flex-col justify-center items-center text-white text-xl font-bold bg-linear-purple">
+                      <p className="text-6xl">
+                        {mainCamera.suspect_count ?? 0}
+                      </p>
+                      <span className="text-sm font-normal text-gray-300 mt-2">
+                        Suspect
+                      </span>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href={`/brand/live-preview/${mainCamera.camera_id}/confirmed`}
+                    className="w-full"
+                  >
+                    <div className="h-[180px] p-4 rounded-xl border-4 flex flex-col justify-center items-center text-white text-xl font-bold bg-linear-green">
+                      <p className="text-6xl">
+                        {mainCamera.confirmed_count ?? 0}
+                      </p>
+                      <span className="text-sm font-normal text-gray-300 mt-2">
+                        Confirmed
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+                <div className="p-4 rounded-xl shadow-xl bg-white text-black text-xl font-bold flex flex-col justify-between h-[260px]">
+                  <div className="px-5 flex justify-between items-start">
+                    <span className="text-lg">Violation</span>
+                  </div>
+                  <div className="flex justify-around h-full items-center mt-2">
+                    <div className="flex flex-col justify-center items-center gap-4">
+                      <div className="text-center">
+                        <p className="text-5xl text-blue-700">
+                          {mainCamera.uniform_violation ?? 0}
+                        </p>
+                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ color: "#D4AF37" }}
+                          >
+                            person_apron
+                          </span>
+                          Uniform
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-5xl text-blue-700">
+                          {mainCamera.grooming_violation ?? 0}
+                        </p>
+                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ color: "#D4AF37" }}
+                          >
+                            face_5
+                          </span>
+                          Grooming
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col justify-center items-center gap-4">
+                      <div className="text-center">
+                        <p className="text-5xl text-blue-700">
+                          {mainCamera.strangers_violation ?? 0}
+                        </p>
+                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ color: "#D4AF37" }}
+                          >
+                            directions_walk
+                          </span>
+                          Strangers
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-5xl text-blue-700">
+                          {mainCamera.behavior_violation ?? 0}
+                        </p>
+                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ color: "#D4AF37" }}
+                          >
+                            accessible_menu
+                          </span>
+                          Behavior
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {camera.length > 0 && (
+        {[mainCamera, ...camera].length > 0 && (
           <div className="ml-10">
             <h2 className="text-xl font-semibold text-black mb-4">
               Other Cameras
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-4">
-              {camera.map((cam) => (
-                <div
-                  key={cam.camera_id}
-                  onClick={() => handleMainCameraSwap(cam)}
-                  className="rounded-2xl w-full h-[180px] cursor-pointer hover:shadow-lg transition"
-                  style={{
-                    backgroundImage: `url('${
-                      cam.thumbnail || "/static/images/bg_login.png"
-                    }')`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
-                  title={cam.camera_name}
-                ></div>
-              ))}
+              {[mainCamera, ...camera].map((cam) => {
+                if (!cam) return null;
+                const isActive = cam.camera_id === mainCamera?.camera_id;
+
+                return (
+                  <div
+                    key={cam.camera_id}
+                    onClick={() => !isActive && handleMainCameraSwap(cam)}
+                    className={`relative rounded-2xl w-full h-[180px] cursor-pointer hover:shadow-lg transition ${
+                      isActive
+                        ? "border-4 border-blue-600 pointer-events-none"
+                        : ""
+                    }`}
+                    style={{
+                      backgroundImage: `url('${
+                        cam.thumbnail || "/static/images/bg_login.png"
+                      }')`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                    title={cam.camera_name}
+                  >
+                    {isActive && (
+                      <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

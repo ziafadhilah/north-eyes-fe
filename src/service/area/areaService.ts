@@ -4,8 +4,12 @@ const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
 const extension_area_url = "/area";
 const areaUrl = `${baseUrl}${extension_area_url}`;
 
-export function fetchareaByOutletId(token: string, id: string) {
-  const params = new URLSearchParams({ outlet_id: id });
+export function fetchareaByOutletId(
+  token: string,
+  id: string,
+  page: number = 1
+) {
+  const params = new URLSearchParams({ outlet_id: id, page: page.toString() });
   return axios.get(areaUrl, {
     headers: {
       "x-authorized-key": token,
