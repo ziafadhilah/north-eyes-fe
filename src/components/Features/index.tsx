@@ -2,9 +2,10 @@
 import Main from "@/components/General/Layout/Main";
 import Modal from "@/components/General/Modal/Modal";
 import { useState } from "react";
-import AddUserForm from "./add_user";
+import AddFeaturesForm from "./add";
+// import AddUserForm from "./add_user";
 
-export default function SlugPage() {
+export default function FeaturesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -25,7 +26,7 @@ export default function SlugPage() {
           <div className="flex items-center">
             <div className="mb-3">
               <h1 className="text-3xl font-bold text-title-color mb-2">
-                Manage User
+                Manage Features
               </h1>
             </div>
           </div>
@@ -166,7 +167,7 @@ export default function SlugPage() {
         </div>
       </Main>
       <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <AddUserForm />
+        <AddFeaturesForm />
       </Modal>
     </div>
   );

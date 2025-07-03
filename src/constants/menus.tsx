@@ -32,4 +32,16 @@ export const menus: Menu[] = [
     icon: <span className="material-symbols-outlined">manage_accounts</span>,
     url: "/user_management",
   },
+  {
+    id: "features",
+    name: "Features",
+    icon: <span className="material-symbols-outlined">empty_dashboard</span>,
+    url: "/features",
+  },
+  {
+    id: "registration",
+    name: "Customer Registration",
+    icon: <span className="material-symbols-outlined">group_add</span>,
+    url: "/registration",
+  },
 ];

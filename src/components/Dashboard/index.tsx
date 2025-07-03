@@ -174,11 +174,11 @@ export default function DashboardPage() {
             <h2 className="text-xl text-white">This the Dashboard of you</h2>
           </div>
           <div className="flex gap-4">
-            <button className="border border-blue-500 bg-white text-blue-600 px-4 py-2 rounded-xl hover:bg-blue-600 transition flex items-center justify-center">
+            <button className="border border-blue-500 bg-white text-blue-600 px-4 py-2 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
               Download&nbsp;
               <span className="material-symbols-outlined">download</span>
             </button>
-            <button className="bg-white text-blue-600 px-4 py-2 border border-blue-500 rounded-xl hover:bg-gray-100 transition flex items-center justify-center">
+            <button className="bg-white text-blue-600 px-4 py-2 border border-blue-500 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
               Date&nbsp;
               <span className="material-symbols-outlined">event_available</span>
             </button>

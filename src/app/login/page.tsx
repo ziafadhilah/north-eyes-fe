@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { loginUser } from "@/service/login/authService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { registerUser } from "@/service/login/registerService";
 import { RegisterData } from "@/constants/registerData";
+import { registrationUser } from "@/service/customer-registration/registrationService";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [message, setMessage] = useState("");
 
   const carouselTexts = [
     "Empowering your decisions through AI-driven insights.",
@@ -58,7 +59,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     if (!identifier || !password) {
-      alert("Identifier dan Password harus diisi");
+      toastr.error("All field mush be filled");
       return;
     }
 
@@ -67,7 +68,7 @@ export default function LoginPage() {
       const result = await loginUser(identifier, password);
 
       if (result.status === "success") {
-        toastr.success("Login berhasil");
+        toastr.success("Login Success");
 
         localStorage.setItem("token", result.data?.token ?? "");
         localStorage.setItem("user_id", result.data?.user_id ?? "");
@@ -80,7 +81,8 @@ export default function LoginPage() {
           router.push("/dashboard");
         }, 1000);
       } else {
-        toastr.error("Login gagal : " + result.message);
+        toastr.error("Failed to Login : " + result.message);
+        setIsLoading(false);
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -88,13 +90,12 @@ export default function LoginPage() {
       } else {
         setErrorMsg("Unexpected error occurred");
       }
-      setIsLoading(false);
     }
   };
 
   const handleRegister = async () => {
-    if (!fullName || !email || !identifier || !password || !phoneNumber) {
-      toastr.error("All field must be filled for registration");
+    if (!fullName || !email || !phoneNumber || !message) {
+      toastr.error("All fields must be filled for registration");
       return;
     }
     try {
@@ -102,12 +103,10 @@ export default function LoginPage() {
       const payload: RegisterData = {
         full_name: fullName,
         email: email,
-        username: identifier,
-        password_hash: password,
-        phone_number: phoneNumber,
-        profile_picture_url: "test",
+        phone: phoneNumber,
+        message: message,
       };
-      const res = await registerUser(payload);
+      const res = await registrationUser(payload);
 
       if (res.data.status === "success") {
         toastr.success("Register success. Please Login.");
@@ -130,15 +129,12 @@ export default function LoginPage() {
   return (
     <div
       className="relative h-screen flex flex-col md:flex-row bg-cover bg-center"
-      style={{
-        backgroundImage: 'url("/static/images/bg_login.jpg")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      style={{ backgroundImage: 'url("/static/images/bg_login.jpg")' }}
     >
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-100 to-purple-800 opacity-80"></div>
 
       <div className="relative z-10 flex w-full h-full flex-col md:flex-row">
+        {/* Left Form */}
         <div className="w-full md:w-1/2 flex items-center justify-center min-h-screen p-4">
           <div className="w-full max-w-xl p-8 rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-center mb-8">
@@ -160,33 +156,6 @@ export default function LoginPage() {
                 : "Please insert your login details to login"}
             </h1>
 
-            {isRegister && (
-              <>
-                <label className="text-gray-700 text-sm">Full Name:</label>
-                <input
-                  type="text"
-                  placeholder="Enter your full name here"
-                  className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
-                />
-                <label className="text-gray-700 text-sm">Email:</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
-                />
-                <label className="text-gray-700 text-sm">Phone Number:</label>
-                <input
-                  type="text"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Input phone number"
-                  className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
-                />
-              </>
-            )}
-
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -197,38 +166,78 @@ export default function LoginPage() {
                 }
               }}
             >
-              <label className="text-gray-700 text-sm">Username:</label>
-              <input
-                ref={userNameRef}
-                type="text"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="Input your username"
-                className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
-              />
+              {isRegister ? (
+                <>
+                  <label className="text-gray-700 text-sm">Full Name:</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name here"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                  />
 
-              <label className="text-gray-700 text-sm">Password:</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Input your password"
-                className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-4"
-              />
+                  <label className="text-gray-700 text-sm">Email:</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                  />
 
-              {!isRegister && (
-                <div className="text-center mb-3">
-                  <a href="#" className="text-red-600 font-medium">
-                    Reset password
-                  </a>
-                </div>
+                  <label className="text-gray-700 text-sm">Phone Number:</label>
+                  <input
+                    type="number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Input phone number"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                  />
+
+                  <label className="text-gray-700 text-sm">Message:</label>
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Your message..."
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                    rows={4}
+                  ></textarea>
+                </>
+              ) : (
+                <>
+                  <label className="text-gray-700 text-sm">Username:</label>
+                  <input
+                    ref={userNameRef}
+                    type="text"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="Input your username"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                  />
+
+                  <label className="text-gray-700 text-sm">Password:</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Input your password"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-4"
+                  />
+
+                  <div className="text-center mb-3">
+                    <a href="#" className="text-red-600 font-medium">
+                      Reset password
+                    </a>
+                  </div>
+                </>
               )}
 
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center mt-6">
                   <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-sm text-gray-600 mt-3">
-                    Logging in, please wait...
+                    {isRegister ? "Registering" : "Logging in"}, please wait...
                   </p>
                 </div>
               ) : (
@@ -260,7 +269,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Side - Carousel */}
+        {/* Right Carousel */}
         <div className="hidden md:flex w-full md:w-1/2 items-center justify-center text-white">
           <div className="text-center text-white">
             <h1 className="text-5xl font-semibold mb-4">North Eyes AI</h1>
@@ -269,7 +278,6 @@ export default function LoginPage() {
               <button
                 onClick={handlePrev}
                 className="text-white text-3xl hover:text-gray-300"
-                aria-label="Previous"
               >
                 <span className="material-symbols">arrow_left</span>
               </button>
@@ -279,7 +287,6 @@ export default function LoginPage() {
               <button
                 onClick={handleNext}
                 className="text-white text-3xl hover:text-gray-300"
-                aria-label="Next"
               >
                 <span className="material-symbols">arrow_right</span>
               </button>
@@ -294,7 +301,6 @@ export default function LoginPage() {
                       ? "bg-white"
                       : "bg-white/40 hover:bg-white/60"
                   }`}
-                  aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
             </div>
