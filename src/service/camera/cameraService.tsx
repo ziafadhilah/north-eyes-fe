@@ -32,7 +32,7 @@ export function useLiveStream(
 ) {
   // console.log(camera_id);
   const socketRef = useRef<Socket | null>(null);
-  const webUrl = "https://northeyes-be.ide.asia ";
+  const webUrl = "https://northeyes-be.ide.asia";
   // const webUrl = "http://68.183.239.230:5001";
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function useLiveStream(
     socket.on("vms_data", (data: string) => {
       const res = JSON.parse(data);
       if (res[0]?.idcamera == camera_id) {
-        drawImage(res[0].img); // pakai callback drawImage
+        drawImage(res[0].img);
       }
     });
 
