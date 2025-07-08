@@ -168,10 +168,14 @@ export default function DashboardPage() {
       {/* Content */}
       <div className="flex-1 flex flex-col p-4">
         <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-3xl text-white font-bold">Hi, Group A!</h1>
-            <h2 className="text-xl text-white">This the Dashboard of you</h2>
+            <h1 className="text-2xl md:text-3xl text-white font-bold">
+              Hi, Group A!
+            </h1>
+            <h2 className="text-md md:text-lg text-white">
+              This the Dashboard of you
+            </h2>
           </div>
           <div className="flex gap-4">
             <button className="border border-blue-500 bg-white text-blue-600 px-4 py-2 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
@@ -186,7 +190,7 @@ export default function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Bar Chart */}
-          <div className="bg-white rounded-2xl shadow-md p-6 h-100">
+          <div className="bg-white rounded-2xl shadow-md p-6 h-auto w-full">
             <h2 className="text-xl font-semibold text-center mb-4 bg-title-chart">
               Violation Chart
             </h2>

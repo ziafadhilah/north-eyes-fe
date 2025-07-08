@@ -7,6 +7,7 @@ import { uploadLogoBrand } from "@/service/brand/uploadBrandService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
+import RegionSelect, { OptionType } from "../General/Region/Region";
 
 type AddBrandFormProps = {
   onClose: () => void;
@@ -17,6 +18,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState({
     brand_name: "",
@@ -37,7 +39,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     employee_daily_point: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -75,6 +81,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
@@ -111,6 +118,21 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     }
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.brand_name.trim())
+      newErrors.brand_name = "Brand Name is required";
+    if (!formData.employee_daily_point.trim())
+      newErrors.employee_daily_point = "Employee Daily Point is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.country.trim()) newErrors.country = "Country is required";
+    if (!formData.address.trim()) newErrors.address = "Address is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   useEffect(() => {
     if (autoFocusRef.current) {
       autoFocusRef.current.focus();
@@ -123,7 +145,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Brand Name
             </label>
             <input
@@ -132,13 +154,19 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="brand_name"
               value={formData.brand_name}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.brand_name
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Brand Name"
-              required
             />
+            {errors.brand_name && (
+              <p className="text-sm text-red-600 mt-1">{errors.brand_name}</p>
+            )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Employee Daily Point
             </label>
             <input
@@ -152,7 +180,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Logo
             </label>
 
@@ -192,7 +220,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Description
             </label>
             <textarea
@@ -207,40 +235,166 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               rows={4}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Description"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Website URL
+            </label>
+            <input
+              type="text"
+              name="website_url"
+              value={formData.website_url}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Website URL"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Email"
               required
             />
           </div>
-          {(
-            [
-              { label: "Website URL", name: "website_url" },
-              { label: "Email", name: "email" },
-              { label: "Phone", name: "phone" },
-              { label: "Industry", name: "industry" },
-              { label: "Founded Year", name: "founded_year", type: "date" },
-              { label: "Headquarter City", name: "headquarter_city" },
-              { label: "Address", name: "address" },
-              { label: "City", name: "city" },
-              { label: "Province", name: "province" },
-              { label: "Postal Code", name: "postal_code" },
-              { label: "Country", name: "country" },
-              { label: "Owner Name", name: "owner_name" },
-            ] as { label: string; name: keyof typeof formData; type?: string }[]
-          ).map(({ label, name, type = "text" }) => (
-            <div key={name}>
-              <label className="block text-sm font-medium text-gray-700">
-                {label}
-              </label>
-              <input
-                type={type}
-                name={name}
-                value={formData[name]}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                placeholder={`Input ${label}`}
-                required
-              />
-            </div>
-          ))}
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Phone
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Phone"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Industry
+            </label>
+            <input
+              type="text"
+              name="industry"
+              value={formData.industry}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Industry"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Founded Year
+            </label>
+            <input
+              type="date"
+              name="founded_year"
+              value={formData.founded_year}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Headquarter City
+            </label>
+            <input
+              type="text"
+              name="headquarter_city"
+              value={formData.headquarter_city}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Headquarter City"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Country
+            </label>
+            <input
+              type="text"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Country"
+              required
+            />
+          </div>
+
+          <RegionSelect
+            onProvinceChange={(province: OptionType) => {
+              setFormData((prev) => ({
+                ...prev,
+                province: province.label,
+              }));
+            }}
+            onRegencyChange={(regency: OptionType) => {
+              setFormData((prev) => ({
+                ...prev,
+                city: regency.label,
+                regency_id: regency.value.toString(),
+              }));
+            }}
+          />
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Address
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Address"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Postal Code
+            </label>
+            <input
+              type="text"
+              name="postal_code"
+              value={formData.postal_code}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Postal Code"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Owner Name
+            </label>
+            <input
+              type="text"
+              name="owner_name"
+              value={formData.owner_name}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Owner Name"
+            />
+          </div>
         </div>
 
         <div className="text-right">
@@ -253,7 +407,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                 "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
             }}
           >
-            {isLoading ? "Menyimpan..." : "Simpan"}
+            {isLoading ? "Adding..." : "Add Brand"}
           </button>
         </div>
       </form>

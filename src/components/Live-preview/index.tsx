@@ -66,7 +66,6 @@ export default function LIndex() {
       fetchCameraByAreaId(token, id)
         .then((res) => {
           const cameras = res.data?.data?.data || [];
-          console.log(res);
           if (cameras.length > 0) {
             setMainCamera(cameras[0]);
             setCamera(cameras.slice(1));

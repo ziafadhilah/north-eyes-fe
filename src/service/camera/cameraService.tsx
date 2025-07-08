@@ -32,7 +32,8 @@ export function useLiveStream(
 ) {
   // console.log(camera_id);
   const socketRef = useRef<Socket | null>(null);
-  const webUrl = "http://68.183.239.230:5001";
+  const webUrl = "https://northeyes-be.ide.asia ";
+  // const webUrl = "http://68.183.239.230:5001";
 
   useEffect(() => {
     if (!camera_id || camera_id === "0") return;
