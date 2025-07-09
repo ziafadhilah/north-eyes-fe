@@ -339,30 +339,31 @@ export default function OutletPage() {
       <Modal
         isOpen={isConfirmDeleteOpen}
         onClose={() => setIsConfirmDeleteOpen(false)}
+        size="sm"
       >
-        <div className="p-2">
-          <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
-          <p className="mb-4">Are you sure you want to delete this outlet?</p>
-          <div className="flex justify-end gap-4">
-            <button
-              className="px-4 py-2 bg-gray-300 rounded-xl"
-              onClick={() => setIsConfirmDeleteOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="px-4 py-2 bg-red-500 text-white rounded-xl"
-              onClick={() => {
-                if (outletToDelete) {
-                  handleDelete(outletToDelete.outlet_id);
-                  setIsConfirmDeleteOpen(false);
-                }
-              }}
-            >
-              Delete
-            </button>
-          </div>
+        {/* <div className="p-2"> */}
+        <h2 className="text-lg font-bold mb-4">Confirm to Delete</h2>
+        <p className="mb-4">Are you sure you want to delete this outlet?</p>
+        <div className="flex justify-end gap-4">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-xl"
+            onClick={() => setIsConfirmDeleteOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-xl"
+            onClick={() => {
+              if (outletToDelete) {
+                handleDelete(outletToDelete.outlet_id);
+                setIsConfirmDeleteOpen(false);
+              }
+            }}
+          >
+            Delete
+          </button>
         </div>
+        {/* </div> */}
       </Modal>
     </div>
   );

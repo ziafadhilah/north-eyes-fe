@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import AddBrandForm from "./add";
-import { BrandData } from "@/constants/brandData";
+import { BrandData, EditBrandData } from "@/constants/brandData";
 import { deleteBrands, fetchBrands } from "@/service/brand/brandService";
 import BrandDetailPage from "./detail";
 import EditBrandForm from "./edit";
@@ -38,12 +38,12 @@ export default function BrandPage() {
   const closeDetailModal = () => setIsDetailModalOpen(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [brandToEdit, setBrandToEdit] = useState<BrandData | null>(null);
+  const [brandToEdit, setBrandToEdit] = useState<EditBrandData | null>(null);
 
   const [brandToDelete, setBrandToDelete] = useState<BrandData | null>(null);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
-  const openEditModal = (brand: BrandData) => {
+  const openEditModal = (brand: EditBrandData) => {
     setBrandToEdit(brand);
     setActiveDropdown(null);
     setIsEditModalOpen(true);
@@ -314,9 +314,10 @@ export default function BrandPage() {
       <Modal
         isOpen={isConfirmDeleteOpen}
         onClose={() => setIsConfirmDeleteOpen(false)}
+        size="sm"
       >
         <div className="p-2">
-          <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
+          <h2 className="text-lg font-bold mb-4">Confirm to Delete</h2>
           <p className="mb-4">Are you sure you want to delete this brand?</p>
           <div className="flex justify-end gap-4">
             <button

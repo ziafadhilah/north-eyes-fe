@@ -42,15 +42,13 @@ export default function LIndex() {
 
   const drawImage = useCallback((imgData: string) => {
     const ctx = canvasRef.current?.getContext("2d");
-    if (ctx) {
-      const img = new Image();
-      img.src = "data:image/jpeg;base64," + imgData;
-      img.onload = () => {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-        setIsLoading(false);
-      };
-    }
+    const img = new Image();
+    img.src = "data:image/jpeg;base64," + imgData;
+    img.onload = () => {
+      ctx?.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx?.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
+      setIsLoading(false);
+    };
   }, []);
 
   useLiveStream(

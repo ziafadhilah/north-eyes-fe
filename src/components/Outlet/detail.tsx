@@ -23,7 +23,6 @@ export default function OutletDetailPage({
       try {
         const token = localStorage.getItem("token");
         const res = await detailOutlet(token || "", outletId);
-        console.log("ini data :", res);
         setOutlet(res.data.data);
       } catch (error) {
         console.error("Gagal mengambil data brand:", error);

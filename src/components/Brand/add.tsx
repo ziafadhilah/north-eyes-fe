@@ -55,6 +55,12 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      toastr.error("Logo harus berformat .jpg, .jpeg, atau .png");
+      return;
+    }
+
     const maxSizeInMB = 2;
     if (file.size > maxSizeInMB * 1024 * 1024) {
       toastr.error(`Ukuran logo tidak boleh lebih dari ${maxSizeInMB}MB.`);
@@ -128,6 +134,18 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.country.trim()) newErrors.country = "Country is required";
     if (!formData.address.trim()) newErrors.address = "Address is required";
+    if (!logoFile) {
+      newErrors.logo_url = "Logo is required";
+    } else {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(logoFile.type)) {
+        newErrors.logo_url = "Logo must be .jpg, .jpeg, or .png";
+      }
+      const maxSizeInMB = 2;
+      if (logoFile.size > maxSizeInMB * 1024 * 1024) {
+        newErrors.logo_url = `Logo must be less than ${maxSizeInMB}MB`;
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -174,16 +192,23 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="employee_daily_point"
               value={formData.employee_daily_point}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.employee_daily_point
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Employee Daily Point"
-              required
             />
+            {errors.employee_daily_point && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.employee_daily_point}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-bold text-gray-700">
               Logo
             </label>
-
             <input
               id="logo-upload"
               type="file"
@@ -191,7 +216,6 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               onChange={handleLogoChange}
               className="hidden"
             />
-
             <label
               htmlFor="logo-upload"
               className="mt-1 flex items-center justify-center h-30 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 transition"
@@ -211,11 +235,13 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                 </div>
               )}
             </label>
-
             {logoFile && (
               <p className="text-sm text-gray-600 mt-1">
                 File: {logoFile.name} ({(logoFile.size / 1024).toFixed(2)} KB)
               </p>
+            )}
+            {errors.logo_url && (
+              <p className="text-sm text-red-600 mt-1">{errors.logo_url}</p>
             )}
           </div>
 
@@ -261,10 +287,16 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.email
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Email"
-              required
             />
+            {errors.email && (
+              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -272,7 +304,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               Phone
             </label>
             <input
-              type="text"
+              type="number"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
@@ -331,10 +363,16 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="country"
               value={formData.country}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.country
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Country"
-              required
             />
+            {errors.country && (
+              <p className="text-sm text-red-600 mt-1">{errors.country}</p>
+            )}
           </div>
 
           <RegionSelect
@@ -362,10 +400,16 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Address"
-              required
             />
+            {errors.address && (
+              <p className="text-sm text-red-600 mt-1">{errors.address}</p>
+            )}
           </div>
 
           <div>
@@ -373,7 +417,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               Postal Code
             </label>
             <input
-              type="text"
+              type="number"
               name="postal_code"
               value={formData.postal_code}
               onChange={handleChange}

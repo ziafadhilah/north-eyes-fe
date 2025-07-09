@@ -22,6 +22,8 @@ export interface BrandData {
   updated_at: string;
   updated_by: string;
   website_url: string;
+  province_id: number;
+  regency_id: number;
 }
 
 export interface CreateBrandData {
@@ -60,5 +62,7 @@ export interface EditBrandData {
   phone: string;
   postal_code: string;
   province: string;
+  province_id: number;
+  regency_id: number;
   website_url: string;
 }

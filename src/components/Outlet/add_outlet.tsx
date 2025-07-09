@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
+import RegionSelect, { OptionType } from "@/components/General/Region/Region";
 
 type AddOutletFormProps = {
   onClose: () => void;
@@ -121,40 +122,108 @@ export default function AddOutletForm({
         <h2 className="text-xl font-bold text-black mb-4">Add Outlet</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(
-              [
-                { label: "Outlet Name", name: "outlet_name" },
-                { label: "Email", name: "email" },
-                { label: "Phone", name: "phone" },
-                { label: "Address", name: "address" },
-                { label: "City", name: "city" },
-                { label: "Province", name: "province" },
-                { label: "Postal Code", name: "postal_code" },
-                { label: "Country", name: "country" },
-              ] as {
-                label: string;
-                name: keyof typeof formData;
-                type?: string;
-              }[]
-            ).map(({ label, name, type = "text" }) => (
-              <div key={name}>
-                <label className="block text-sm font-medium text-gray-700">
-                  {label}
-                </label>
-                <input
-                  ref={name === "outlet_name" ? autoFocusRef : undefined}
-                  type={type}
-                  name={name}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                  placeholder={`Input ${label}`}
-                  required
-                />
-              </div>
-            ))}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-bold text-gray-700">
+                Outlet Name
+              </label>
+              <input
+                type="text"
+                name="outlet_name"
+                value={formData.outlet_name}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Input Outlet Name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700">
+                Email
+              </label>
+              <input
+                type="text"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Input Email"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700">
+                Phone
+              </label>
+              <input
+                type="number"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Input Phone"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700">
+                Country
+              </label>
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Input Country"
+              />
+            </div>
+
+            <RegionSelect
+              onProvinceChange={(province: OptionType) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  province: province.label,
+                }));
+              }}
+              onRegencyChange={(regency: OptionType) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  city: regency.label,
+                  regency_id: regency.value.toString(),
+                }));
+              }}
+            />
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700">
+                Address
+              </label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Input Address"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700">
+                Postal Code
+              </label>
+              <input
+                type="number"
+                name="postal_code"
+                value={formData.postal_code}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                placeholder="Input Postal Code"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700">
                 Logo
               </label>
 

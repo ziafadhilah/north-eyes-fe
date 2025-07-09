@@ -7,6 +7,7 @@ import "toastr/build/toastr.min.css";
 import axios from "axios";
 import { EditBrandData } from "@/constants/brandData";
 import { updateBrands } from "@/service/brand/brandService";
+import RegionSelect, { OptionType } from "@/components/General/Region/Region";
 
 type EditBrandFormProps = {
   brandData: EditBrandData;
@@ -24,6 +25,36 @@ export default function EditBrandForm({
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({ ...brandData });
+
+  const [selectedProvince, setSelectedProvince] = useState<OptionType | null>({
+    value: brandData.province_id,
+    label: brandData.province,
+  });
+
+  const [selectedRegency, setSelectedRegency] = useState<OptionType | null>({
+    value: brandData.regency_id,
+    label: brandData.city,
+  });
+
+  const handleProvinceChange = (province: OptionType) => {
+    setSelectedProvince(province);
+    setFormData((prev) => ({
+      ...prev,
+      province: province.label,
+      province_id: province.value,
+      city: "",
+      regency_id: 0,
+    }));
+  };
+
+  const handleRegencyChange = (regency: OptionType) => {
+    setSelectedRegency(regency);
+    setFormData((prev) => ({
+      ...prev,
+      city: regency.label,
+      regency_id: regency.value,
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -181,6 +212,13 @@ export default function EditBrandForm({
             />
           </div>
 
+          <RegionSelect
+            initialProvince={selectedProvince}
+            initialRegency={selectedRegency}
+            onProvinceChange={handleProvinceChange}
+            onRegencyChange={handleRegencyChange}
+          />
+
           {(
             [
               { label: "Website URL", name: "website_url" },
@@ -194,8 +232,8 @@ export default function EditBrandForm({
               },
               { label: "Headquarter City", name: "headquarter_city" },
               { label: "Address", name: "address" },
-              { label: "City", name: "city" },
-              { label: "Province", name: "province" },
+              // { label: "City", name: "city" },
+              // { label: "Province", name: "province" },
               { label: "Postal Code", name: "postal_code" },
               { label: "Country", name: "country" },
               { label: "Owner Name", name: "owner_name" },

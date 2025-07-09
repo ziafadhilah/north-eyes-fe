@@ -47,6 +47,7 @@ export function useLiveStream(
 
     socket.on("vms_data", (data: string) => {
       const res = JSON.parse(data);
+      // console.log(res);
       if (res[0]?.idcamera == camera_id) {
         drawImage(res[0].img);
       }

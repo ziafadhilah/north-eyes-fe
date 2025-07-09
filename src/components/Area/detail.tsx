@@ -20,7 +20,6 @@ export default function AreaDetailPage({ onClose, areaId }: AreaDetailProps) {
       try {
         const token = localStorage.getItem("token");
         const res = await detailAreas(token || "", areaId);
-        console.log("ini data :", res);
         setAreas(res.data.data);
       } catch (error) {
         console.error("Gagal mengambil data brand:", error);
