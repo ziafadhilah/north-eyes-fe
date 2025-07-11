@@ -77,7 +77,7 @@ export default function BrandPage() {
             setBrands(responseData?.data || []);
             setTotalPages(responseData?.pages || 1);
             setIsLoading(false);
-          }, 2000);
+          }, 1000);
         } else {
           toastr.error("Error fetching brands");
           setIsLoading(false);
@@ -211,21 +211,35 @@ export default function BrandPage() {
                     }}
                     className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
                   >
-                    <img
-                      src={
-                        data.logo_url
-                          ? data.logo_url
-                          : "/static/images/ex_brand.png"
-                      }
-                      alt={data.brand_name}
-                      className="w-50 h-50 mb-3"
-                    />
+                    <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
+                      <img
+                        src={
+                          data.logo_url
+                            ? data.logo_url
+                            : "/static/images/ex_brand.png"
+                        }
+                        alt={data.brand_name}
+                        className="w-full h-full object-cover rounded-2xl shadow-lg"
+                      />
+                    </div>
+
+                    {/* <div className="p-7">
+                      <img
+                        src={
+                          data.logo_url
+                            ? data.logo_url
+                            : "/static/images/ex_brand.png"
+                        }
+                        alt={data.brand_name}
+                        className="w-50 h-50 mb-3 rounded-lg shadow-2xl"
+                      />
+                    </div> */}
                     <p className="font-bold text-black">{data.brand_name}</p>
                     <p className="text-black">{data.address}</p>
                   </Link>
 
                   <div
-                    className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
+                    className="absolute top-3 right-5 text-gray-600 hover:text-black cursor-pointer z-10"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -234,7 +248,9 @@ export default function BrandPage() {
                       );
                     }}
                   >
-                    <span className="material-symbols-outlined">more_vert</span>
+                    <span className="material-symbols-outlined">
+                      more_horiz
+                    </span>
                   </div>
 
                   {activeDropdown === data.brand_id && (

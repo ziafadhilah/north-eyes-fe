@@ -26,6 +26,8 @@ export default function EditBrandForm({
 
   const [formData, setFormData] = useState({ ...brandData });
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const [selectedProvince, setSelectedProvince] = useState<OptionType | null>({
     value: brandData.province_id,
     label: brandData.province,
@@ -93,6 +95,7 @@ export default function EditBrandForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
@@ -130,13 +133,40 @@ export default function EditBrandForm({
     }
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.brand_name.trim())
+      newErrors.brand_name = "Brand Name is required";
+    if (!formData.employee_daily_point.toString().trim())
+      newErrors.employee_daily_point = "Employee Daily Point is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.country.trim()) newErrors.country = "Country is required";
+    if (!formData.address.trim()) newErrors.address = "Address is required";
+    if (!logoFile) {
+      newErrors.logo_url = "Logo is required";
+    } else {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(logoFile.type)) {
+        newErrors.logo_url = "Logo must be .jpg, .jpeg, or .png";
+      }
+      const maxSizeInMB = 2;
+      if (logoFile.size > maxSizeInMB * 1024 * 1024) {
+        newErrors.logo_url = `Logo must be less than ${maxSizeInMB}MB`;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   return (
     <div className="relative z-10 overflow-y-auto max-h-[90vh] p-4">
       <h2 className="text-xl font-bold text-black mb-4">Edit Brand</h2>
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Brand Name
             </label>
             <input
@@ -144,14 +174,20 @@ export default function EditBrandForm({
               name="brand_name"
               value={formData.brand_name}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.brand_name
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Brand Name"
-              required
             />
+            {errors.brand_name && (
+              <p className="text-sm text-red-600 mt-1">{errors.brand_name}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Employee Daily Point
             </label>
             <input
@@ -159,9 +195,18 @@ export default function EditBrandForm({
               name="employee_daily_point"
               value={formData.employee_daily_point}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-              required
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.employee_daily_point
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Employee Daily Point"
             />
+            {errors.employee_daily_point && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.employee_daily_point}
+              </p>
+            )}
           </div>
 
           <div>
@@ -169,7 +214,7 @@ export default function EditBrandForm({
               htmlFor="logo-upload"
               className="cursor-pointer px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 inline-block"
             >
-              Choose Logo
+              Logo
             </label>
             <input
               id="logo-upload"
@@ -193,7 +238,7 @@ export default function EditBrandForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-gray-700">
               Description
             </label>
             <textarea
@@ -206,10 +251,120 @@ export default function EditBrandForm({
                 }))
               }
               rows={4}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Description"
-              required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Website URL
+            </label>
+            <input
+              type="text"
+              name="website_url"
+              value={formData.website_url}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Website URL"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.email
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Email"
+            />
+            {errors.email && (
+              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Phone
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Phone"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Industry
+            </label>
+            <input
+              type="text"
+              name="industry"
+              value={formData.industry}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Industry"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Founded Year
+            </label>
+            <input
+              type="date"
+              name="founded_year"
+              value={formData.founded_year}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Headquarter City
+            </label>
+            <input
+              type="text"
+              name="headquarter_city"
+              value={formData.headquarter_city}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Headquarter City"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Country
+            </label>
+            <input
+              type="text"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.country
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Country"
+            />
+            {errors.country && (
+              <p className="text-sm text-red-600 mt-1">{errors.country}</p>
+            )}
           </div>
 
           <RegionSelect
@@ -219,61 +374,54 @@ export default function EditBrandForm({
             onRegencyChange={handleRegencyChange}
           />
 
-          {(
-            [
-              { label: "Website URL", name: "website_url" },
-              { label: "Email", name: "email" },
-              { label: "Phone", name: "phone" },
-              { label: "Industry", name: "industry" },
-              {
-                label: "Founded Year",
-                name: "founded_year",
-                type: "year-select",
-              },
-              { label: "Headquarter City", name: "headquarter_city" },
-              { label: "Address", name: "address" },
-              // { label: "City", name: "city" },
-              // { label: "Province", name: "province" },
-              { label: "Postal Code", name: "postal_code" },
-              { label: "Country", name: "country" },
-              { label: "Owner Name", name: "owner_name" },
-            ] as { label: string; name: keyof typeof formData; type?: string }[]
-          ).map(({ label, name, type = "text" }) => (
-            <div key={name}>
-              <label className="block text-sm font-medium text-gray-700">
-                {label}
-              </label>
-              {type === "year-select" ? (
-                <select
-                  name={name}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                  required
-                >
-                  <option value="">Pilih Tahun</option>
-                  {Array.from({ length: 100 }, (_, i) => {
-                    const year = new Date().getFullYear() - i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    );
-                  })}
-                </select>
-              ) : (
-                <input
-                  type={type}
-                  name={name}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                  placeholder={`Input ${label}`}
-                  required
-                />
-              )}
-            </div>
-          ))}
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Address
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Address"
+            />
+            {errors.address && (
+              <p className="text-sm text-red-600 mt-1">{errors.address}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Postal Code
+            </label>
+            <input
+              type="number"
+              name="postal_code"
+              value={formData.postal_code}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Postal Code"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Owner Name
+            </label>
+            <input
+              type="text"
+              name="owner_name"
+              value={formData.owner_name}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Input Owner Name"
+            />
+          </div>
         </div>
 
         <div className="text-right">

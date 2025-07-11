@@ -202,103 +202,112 @@ export default function OutletPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-          <button
-            onClick={openAddModal}
-            className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-          >
-            <div
-              className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
-              style={{
-                background:
-                  "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
-              }}
-            >
-              <span className="material-symbols-outlined">add</span>
-            </div>
-            <p className="font-bold text-black">Add Outlet</p>
-          </button>
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center mt-6">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-sm text-gray-600 mt-3">
-                Loading ... Please wait
-              </p>
+            <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm text-gray-600 mt-3">
+                  Loading ... Please wait
+                </p>
+              </div>
             </div>
           ) : (
-            outlets.map((data) => (
-              <div key={data.outlet_id} className="relative w-full max-w-sm">
-                <Link
-                  href={{
-                    pathname: `/brand/area/${data.outlet_id}`,
-                    query: {
-                      outlet_name: data.outlet_name,
-                      brand_name: brand_name,
-                    },
-                  }}
-                  className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-                >
-                  <img
-                    src={
-                      data.logo_url
-                        ? data.logo_url
-                        : "/static/images/ex_brand.png"
-                    }
-                    alt={data.outlet_name}
-                    className="w-50 h-50 mb-3"
-                  />
-                  <p className="font-bold text-black">{data.outlet_name}</p>
-                </Link>
+            <>
+              <button
+                onClick={openAddModal}
+                className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+              >
                 <div
-                  className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setActiveDropdown(
-                      activeDropdown === data.outlet_id ? null : data.outlet_id
-                    );
+                  className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
                   }}
                 >
-                  <span className="material-symbols-outlined">more_vert</span>
+                  <span className="material-symbols-outlined">add</span>
                 </div>
+                <p className="font-bold text-black">Add Outlet</p>
+              </button>
 
-                {activeDropdown === data.outlet_id && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
+              {outlets.map((data) => (
+                <div key={data.outlet_id} className="relative w-full max-w-sm">
+                  <Link
+                    href={{
+                      pathname: `/brand/area/${data.outlet_id}`,
+                      query: {
+                        outlet_name: data.outlet_name,
+                        brand_name: brand_name,
+                      },
+                    }}
+                    className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
                   >
-                    <button
-                      onClick={() => handleOpenDetail(data)}
-                      className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
-                    >
-                      <span className="material-symbols-outlined">
-                        visibility
-                      </span>
-                      Detail
-                    </button>
-                    <button
-                      onClick={() => openEditModal(data)}
-                      className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
-                    >
-                      <span className="material-symbols-outlined">
-                        draft_orders
-                      </span>
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveDropdown(null);
-                        setOutletToDelete(data);
-                        setIsConfirmDeleteOpen(true);
-                      }}
-                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
-                    >
-                      <span className="material-symbols-outlined">delete</span>
-                      Delete
-                    </button>
+                    <img
+                      src={
+                        data.logo_url
+                          ? data.logo_url
+                          : "/static/images/ex_brand.png"
+                      }
+                      alt={data.outlet_name}
+                      className="w-50 h-50 mb-3"
+                    />
+                    <p className="font-bold text-black">{data.outlet_name}</p>
+                  </Link>
+                  <div
+                    className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setActiveDropdown(
+                        activeDropdown === data.outlet_id
+                          ? null
+                          : data.outlet_id
+                      );
+                    }}
+                  >
+                    <span className="material-symbols-outlined">more_vert</span>
                   </div>
-                )}
-              </div>
-            ))
+
+                  {activeDropdown === data.outlet_id && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
+                    >
+                      <button
+                        onClick={() => handleOpenDetail(data)}
+                        className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                      >
+                        <span className="material-symbols-outlined">
+                          visibility
+                        </span>
+                        Detail
+                      </button>
+                      <button
+                        onClick={() => openEditModal(data)}
+                        className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
+                      >
+                        <span className="material-symbols-outlined">
+                          draft_orders
+                        </span>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          setOutletToDelete(data);
+                          setIsConfirmDeleteOpen(true);
+                        }}
+                        className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+                      >
+                        <span className="material-symbols-outlined">
+                          delete
+                        </span>
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
           )}
         </div>
 
@@ -341,7 +350,6 @@ export default function OutletPage() {
         onClose={() => setIsConfirmDeleteOpen(false)}
         size="sm"
       >
-        {/* <div className="p-2"> */}
         <h2 className="text-lg font-bold mb-4">Confirm to Delete</h2>
         <p className="mb-4">Are you sure you want to delete this outlet?</p>
         <div className="flex justify-end gap-4">
@@ -363,7 +371,6 @@ export default function OutletPage() {
             Delete
           </button>
         </div>
-        {/* </div> */}
       </Modal>
     </div>
   );

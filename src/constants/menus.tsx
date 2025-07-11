@@ -40,7 +40,7 @@ export const menus: Menu[] = [
   },
   {
     id: "registration",
-    name: "Customer Registration",
+    name: "Customer Register",
     icon: <span className="material-symbols-outlined">group_add</span>,
     url: "/registration",
   },

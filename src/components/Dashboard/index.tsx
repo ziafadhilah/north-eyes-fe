@@ -155,25 +155,25 @@ export default function DashboardPage() {
 
   return (
     <div
-      className="flex flex-col md:flex-row min-h-screen"
+      className="flex flex-col lg:flex-row min-h-screen"
       style={{
         background: "linear-gradient(180deg, #A7CBF0 0%, #1A2A6C 100%)",
       }}
     >
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? "block" : "hidden"} md:block`}>
+      <div className={`${sidebarOpen ? "block" : "hidden"} lg:block`}>
         <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
       {/* Content */}
       <div className="flex-1 flex flex-col p-4">
         <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl text-white font-bold">
+            <h1 className="text-2xl lg:text-3xl text-white font-bold">
               Hi, Group A!
             </h1>
-            <h2 className="text-md md:text-lg text-white">
+            <h2 className="text-md lg:text-lg text-white">
               This the Dashboard of you
             </h2>
           </div>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Bar Chart */}
           <div className="bg-white rounded-2xl shadow-md p-6 h-auto w-full">
             <h2 className="text-xl font-semibold text-center mb-4 bg-title-chart">
@@ -263,7 +263,7 @@ export default function DashboardPage() {
               </button>
             ))}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-cols-5 gap-4">
             {paginatedEmployees.map((emp, idx) => (
               <div
                 key={idx}

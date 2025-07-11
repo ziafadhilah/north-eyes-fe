@@ -14,7 +14,7 @@ export default function Header({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
-  const [, setCompanyPhoto] = useState<string | null>(null);
+  const [companyPhoto, setCompanyPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     setCompanyName(localStorage.getItem("company"));
@@ -41,9 +41,9 @@ export default function Header({
   }, []);
 
   return (
-    <header className="flex justify-between items-center mb-4">
+    <header className="flex flex-wrap items-center justify-between gap-y-2 p-2">
       <button
-        className="md:hidden text-white text-3xl transition-transform duration-300 ease-in-out hover:scale-120"
+        className="lg:hidden text-white text-3xl transition-transform duration-300 ease-in-out hover:scale-120"
         onClick={onToggleSidebar}
       >
         ☰
@@ -74,7 +74,9 @@ export default function Header({
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
             <img
-              src="/static/images/user_avatar.png"
+              src={
+                companyPhoto ? companyPhoto : "/static/images/user_avatar.png"
+              }
               alt="User Avatar"
               className="w-10 h-10 rounded-full border"
             />
@@ -83,8 +85,8 @@ export default function Header({
                 {companyName}
               </span>
               <span
-                className="text-center text-xs px-2 py-0.5 rounded-md text-white"
-                style={{ backgroundColor: "rgba(0, 128, 128, 1)" }}
+                className="text-sm rounded-md text-white uppercase font-medium"
+                // style={{ backgroundColor: "rgba(0, 128, 128, 1)" }}
               >
                 Super Admin
               </span>
@@ -92,11 +94,13 @@ export default function Header({
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 w-40 bg-white border rounded-md shadow-lg z-50">
+            <div className="mt-2 absolute right-0 min-w-[15rem] bg-white rounded-md shadow-2xl z-50 overflow-hidden animate-fade-in">
+              <div className="px-4 py-2 text-sm text-gray-400">Account</div>
               <button
                 onClick={handleLogout}
-                className="block w-full px-4 py-2 text-left text-sm text-red-600 rounded-md hover:bg-gray-100"
+                className="flex items-center gap-2 w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200"
               >
+                <span className="material-symbols-outlined">logout</span>
                 Logout
               </button>
             </div>
