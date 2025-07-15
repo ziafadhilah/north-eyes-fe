@@ -4,32 +4,33 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { createFeatures } from "@/service/features/featuresService";
+import { updateFeatures } from "@/service/features/featuresService";
+import { editFeatureData } from "@/constants/featuresData";
 
-type AddFeaturesFormProps = {
+type EditFeatureFormProps = {
+  featureData: editFeatureData;
   onClose: () => void;
 };
 
-export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
+export default function EditFeatureForm({
+  onClose,
+  featureData,
+}: EditFeatureFormProps) {
   const autoFocusRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    is_active: "",
-  });
+  const [formData, setFormData] = useState({ ...featureData });
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name === "is_active") {
+      setFormData((prev) => ({ ...prev, is_active: value === "true" }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const validateForm = () => {
@@ -38,7 +39,8 @@ export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
     if (!formData.name.trim()) newErrors.name = "Feature name is required";
     if (!formData.description.trim())
       newErrors.description = "Description is required";
-    if (!formData.is_active.trim()) newErrors.is_active = "Status is required";
+    if (typeof formData.is_active !== "boolean")
+      newErrors.is_active = "Status is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -50,32 +52,30 @@ export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
-
     if (!token) {
       toastr.error("Token not found.");
       return;
     }
 
-    const payload = {
-      ...formData,
-      is_active: formData.is_active === "true" ? true : false,
-      order: 1,
-    };
-
     try {
-      await createFeatures(payload, token);
-      toastr.success("Feature added successfully.");
-      onClose();
-      setTimeout(() => window.location.reload(), 500);
+      const payload = { ...formData };
+      const res = await updateFeatures(payload, token, featureData.feature_id);
+
+      if (res.data.status === "success") {
+        toastr.success("Feature data has been updated.");
+        onClose();
+        setTimeout(() => window.location.reload(), 500);
+      } else {
+        toastr.error("Failed to update feature. Please try again.");
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toastr.error(
-          "Failed to add feature : ",
+          "Failed to update feature.",
           error.response?.data?.message || error.message
         );
-        console.log(error);
       } else {
-        toastr.error("Failed to add feature.");
+        toastr.error("Failed to update feature.");
       }
     } finally {
       setIsLoading(false);
@@ -91,7 +91,7 @@ export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
   return (
     <>
       <div className="relative z-10">
-        <h2 className="text-xl font-bold text-black mb-4">Add Features</h2>
+        <h2 className="text-xl font-bold text-black mb-4">Edit Features</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -118,7 +118,7 @@ export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
               </label>
               <select
                 name="is_active"
-                value={formData.is_active}
+                value={formData.is_active === true ? "true" : "false"}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               >
@@ -167,7 +167,7 @@ export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
                   "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
               }}
             >
-              {isLoading ? "Adding..." : "Add Feature"}
+              {isLoading ? "Please wait..." : "Edit Feature"}
             </button>
           </div>
         </form>

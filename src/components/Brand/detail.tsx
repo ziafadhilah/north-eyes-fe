@@ -23,7 +23,6 @@ export default function BrandDetailPage({
       try {
         const token = localStorage.getItem("token");
         const res = await detailBrands(token || "", brandId);
-        console.log("ini data :", res);
         setBrands(res.data.data);
       } catch (error) {
         console.error("Gagal mengambil data brand:", error);

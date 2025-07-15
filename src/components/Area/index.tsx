@@ -271,40 +271,44 @@ export default function AreaPage() {
                 </div>
 
                 {activeDropdown === data.area_id && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
-                  >
-                    <button
-                      onClick={() => handleOpenDetail(data)}
-                      className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                  <>
+                    <div
+                      ref={dropdownRef}
+                      className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
                     >
-                      <span className="material-symbols-outlined">
-                        visibility
-                      </span>
-                      Detail
-                    </button>
-                    <button
-                      onClick={() => openEditModal(data)}
-                      className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
-                    >
-                      <span className="material-symbols-outlined">
-                        draft_orders
-                      </span>
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveDropdown(null);
-                        setAreaToDelete(data);
-                        setIsConfirmDeleteOpen(true);
-                      }}
-                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
-                    >
-                      <span className="material-symbols-outlined">delete</span>
-                      Delete
-                    </button>
-                  </div>
+                      <button
+                        onClick={() => handleOpenDetail(data)}
+                        className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                      >
+                        <span className="material-symbols-outlined">
+                          visibility
+                        </span>
+                        Detail
+                      </button>
+                      <button
+                        onClick={() => openEditModal(data)}
+                        className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
+                      >
+                        <span className="material-symbols-outlined">
+                          draft_orders
+                        </span>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          setAreaToDelete(data);
+                          setIsConfirmDeleteOpen(true);
+                        }}
+                        className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+                      >
+                        <span className="material-symbols-outlined">
+                          delete
+                        </span>
+                        Delete
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             ))

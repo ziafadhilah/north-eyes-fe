@@ -70,7 +70,7 @@ export default function Main({ children }: { children: ReactNode }) {
     >
       {/* Sidebar */}
       <div
-        className={`fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${
+        className={`p-2 fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:static lg:translate-x-0`}
       >
@@ -81,7 +81,7 @@ export default function Main({ children }: { children: ReactNode }) {
       <div className="flex-1 flex flex-col p-2 min-h-screen overflow-hidden">
         <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <div
-          className="flex-1 overflow-y-auto rounded-3xl shadow-2xl p-4 lg:p-8 border-5"
+          className="flex-1 overflow-y-auto rounded-3xl shadow-2xl p-2 lg:p-8 border-5"
           style={{
             backgroundColor: "rgba(243, 243, 243, 1)",
             borderColor: "#A7CBF0",
