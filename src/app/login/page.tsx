@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useRouter } from "next/navigation";
@@ -9,12 +8,14 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { RegisterData } from "@/constants/registerData";
 import { registrationUser } from "@/service/customer-registration/registrationService";
+import { fetchFeatureFE } from "@/service/features/featuresService";
+import { featureData } from "@/constants/featuresData";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const userNameRef = useRef<HTMLInputElement>(null);
-  const [currentText, setCurrentText] = useState(0);
+  const [currentFeature, setCurrentFeature] = useState(0);
   const [isRegister, setIsRegister] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -23,43 +24,30 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [message, setMessage] = useState("");
+  const [features, setFeatures] = useState<featureData[]>();
 
-  const carouselTexts = [
-    "Empowering your decisions through AI-driven insights.",
-    "Secure, seamless, and smart login experience.",
-    "Designed to scale with your business needs.",
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentText((prev) => (prev + 1) % carouselTexts.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (userNameRef.current) {
-      userNameRef.current.focus();
-    }
-  }, []);
-
-  const goToSlide = (index: number) => {
-    setCurrentText(index);
+  const loadFeatures = async () => {
+    const res = await fetchFeatureFE();
+    setFeatures(res.data.data.feature);
   };
 
   const handlePrev = () => {
-    setCurrentText(
-      (prev) => (prev - 1 + carouselTexts.length) % carouselTexts.length
-    );
+    if (!features) return;
+    setCurrentFeature((prev) => (prev - 1 + features.length) % features.length);
   };
 
   const handleNext = () => {
-    setCurrentText((prev) => (prev + 1) % carouselTexts.length);
+    if (!features) return;
+    setCurrentFeature((prev) => (prev + 1) % features.length);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentFeature(index);
   };
 
   const handleLogin = async () => {
     if (!identifier || !password) {
-      toastr.error("All field mush be filled");
+      toastr.error("All field must be filled");
       return;
     }
 
@@ -126,12 +114,32 @@ export default function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    loadFeatures();
+  }, []);
+
+  useEffect(() => {
+    if (!features || features.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % features.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [features]);
+
+  useEffect(() => {
+    if (userNameRef.current) {
+      userNameRef.current.focus();
+    }
+  }, []);
+
   return (
     <div
       className="relative h-screen flex flex-col md:flex-row bg-cover bg-center"
       style={{ backgroundImage: 'url("/static/images/bg_login.jpg")' }}
     >
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-100 to-purple-800 opacity-80"></div>
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-100/70 to-purple-800/100 animate-gradientMove"></div>
 
       <div className="relative z-10 flex w-full h-full flex-col md:flex-row">
         {/* Left Form */}
@@ -273,7 +281,11 @@ export default function LoginPage() {
         <div className="hidden md:flex w-full md:w-1/2 items-center justify-center text-white">
           <div className="text-center text-white">
             <h1 className="text-5xl font-semibold mb-4">North Eyes AI</h1>
-            <h2 className="text-3xl font-semibold mb-4">Live View</h2>
+            <h2 className="text-3xl font-semibold mb-4">
+              {features && features.length > 0
+                ? features[currentFeature].name
+                : "Live View"}
+            </h2>
             <div className="flex items-center justify-center space-x-4 mb-6">
               <button
                 onClick={handlePrev}
@@ -281,9 +293,13 @@ export default function LoginPage() {
               >
                 <span className="material-symbols">arrow_left</span>
               </button>
+
               <p className="text-center text-lg italic max-w-md">
-                {carouselTexts[currentText]}
+                {features && features.length > 0
+                  ? features[currentFeature].description
+                  : "Loading features..."}
               </p>
+
               <button
                 onClick={handleNext}
                 className="text-white text-3xl hover:text-gray-300"
@@ -291,18 +307,20 @@ export default function LoginPage() {
                 <span className="material-symbols">arrow_right</span>
               </button>
             </div>
+
             <div className="flex items-center justify-center space-x-4 mt-4">
-              {carouselTexts.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`h-1 w-10 rounded-full transition-all ${
-                    currentText === index
-                      ? "bg-white"
-                      : "bg-white/40 hover:bg-white/60"
-                  }`}
-                />
-              ))}
+              {features &&
+                features.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`h-1 w-10 rounded-full transition-all ${
+                      currentFeature === index
+                        ? "bg-white"
+                        : "bg-white/40 hover:bg-white/60"
+                    }`}
+                  />
+                ))}
             </div>
           </div>
         </div>

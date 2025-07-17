@@ -143,6 +143,15 @@ export default function DashboardPage() {
     };
   }, [router]);
 
+  useEffect(() => {
+    const companyData = localStorage.getItem("company");
+    const token = localStorage.getItem("token");
+    if (!companyData || !token) {
+      router.push("/login");
+      return;
+    }
+  });
+
   if (Object.keys(employeeData).length === 0) return null;
 
   const brands = Object.keys(employeeData);

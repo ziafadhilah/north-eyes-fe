@@ -69,7 +69,6 @@ export default function FeaturesPage() {
     const res = await fetchFeatures(token);
     if (res.status === 200) {
       const response = res.data.data.feature;
-      console.log(response);
       setTimeout(() => {
         setFeatures(response);
         setIsLoading(false);

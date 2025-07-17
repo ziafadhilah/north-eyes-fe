@@ -1,6 +1,7 @@
 import { createFeatureData, editFeatureData } from "@/constants/featuresData";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
+const baseUrlFE = "https://northeyes-be.ide.asia/frontend";
 const extension_feature_url = "/feature";
 const featuresUrl = `${baseUrl}${extension_feature_url}`;
 
@@ -56,4 +57,8 @@ export function deleteFeatures(token: string, id: string) {
       "x-authorized-key": token,
     },
   });
+}
+
+export function fetchFeatureFE() {
+  return axios.get(`${baseUrlFE}/features`);
 }
