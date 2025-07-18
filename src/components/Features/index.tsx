@@ -125,7 +125,7 @@ export default function FeaturesPage() {
   return (
     <div>
       <Main>
-        <div className="flex items-start justify-between mb-5 w-full">
+        <div className="flex items-start justify-between mb-5 w-full p-2">
           <div className="flex items-center">
             <div className="mb-3">
               <h1 className="text-3xl font-bold text-title-color mb-2">
@@ -149,97 +149,95 @@ export default function FeaturesPage() {
             onClick={openModal}
             className="text-white p-2 bg-blue-600 rounded-xl shadow-sm flex items-center justify-center hover:scale-105 hover:bg-blue-500"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <span className="material-symbols-outlined">add</span>
               <span className="text-md font-medium text-white">
-                Add Feature
+                Add Feature&nbsp;
               </span>
             </div>
           </button>
         </div>
 
-        <div className="overflow-x-auto border rounded-lg shadow-sm bg-white">
-          <div className="overflow-hidden rounded-lg">
-            <table className="min-w-full text-sm text-left text-gray-700">
-              <thead className="bg-gray-100 text-gray-700">
+        <div className="w-full overflow-x-auto border rounded-lg shadow-sm bg-white p-2">
+          <table className="w-full text-sm text-left text-gray-700 min-w-[700px]">
+            <thead className="text-gray-700 text-center">
+              <tr>
+                <th className="py-3 px-4">Name</th>
+                <th className="py-3 px-4">Description</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody className="text-center">
+              {isLoading ? (
                 <tr>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Action</th>
+                  <td colSpan={6} className="py-3 px-4 text-center">
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span>Loading... Please wait</span>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={6} className="py-3 px-4 text-center">
-                      <div className="flex justify-center items-center gap-2">
-                        <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Loading... Please wait</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : features.length > 0 ? (
-                  features.map((data) => (
-                    <tr
-                      key={data.feature_id}
-                      className="border-t hover:bg-gray-50"
-                    >
-                      <td className="py-3 px-4">{data.name}</td>
-                      <td className="py-3 px-4">{data.description}</td>
-                      {data.is_active == true ? (
-                        <td className="py-3 px-4 text-green-600">Active</td>
-                      ) : (
-                        <td className="py-3 px-4 text-red-600">Inactive</td>
-                      )}
+              ) : features.length > 0 ? (
+                features.map((data) => (
+                  <tr
+                    key={data.feature_id}
+                    className="border-t hover:bg-gray-50"
+                  >
+                    <td className="py-3 px-4">{data.name}</td>
+                    <td className="py-3 px-4">{data.description}</td>
+                    {data.is_active == true ? (
+                      <td className="py-3 px-4 text-green-600">Active</td>
+                    ) : (
+                      <td className="py-3 px-4 text-red-600">Inactive</td>
+                    )}
 
-                      <td className="py-3 px-4">
-                        <button
-                          className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-blue-500"
-                          title="View"
-                          onClick={() => handleOpenDetail(data)}
-                        >
-                          <span className="material-symbols-outlined">
-                            visibility
-                          </span>
-                        </button>
-                        <button
-                          className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-yellow-500"
-                          title="Edit"
-                          onClick={() => openEditModal(data)}
-                        >
-                          <span className="material-symbols-outlined">
-                            draft_orders
-                          </span>
-                        </button>
-                        <button
-                          className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
-                          title="Delete"
-                          onClick={() => {
-                            setFeatureToDelete(data);
-                            setIsConfirmDeleteOpen(true);
-                          }}
-                        >
-                          <span className="material-symbols-outlined">
-                            delete
-                          </span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="py-3 px-4 text-center text-gray-500"
-                    >
-                      No users data found.
+                    <td className="py-3 px-4">
+                      <button
+                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-blue-500"
+                        title="View"
+                        onClick={() => handleOpenDetail(data)}
+                      >
+                        <span className="material-symbols-outlined">
+                          visibility
+                        </span>
+                      </button>
+                      <button
+                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-yellow-500"
+                        title="Edit"
+                        onClick={() => openEditModal(data)}
+                      >
+                        <span className="material-symbols-outlined">
+                          draft_orders
+                        </span>
+                      </button>
+                      <button
+                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
+                        title="Delete"
+                        onClick={() => {
+                          setFeatureToDelete(data);
+                          setIsConfirmDeleteOpen(true);
+                        }}
+                      >
+                        <span className="material-symbols-outlined">
+                          delete
+                        </span>
+                      </button>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="py-3 px-4 text-center text-gray-500"
+                  >
+                    No users data found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </Main>
       <Modal isOpen={isModalOpen} onClose={closeModal}>

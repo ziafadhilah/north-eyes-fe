@@ -154,7 +154,7 @@ export default function BrandPage() {
   return (
     <>
       <Main>
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 w-full gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 w-full gap-4 p-2">
           <div className="flex items-start md:items-center gap-3">
             <div></div>
             <div>
@@ -174,15 +174,15 @@ export default function BrandPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center p-2">
           {isLoading ? (
             <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
-              <div className="flex flex-col items-center justify-center">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm text-gray-600 mt-3">
-                  Loading ... Please wait
-                </p>
+              <div className="relative w-12 h-12 flex items-center justify-center mr-4">
+                <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
+                <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
               </div>
+              <p className="text-lg text-gray-600">Loading ...</p>
             </div>
           ) : (
             <>

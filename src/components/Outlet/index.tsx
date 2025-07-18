@@ -156,43 +156,43 @@ export default function OutletPage() {
   return (
     <div>
       <Main>
-        <div className="flex items-start justify-between mb-3 w-full">
-          <div className="flex items-center">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center text-black transition-transform duration-300 ease-in-out hover:scale-120"
-            >
-              <span
-                className="material-symbols-outlined mr-5"
-                style={{ fontSize: "32px" }}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 w-full gap-4 p-2">
+          <div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center text-black transition-transform duration-300 ease-in-out hover:scale-120"
               >
-                arrow_back
-              </span>
-            </button>
+                <span
+                  className="material-symbols-outlined mr-2"
+                  style={{ fontSize: "30px" }}
+                >
+                  arrow_back
+                </span>
+              </button>
 
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-title-color mb-2">
-                List Outlet
-              </h1>
-              <nav
-                className="text-sm text-gray-500 mt-1"
-                aria-label="breadcrumb"
-              >
-                <ol className="flex items-center space-x-2">
-                  <li className="flex items-center">
-                    <Link href="/brand" className="hover:underline">
-                      Brand
-                    </Link>
-                    <span className="material-symbols-outlined mx-2 text-base text-gray-400">
-                      chevron_right
-                    </span>
-                  </li>
-                  <li className="text-gray-700 font-medium">{brand_name}</li>
-                </ol>
-              </nav>
+              <div className="mb-3">
+                <h1 className="text-3xl font-bold text-title-color mb-1">
+                  List Outlet
+                </h1>
+                <nav className="text-sm text-gray-500" aria-label="breadcrumb">
+                  <ol className="flex items-center space-x-2">
+                    <li className="flex items-center">
+                      <Link href="/brand" className="hover:underline">
+                        Brand
+                      </Link>
+                      <span className="material-symbols-outlined mx-2 text-base text-gray-400">
+                        chevron_right
+                      </span>
+                    </li>
+                    <li className="text-gray-700 font-medium">{brand_name}</li>
+                  </ol>
+                </nav>
+              </div>
             </div>
           </div>
-          <div className="text-right">
+
+          <div className="text-left md:text-right p-3">
             <span className="text-white text-md font-medium px-2.5 py-0.5 rounded-md ne-accent">
               {dayName}
             </span>
@@ -201,15 +201,16 @@ export default function OutletPage() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center p-2">
           {isLoading ? (
             <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
-              <div className="flex flex-col items-center justify-center">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm text-gray-600 mt-3">
-                  Loading ... Please wait
-                </p>
+              <div className="relative w-12 h-12 flex items-center justify-center mr-4">
+                <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
+                <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
               </div>
+              <p className="text-lg text-gray-600">Loading ...</p>
             </div>
           ) : (
             <>
@@ -241,19 +242,21 @@ export default function OutletPage() {
                     }}
                     className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
                   >
-                    <img
-                      src={
-                        data.logo_url
-                          ? data.logo_url
-                          : "/static/images/ex_brand.png"
-                      }
-                      alt={data.outlet_name}
-                      className="w-50 h-50 mb-3"
-                    />
+                    <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
+                      <img
+                        src={
+                          data.logo_url
+                            ? data.logo_url
+                            : "/static/images/ex_brand.png"
+                        }
+                        alt={data.outlet_name}
+                        className="w-full h-full object-cover rounded-2xl shadow-lg"
+                      />
+                    </div>
                     <p className="font-bold text-black">{data.outlet_name}</p>
                   </Link>
                   <div
-                    className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
+                    className="absolute top-3 right-5 text-gray-600 hover:text-black cursor-pointer z-10"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -264,7 +267,9 @@ export default function OutletPage() {
                       );
                     }}
                   >
-                    <span className="material-symbols-outlined">more_vert</span>
+                    <span className="material-symbols-outlined">
+                      more_horiz
+                    </span>
                   </div>
 
                   {activeDropdown === data.outlet_id && (

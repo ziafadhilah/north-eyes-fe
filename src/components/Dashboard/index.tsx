@@ -170,12 +170,16 @@ export default function DashboardPage() {
       }}
     >
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? "block" : "hidden"} lg:block`}>
+      <div
+        className={`p-2 fixed inset-0 z-50 transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:static lg:translate-x-0`}
+      >
         <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col p-4">
+      <div className="flex-1 flex flex-col p-2 min-h-screen overflow-hidden">
         <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>

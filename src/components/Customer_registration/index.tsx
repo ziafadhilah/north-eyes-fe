@@ -64,7 +64,7 @@ export default function RegistrationPage() {
 
   return (
     <Main>
-      <div className="flex items-start justify-between mb-5 w-full">
+      <div className="flex items-start justify-between mb-5 w-full p-2">
         <div className="flex items-center">
           <div className="mb-3">
             <h1 className="text-3xl font-bold text-title-color mb-2">
@@ -82,70 +82,67 @@ export default function RegistrationPage() {
         </div>
       </div>
 
-      <div className="overflow-x-auto border rounded-lg shadow-sm bg-white">
-        <div className="overflow-hidden rounded-lg">
-          <table className="min-w-full text-sm text-left text-gray-700">
-            <thead className="bg-gray-100 text-gray-700">
+      <div className="w-full overflow-x-auto border rounded-lg shadow-sm bg-white p-2">
+        <table className="w-full text-sm text-left text-gray-700 min-w-[700px]">
+          <thead className="text-gray-700">
+            <tr>
+              <th className="py-3 px-4 whitespace-nowrap">Full Name</th>
+              <th className="py-3 px-4 whitespace-nowrap">Email</th>
+              <th className="py-3 px-4 whitespace-nowrap">Phone</th>
+              <th className="py-3 px-4 whitespace-nowrap">Message</th>
+              <th className="py-3 px-4 whitespace-nowrap">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
               <tr>
-                <th className="py-3 px-4">Full Name</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Phone</th>
-                <th className="py-3 px-4">Message</th>
-                <th className="py-3 px-4">Action</th>
+                <td colSpan={5} className="py-3 px-4 text-center">
+                  <div className="flex justify-center items-center gap-2">
+                    <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading... Please wait</span>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="py-3 px-4 text-center">
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span>Loading... Please wait</span>
-                    </div>
+            ) : registration.length > 0 ? (
+              registration.map((data) => (
+                <tr
+                  key={data.registration_id}
+                  className="border-t hover:bg-gray-50"
+                >
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    {data.full_name}
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">{data.email}</td>
+                  <td className="py-3 px-4 whitespace-nowrap">{data.phone}</td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    {data.message}
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <button className="text-black px-3 py-1" title="View">
+                      <span className="material-symbols-outlined">
+                        visibility
+                      </span>
+                    </button>
+                    <button className="text-black px-3 py-1" title="Edit">
+                      <span className="material-symbols-outlined">
+                        draft_orders
+                      </span>
+                    </button>
+                    <button className="text-black px-3 py-1" title="Delete">
+                      <span className="material-symbols-outlined">delete</span>
+                    </button>
                   </td>
                 </tr>
-              ) : registration.length > 0 ? (
-                registration.map((data) => (
-                  <tr
-                    key={data.registration_id}
-                    className="border-t hover:bg-gray-50"
-                  >
-                    <td className="py-3 px-4">{data.full_name}</td>
-                    <td className="py-3 px-4">{data.email}</td>
-                    <td className="py-3 px-4">{data.phone}</td>
-                    <td className="py-3 px-4">{data.message}</td>
-                    <td className="py-3 px-4">
-                      <button className="text-black px-3 py-1" title="View">
-                        <span className="material-symbols-outlined">
-                          visibility
-                        </span>
-                      </button>
-                      <button className="text-black px-3 py-1" title="Edit">
-                        <span className="material-symbols-outlined">
-                          draft_orders
-                        </span>
-                      </button>
-                      <button className="text-black px-3 py-1" title="Delete">
-                        <span className="material-symbols-outlined">
-                          delete
-                        </span>
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="py-3 px-4 text-center text-gray-500"
-                  >
-                    No registration data found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="py-3 px-4 text-center text-gray-500">
+                  No registration data found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       <Pagination

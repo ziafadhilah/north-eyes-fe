@@ -155,52 +155,53 @@ export default function AreaPage() {
   return (
     <>
       <Main>
-        <div className="flex items-start justify-between mb-3 w-full">
-          <div className="flex items-center">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center text-black transition-transform duration-300 ease-in-out hover:scale-120"
-            >
-              <span
-                className="material-symbols-outlined mr-5"
-                style={{ fontSize: "32px" }}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 w-full gap-4 p-2">
+          <div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center text-black transition-transform duration-300 ease-in-out hover:scale-120"
               >
-                arrow_back
-              </span>
-            </button>
+                <span
+                  className="material-symbols-outlined mr-5"
+                  style={{ fontSize: "32px" }}
+                >
+                  arrow_back
+                </span>
+              </button>
 
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-title-color mb-2">Area</h1>
-              <nav
-                className="text-sm text-gray-500 mt-1"
-                aria-label="breadcrumb"
-              >
-                <ol className="flex items-center space-x-2">
-                  <li>
-                    <Link href="/brand" className="hover:underline">
-                      Brand
-                    </Link>
-                  </li>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <li className="text-gray-700 font-medium">{brand_name}</li>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <li>
-                    <button
-                      onClick={() => window.history.back()}
-                      className="flex items-center text-black"
-                    >
-                      {outlet_name}
-                    </button>
-                  </li>
-                </ol>
-              </nav>
+              <div className="mb-3">
+                <h1 className="text-3xl font-bold text-title-color mb-1">
+                  Area
+                </h1>
+                <nav className="text-sm text-gray-500" aria-label="breadcrumb">
+                  <ol className="flex items-center space-x-2">
+                    <li className="flex items-center">
+                      <Link href="/brand" className="hover:underline">
+                        Brand
+                      </Link>
+                    </li>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
+                    <li className="text-gray-700 font-medium">{brand_name}</li>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
+                    <li>
+                      <button
+                        onClick={() => window.history.back()}
+                        className="flex items-center text-black"
+                      >
+                        {outlet_name}
+                      </button>
+                    </li>
+                  </ol>
+                </nav>
+              </div>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-left md:text-right p-3">
             <span className="text-white text-md font-medium px-2.5 py-0.5 rounded-md ne-accent">
               {dayName}
             </span>
@@ -209,69 +210,77 @@ export default function AreaPage() {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center">
-          <button
-            onClick={openModal}
-            className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-          >
-            <div
-              className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
-              style={{
-                background:
-                  "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
-              }}
-            >
-              <span className="material-symbols-outlined">add</span>
-            </div>
-            <p className="font-bold text-black">Add Area</p>
-          </button>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center p-2">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center mt-6">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-sm text-gray-600 mt-3">
-                Loading ... Please wait
-              </p>
+            <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
+              <div className="relative w-12 h-12 flex items-center justify-center mr-4">
+                <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
+                <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
+                <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
+              </div>
+              <p className="text-lg text-gray-600">Loading ...</p>
             </div>
           ) : (
-            areas.map((data) => (
-              <div key={data.area_id} className="relative w-full max-w-sm">
-                <Link
-                  href={{
-                    pathname: `/brand/live-preview/${data.area_id}`,
-                    query: {
-                      outlet_name: outlet_name,
-                      brand_name: brand_name,
-                      area_name: data.area_name,
-                    },
-                  }}
-                  className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-                >
-                  <img
-                    src={
-                      data.logo_url
-                        ? data.logo_url
-                        : "/static/images/ex_brand.png"
-                    }
-                    alt={data.area_name}
-                    className="w-50 h-50 mb-3"
-                  />
-                  <p className="font-bold text-black">{data.area_name}</p>
-                </Link>
+            <>
+              <button
+                onClick={openModal}
+                className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+              >
                 <div
-                  className="absolute top-5 right-1 text-gray-600 hover:text-black cursor-pointer z-10"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setActiveDropdown(
-                      activeDropdown === data.area_id ? null : data.area_id
-                    );
+                  className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
                   }}
                 >
-                  <span className="material-symbols-outlined">more_vert</span>
+                  <span className="material-symbols-outlined">add</span>
                 </div>
+                <p className="font-bold text-black">Add Area</p>
+              </button>
 
-                {activeDropdown === data.area_id && (
-                  <>
+              {areas.map((data) => (
+                <div key={data.area_id} className="relative w-full max-w-sm">
+                  <Link
+                    href={{
+                      pathname: `/brand/live-preview/${data.area_id}`,
+                      query: {
+                        outlet_name: outlet_name,
+                        brand_name: brand_name,
+                        area_name: data.area_name,
+                      },
+                    }}
+                    className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                  >
+                    <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
+                      <img
+                        src={
+                          data.logo_url
+                            ? data.logo_url
+                            : "/static/images/ex_brand.png"
+                        }
+                        alt={data.area_name}
+                        className="w-full h-full object-cover rounded-2xl shadow-lg"
+                      />
+                    </div>
+                    <p className="font-bold text-black">{data.area_name}</p>
+                  </Link>
+                  <div
+                    className="absolute top-3 right-5 text-gray-600 hover:text-black cursor-pointer z-10"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setActiveDropdown(
+                        activeDropdown === data.area_id ? null : data.area_id
+                      );
+                    }}
+                  >
+                    <span className="material-symbols-outlined">
+                      more_horiz
+                    </span>
+                  </div>
+
+                  {activeDropdown === data.area_id && (
                     <div
                       ref={dropdownRef}
                       className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
@@ -308,10 +317,10 @@ export default function AreaPage() {
                         Delete
                       </button>
                     </div>
-                  </>
-                )}
-              </div>
-            ))
+                  )}
+                </div>
+              ))}
+            </>
           )}
         </div>
         <Pagination
@@ -350,29 +359,28 @@ export default function AreaPage() {
       <Modal
         isOpen={isConfirmDeleteOpen}
         onClose={() => setIsConfirmDeleteOpen(false)}
+        size="sm"
       >
-        <div className="p-2">
-          <h2 className="text-lg font-bold mb-4">Confirm Delete</h2>
-          <p className="mb-4">Are you sure you want to delete this area?</p>
-          <div className="flex justify-end gap-4">
-            <button
-              className="px-4 py-2 bg-gray-300 rounded-xl"
-              onClick={() => setIsConfirmDeleteOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              className="px-4 py-2 bg-red-500 text-white rounded-xl"
-              onClick={() => {
-                if (areaToDelete) {
-                  handleDelete(areaToDelete.area_id);
-                  setIsConfirmDeleteOpen(false);
-                }
-              }}
-            >
-              Delete
-            </button>
-          </div>
+        <h2 className="text-lg font-bold mb-4">Confirm to Delete</h2>
+        <p className="mb-4">Are you sure you want to delete this area?</p>
+        <div className="flex justify-end gap-4">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-xl"
+            onClick={() => setIsConfirmDeleteOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-xl"
+            onClick={() => {
+              if (areaToDelete) {
+                handleDelete(areaToDelete.area_id);
+                setIsConfirmDeleteOpen(false);
+              }
+            }}
+          >
+            Delete
+          </button>
         </div>
       </Modal>
     </>

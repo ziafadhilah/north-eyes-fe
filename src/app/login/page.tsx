@@ -243,7 +243,11 @@ export default function LoginPage() {
 
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center mt-6">
-                  <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="relative w-12 h-12 flex items-center justify-center">
+                    <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
+                    <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
+                  </div>
                   <p className="text-sm text-gray-600 mt-3">
                     {isRegister ? "Registering" : "Logging in"}, please wait...
                   </p>
