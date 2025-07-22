@@ -14,7 +14,9 @@ import {
 import { useEffect, useState } from "react";
 import Sidebar from "@/components/General/Layout/Sidebar";
 import Header from "@/components/General/Layout/Header";
+import { SkeletonBox } from "@/components/General/Skleton/Skleton";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 
@@ -64,6 +66,7 @@ const pieColors = ["#B0D8D8", "#FFDD6D", "#B8BDD1"];
 const ITEMS_PER_PAGE = 10;
 
 export default function DashboardPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [employeeData, setEmployeeData] = useState<
@@ -152,6 +155,11 @@ export default function DashboardPage() {
     }
   });
 
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   if (Object.keys(employeeData).length === 0) return null;
 
   const brands = Object.keys(employeeData);
@@ -178,139 +186,193 @@ export default function DashboardPage() {
         <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col p-2 min-h-screen overflow-hidden">
-        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl lg:text-3xl text-white font-bold">
-              Hi, Group A!
-            </h1>
-            <h2 className="text-md lg:text-lg text-white">
-              This the Dashboard of you
-            </h2>
+      <motion.div
+        className="flex-1 flex flex-col p-4 min-h-screen overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+      >
+        {/* Content */}
+        <div className="flex-1 flex flex-col p-2 min-h-screen overflow-hidden">
+          <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl lg:text-3xl text-white font-bold">
+                Hi, Group A!
+              </h1>
+              <h2 className="text-md lg:text-lg text-white">
+                This the Dashboard of you
+              </h2>
+            </div>
+            <div className="flex gap-4">
+              <button className="border border-blue-500 bg-white text-blue-600 px-4 py-2 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
+                Download&nbsp;
+                <span className="material-symbols-outlined">download</span>
+              </button>
+              <button className="bg-white text-blue-600 px-4 py-2 border border-blue-500 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
+                Date&nbsp;
+                <span className="material-symbols-outlined">
+                  event_available
+                </span>
+              </button>
+            </div>
           </div>
-          <div className="flex gap-4">
-            <button className="border border-blue-500 bg-white text-blue-600 px-4 py-2 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
-              Download&nbsp;
-              <span className="material-symbols-outlined">download</span>
-            </button>
-            <button className="bg-white text-blue-600 px-4 py-2 border border-blue-500 rounded-xl hover:bg-gray-200 transition flex items-center justify-center">
-              Date&nbsp;
-              <span className="material-symbols-outlined">event_available</span>
-            </button>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Bar Chart */}
-          <div className="bg-white rounded-2xl shadow-md p-6 h-auto w-full">
-            <h2 className="text-xl font-semibold text-center mb-4 bg-title-chart">
-              Violation Chart
-            </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={barData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Bar Chart */}
+            {isLoading ? (
+              <SkeletonBox className="w-full h-[300px]" />
+            ) : (
+              <motion.div
+                className="overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
               >
-                <defs>
-                  <linearGradient id="gradientMax" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1A2A6C" />
-                    <stop offset="100%" stopColor="#2671FF" />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="users" shape={CustomBarShape} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+                <div className="bg-white rounded-2xl shadow-md p-6 h-auto w-full">
+                  <h2 className="text-xl font-semibold text-center mb-4 bg-title-chart">
+                    Violation Chart
+                  </h2>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart
+                      data={barData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                    >
+                      <defs>
+                        <linearGradient
+                          id="gradientMax"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop offset="0%" stopColor="#1A2A6C" />
+                          <stop offset="100%" stopColor="#2671FF" />
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="users" shape={CustomBarShape} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </motion.div>
+            )}
 
-          {/* Pie Chart */}
-          <div className="bg-white rounded-2xl shadow-md p-6 h-100">
-            <h2 className="text-xl font-semibold text-center mb-4 bg-title-diagram">
-              Violation Diagram
-            </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart margin={{ top: 20, right: 30, left: 20, bottom: 0 }}>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={120}
-                  label
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={pieColors[index % pieColors.length]}
-                    />
+            {/* Pie Chart */}
+            {isLoading ? (
+              <SkeletonBox className="w-full h-[300px] rounded-full" />
+            ) : (
+              <motion.div
+                className="overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+              >
+                <div className="bg-white rounded-2xl shadow-md p-6 h-auto w-full">
+                  <h2 className="text-xl font-semibold text-center mb-4 bg-title-diagram">
+                    Violation Diagram
+                  </h2>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart
+                      margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
+                    >
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        label
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={pieColors[index % pieColors.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </motion.div>
+            )}
+          </div>
+          {isLoading ? (
+            <SkeletonBox className="w-full h-[300px] rounded-full mt-6" />
+          ) : (
+            <motion.div
+              className="overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 2, ease: "easeOut" }}
+            >
+              <div className="bg-white rounded-2xl shadow-md p-6 mt-6">
+                <h2 className="text-2xl text-center font-bold mb-4 bg-top-10">
+                  Top 10 Employee Points
+                </h2>
+                <div className="flex gap-4 mb-4">
+                  {brands.map((brand) => (
+                    <button
+                      key={brand}
+                      onClick={() => {
+                        setSelectedBrand(brand);
+                        setCurrentPage(1);
+                      }}
+                      className={`px-4 py-2 rounded-lg border ${
+                        selectedBrand === brand
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {brand}
+                    </button>
                   ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl shadow-md p-6 mt-6">
-          <h2 className="text-2xl text-center font-bold mb-4 bg-top-10">
-            Top 10 Employee Points
-          </h2>
-          <div className="flex gap-4 mb-4">
-            {brands.map((brand) => (
-              <button
-                key={brand}
-                onClick={() => {
-                  setSelectedBrand(brand);
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-lg border ${
-                  selectedBrand === brand
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                {brand}
-              </button>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:grid-cols-5 gap-4">
-            {paginatedEmployees.map((emp, idx) => (
-              <div
-                key={idx}
-                className="p-4 border rounded-xl text-center shadow-sm hover:shadow-md transition"
-              >
-                <div className="text-lg font-semibold">{emp.name}</div>
-                <div className="text-sm text-gray-500">Point: {emp.point}</div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {paginatedEmployees.map((emp, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 border rounded-xl text-center shadow-sm hover:shadow-md transition"
+                    >
+                      <div className="text-lg font-semibold">{emp.name}</div>
+                      <div className="text-sm text-gray-500">
+                        Point: {emp.point}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <div className="text-sm text-gray-500">
+                    Page {currentPage} of{" "}
+                    {Math.ceil(
+                      employeeData[selectedBrand].length / ITEMS_PER_PAGE
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 border rounded disabled:opacity-50"
+                    >
+                      Prev
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                      disabled={endIndex >= employeeData[selectedBrand].length}
+                      className="px-3 py-1 border rounded disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-          <div className="flex justify-between items-center mt-4">
-            <div className="text-sm text-gray-500">
-              Page {currentPage} of{" "}
-              {Math.ceil(employeeData[selectedBrand].length / ITEMS_PER_PAGE)}
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Prev
-              </button>
-              <button
-                onClick={() => setCurrentPage((p) => p + 1)}
-                disabled={endIndex >= employeeData[selectedBrand].length}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+            </motion.div>
+          )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

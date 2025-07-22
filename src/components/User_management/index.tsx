@@ -200,7 +200,7 @@ export default function SlugPage() {
                         </span>
                       </button>
                       <button
-                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-yellow-500"
+                        className="px-3 py-1 cursor-pointer hover:bg-gray-100 text-yellow-500"
                         title="Edit"
                         onClick={() => openEditModal(data)}
                       >
@@ -209,7 +209,7 @@ export default function SlugPage() {
                         </span>
                       </button>
                       <button
-                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
+                        className="px-3 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
                         title="Delete"
                         onClick={() => {
                           setUserToDelete(data);

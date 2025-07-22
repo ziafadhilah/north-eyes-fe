@@ -94,7 +94,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     const company_id = localStorage.getItem("company_id");
 
     if (!token || !company_id) {
-      alert("Token atau Company ID tidak ditemukan.");
+      toastr.error("Token atau Company ID tidak ditemukan.");
       return;
     }
 

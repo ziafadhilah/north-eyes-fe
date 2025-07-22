@@ -10,6 +10,7 @@ import { RegisterData } from "@/constants/registerData";
 import { registrationUser } from "@/service/customer-registration/registrationService";
 import { fetchFeatureFE } from "@/service/features/featuresService";
 import { featureData } from "@/constants/featuresData";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -143,7 +144,12 @@ export default function LoginPage() {
 
       <div className="relative z-10 flex w-full h-full flex-col md:flex-row">
         {/* Left Form */}
-        <div className="w-full md:w-1/2 flex items-center justify-center min-h-screen p-4">
+        <motion.div
+          className="w-full md:w-1/2 flex items-center justify-center min-h-screen p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+        >
           <div className="w-full max-w-xl p-8 rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-center mb-8">
               <span className="text-xl font-bold text-gray-800 mr-2">
@@ -279,10 +285,15 @@ export default function LoginPage() {
               )}
             </form>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Carousel */}
-        <div className="hidden md:flex w-full md:w-1/2 items-center justify-center text-white">
+        <motion.div
+          className="hidden md:flex w-full md:w-1/2 items-center justify-center text-white"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+        >
           <div className="text-center text-white">
             <h1 className="text-5xl font-semibold mb-4">North Eyes AI</h1>
             <h2 className="text-3xl font-semibold mb-4">
@@ -327,7 +338,7 @@ export default function LoginPage() {
                 ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

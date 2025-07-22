@@ -22,3 +22,12 @@ export interface CreateCameraData {
   url: string;
   description: string;
 }
+
+export interface EditCameraData {
+  camera_name: string;
+  camera_code: string;
+  camera_id: string;
+  area_id: string;
+  url: string;
+  description: string;
+}

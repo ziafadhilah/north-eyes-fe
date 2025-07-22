@@ -1,4 +1,4 @@
-import { CreateCameraData } from "@/constants/cameraData";
+import { CreateCameraData, EditCameraData } from "@/constants/cameraData";
 import { io, Socket } from "socket.io-client";
 import axios from "axios";
 import { useEffect, useRef } from "react";
@@ -19,6 +19,15 @@ export function fetchCameraByAreaId(token: string, id: string) {
 
 export function createCamera(data: CreateCameraData, token: string) {
   return axios.post(cameraUrl, data, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function editCamera(data: EditCameraData, token: string, id: string) {
+  return axios.put(`${cameraUrl}/${id}`, data, {
     headers: {
       "x-authorized-key": token,
       "Content-Type": "application/json",

@@ -5,7 +5,8 @@ import Modal from "@/components/General/Modal/Modal";
 import { useParams, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AddCameraForm from "./add_camera";
-import { CameraData } from "@/constants/cameraData";
+import { EditCameraForm } from "./edit";
+import { CameraData, EditCameraData } from "@/constants/cameraData";
 import {
   fetchCameraByAreaId,
   useLiveStream,
@@ -20,10 +21,15 @@ export default function LIndex() {
   const brand_name = searchParams.get("brand_name") as string;
   const outlet_name = searchParams.get("outlet_name") as string;
   const area_name = searchParams.get("area_name") as string;
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const [camera, setCamera] = useState<CameraData[]>([]);
   const [mainCamera, setMainCamera] = useState<CameraData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [cameraToEdit, setCameraToEdit] = useState<EditCameraData | null>(null);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -64,6 +70,7 @@ export default function LIndex() {
       fetchCameraByAreaId(token, id)
         .then((res) => {
           const cameras = res.data?.data?.data || [];
+          console.log("Data Kamera :", res);
           if (cameras.length > 0) {
             setMainCamera(cameras[0]);
             setCamera(cameras.slice(1));
@@ -85,6 +92,36 @@ export default function LIndex() {
     setIsLoading(true);
     setIsStreamingActive(true);
   };
+
+  const openEditModal = (camera: CameraData) => {
+    setCameraToEdit(camera);
+    setActiveDropdown(null);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setCameraToEdit(null);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setActiveDropdown(null);
+      }
+    }
+
+    if (activeDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeDropdown]);
 
   return (
     <div>
@@ -184,7 +221,53 @@ export default function LIndex() {
                     className="rounded-xl w-full h-full"
                   ></canvas>
                 )}
-                <Link
+                <div
+                  className="absolute top-3 right-3 bg-teal-600 p-2 rounded-full shadow-md hover:bg-teal-500 flex items-center justify-center cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveDropdown(
+                      activeDropdown === mainCamera.camera_id
+                        ? null
+                        : mainCamera.camera_id
+                    );
+                  }}
+                >
+                  <span className="material-symbols-outlined text-white">
+                    settings
+                  </span>
+                </div>
+                {activeDropdown === mainCamera.camera_id && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
+                  >
+                    <ul className="flex flex-col">
+                      <li>
+                        <Link
+                          href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          <span className="material-symbols-outlined text-base mr-2 align-middle">
+                            settings
+                          </span>
+                          Settings
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={() => openEditModal(mainCamera)}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-base mr-2">
+                            edit
+                          </span>
+                          Edit
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+                {/* <Link
                   href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
                   className="absolute top-3 right-3 bg-teal-600 p-2 rounded-full shadow-md hover:bg-teal-500 flex items-center justify-center"
                   title="Settings"
@@ -192,7 +275,7 @@ export default function LIndex() {
                   <span className="material-symbols-outlined text-white">
                     settings
                   </span>
-                </Link>
+                </Link> */}
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex gap-3">
@@ -297,7 +380,7 @@ export default function LIndex() {
         )}
 
         {[mainCamera, ...camera].length > 0 && (
-          <div className="ml-10">
+          <div className="px-2 lg:px-0 w-full">
             <h2 className="text-xl font-semibold text-black mb-4">
               Other Cameras
             </h2>
@@ -339,6 +422,14 @@ export default function LIndex() {
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <AddCameraForm onClose={closeModal} areaId={id} />
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+        {cameraToEdit ? (
+          <EditCameraForm cameraData={cameraToEdit} onClose={closeEditModal} />
+        ) : (
+          <p>Loading...</p>
+        )}
       </Modal>
     </div>
   );

@@ -11,10 +11,12 @@ import { useRouter } from "next/navigation";
 import AddBrandForm from "./add";
 import { BrandData, EditBrandData } from "@/constants/brandData";
 import { deleteBrands, fetchBrands } from "@/service/brand/brandService";
+import { motion } from "framer-motion";
 import BrandDetailPage from "./detail";
 import EditBrandForm from "./edit";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import { SkeletonBox } from "../General/Skleton/Skleton";
 
 export default function BrandPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -176,54 +178,69 @@ export default function BrandPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center p-2">
           {isLoading ? (
-            <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
-              <div className="relative w-12 h-12 flex items-center justify-center mr-4">
-                <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
-                <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
-                <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
-              </div>
-              <p className="text-lg text-gray-600">Loading ...</p>
-            </div>
+            // <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
+            //   <div className="relative w-12 h-12 flex items-center justify-center mr-4">
+            //     <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
+            //     <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
+            //     <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
+            //   </div>
+            //   <p className="text-lg text-gray-600">Loading ...</p>
+            // </div>
+            <SkeletonBox className="w-full h-[300px]" />
           ) : (
             <>
-              <button
-                onClick={openAddModal}
+              <motion.div
                 className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
               >
-                <div
-                  className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
-                  }}
+                <button
+                  onClick={openAddModal}
+                  className="flex flex-col items-center justify-center text-center"
                 >
-                  <span className="material-symbols-outlined">add</span>
-                </div>
-                <p className="font-bold text-black">Add Brand</p>
-              </button>
+                  <div
+                    className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom,rgba(3, 85, 247, 1), rgba(2, 50, 145, 1))",
+                    }}
+                  >
+                    <span className="material-symbols-outlined">add</span>
+                  </div>
+                  <p className="font-bold text-black">Add Brand</p>
+                </button>
+              </motion.div>
 
               {brands.map((data) => (
-                <div key={data.brand_id} className="relative w-full max-w-sm">
-                  <Link
-                    href={{
-                      pathname: `brand/outlet/${data.brand_id}`,
-                      query: { name: data.brand_name },
-                    }}
-                    className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-                  >
-                    <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
-                      <img
-                        src={
-                          data.logo_url
-                            ? data.logo_url
-                            : "/static/images/ex_brand.png"
-                        }
-                        alt={data.brand_name}
-                        className="w-full h-full object-cover rounded-2xl shadow-lg"
-                      />
-                    </div>
+                <motion.div
+                  key={data.brand_id}
+                  className="overflow-hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                >
+                  <div key={data.brand_id} className="relative w-full max-w-sm">
+                    <Link
+                      href={{
+                        pathname: `brand/outlet/${data.brand_id}`,
+                        query: { name: data.brand_name },
+                      }}
+                      className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                    >
+                      <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
+                        <img
+                          src={
+                            data.logo_url
+                              ? data.logo_url
+                              : "/static/images/ex_brand.png"
+                          }
+                          alt={data.brand_name}
+                          className="w-full h-full object-cover rounded-2xl shadow-lg"
+                        />
+                      </div>
 
-                    {/* <div className="p-7">
+                      {/* <div className="p-7">
                       <img
                         src={
                           data.logo_url
@@ -234,64 +251,67 @@ export default function BrandPage() {
                         className="w-50 h-50 mb-3 rounded-lg shadow-2xl"
                       />
                     </div> */}
-                    <p className="font-bold text-black">{data.brand_name}</p>
-                    <p className="text-black">{data.address}</p>
-                  </Link>
+                      <p className="font-bold text-black">{data.brand_name}</p>
+                      <p className="text-black">{data.address}</p>
+                    </Link>
 
-                  <div
-                    className="absolute top-3 right-5 text-gray-600 hover:text-black cursor-pointer z-10"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setActiveDropdown(
-                        activeDropdown === data.brand_id ? null : data.brand_id
-                      );
-                    }}
-                  >
-                    <span className="material-symbols-outlined">
-                      more_horiz
-                    </span>
-                  </div>
-
-                  {activeDropdown === data.brand_id && (
                     <div
-                      ref={dropdownRef}
-                      className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
+                      className="absolute top-3 right-5 text-gray-600 hover:text-black cursor-pointer z-10"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setActiveDropdown(
+                          activeDropdown === data.brand_id
+                            ? null
+                            : data.brand_id
+                        );
+                      }}
                     >
-                      <button
-                        onClick={() => handleOpenDetail(data)}
-                        className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
-                      >
-                        <span className="material-symbols-outlined">
-                          visibility
-                        </span>
-                        Detail
-                      </button>
-                      <button
-                        onClick={() => openEditModal(data)}
-                        className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
-                      >
-                        <span className="material-symbols-outlined">
-                          draft_orders
-                        </span>
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setActiveDropdown(null);
-                          setBrandToDelete(data);
-                          setIsConfirmDeleteOpen(true);
-                        }}
-                        className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
-                      >
-                        <span className="material-symbols-outlined">
-                          delete
-                        </span>
-                        Delete
-                      </button>
+                      <span className="material-symbols-outlined">
+                        more_horiz
+                      </span>
                     </div>
-                  )}
-                </div>
+
+                    {activeDropdown === data.brand_id && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute top-10 right-2 bg-white border border-gray-300 shadow-md rounded-md w-32 z-20"
+                      >
+                        <button
+                          onClick={() => handleOpenDetail(data)}
+                          className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-blue-500"
+                        >
+                          <span className="material-symbols-outlined">
+                            visibility
+                          </span>
+                          Detail
+                        </button>
+                        <button
+                          onClick={() => openEditModal(data)}
+                          className="flex items-center w-full gap-2 text-left px-4 py-2 hover:bg-gray-100 text-yellow-500"
+                        >
+                          <span className="material-symbols-outlined">
+                            draft_orders
+                          </span>
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setActiveDropdown(null);
+                            setBrandToDelete(data);
+                            setIsConfirmDeleteOpen(true);
+                          }}
+                          className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+                        >
+                          <span className="material-symbols-outlined">
+                            delete
+                          </span>
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
               ))}
             </>
           )}
