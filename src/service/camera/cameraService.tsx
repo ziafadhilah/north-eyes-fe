@@ -63,6 +63,15 @@ export function fetchSettingsCameraByCameraId(token: string, id: string) {
   });
 }
 
+export function deleteCamera(token: string, id: string) {
+  return axios.delete(`${cameraUrl}/${id}`, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+  });
+}
+
 export function useLiveStream(
   camera_id: string,
   drawImage: (imgData: string) => void

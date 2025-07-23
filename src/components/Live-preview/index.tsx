@@ -8,9 +8,12 @@ import AddCameraForm from "./add_camera";
 import { EditCameraForm } from "./edit";
 import { CameraData, EditCameraData } from "@/constants/cameraData";
 import {
+  deleteCamera,
   fetchCameraByAreaId,
   useLiveStream,
 } from "@/service/camera/cameraService";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export default function LIndex() {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +36,9 @@ export default function LIndex() {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [cameraToDelete, setCameraToDelete] = useState<CameraData | null>(null);
 
   const today = new Date();
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
@@ -78,6 +84,23 @@ export default function LIndex() {
         .catch((err) => console.error("Error fetching brand:", err));
     }
   }, [id]);
+
+  const handleDelete = async (cameraId: string) => {
+    const token = localStorage.getItem("token") || "";
+
+    try {
+      const res = await deleteCamera(token, cameraId);
+      if (res.data.status === "success") {
+        toastr.success("Camera deleted successfully");
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        toastr.error("Failed to delete outlet");
+      }
+    } catch (error) {
+      toastr.error("Error occurred while deleting outlet");
+      console.error(error);
+    }
+  };
 
   const handleMainCameraSwap = (clickedCamera: CameraData) => {
     if (!mainCamera) return;
@@ -273,6 +296,20 @@ export default function LIndex() {
                           Edit
                         </button>
                       </li>
+                      <li>
+                        <button
+                          onClick={() => {
+                            setCameraToDelete(mainCamera);
+                            setIsConfirmDeleteOpen(true);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-base mr-2">
+                            delete
+                          </span>
+                          Delete
+                        </button>
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -439,6 +476,34 @@ export default function LIndex() {
         ) : (
           <p>Loading...</p>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={isConfirmDeleteOpen}
+        onClose={() => setIsConfirmDeleteOpen(false)}
+        size="sm"
+      >
+        <h2 className="text-lg font-bold mb-4">Confirm to Delete</h2>
+        <p className="mb-4">Are you sure you want to delete this camera?</p>
+        <div className="flex justify-end gap-4">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-xl"
+            onClick={() => setIsConfirmDeleteOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-xl"
+            onClick={() => {
+              if (cameraToDelete) {
+                handleDelete(cameraToDelete.camera_id);
+                setIsConfirmDeleteOpen(false);
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
       </Modal>
     </div>
   );
