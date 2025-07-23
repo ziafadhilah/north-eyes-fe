@@ -1,8 +1,10 @@
 export interface CameraData {
+  area_id: string;
+  camera_code: string;
   camera_id: string;
   camera_name: string;
-  camera_code: string;
-  area_id: string;
+  camera_socket: string;
+  client_socket: string;
   url: string;
   description: string;
   // tambahan bisa di comment nanti
@@ -30,4 +32,13 @@ export interface EditCameraData {
   area_id: string;
   url: string;
   description: string;
+}
+
+export interface EditCameraSetting {
+  rules: {
+    type: string;
+    category: string;
+    level: number;
+    active: "on" | "off";
+  }[];
 }

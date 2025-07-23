@@ -70,7 +70,6 @@ export default function LIndex() {
       fetchCameraByAreaId(token, id)
         .then((res) => {
           const cameras = res.data?.data?.data || [];
-          console.log("Data Kamera :", res);
           if (cameras.length > 0) {
             setMainCamera(cameras[0]);
             setCamera(cameras.slice(1));
@@ -126,55 +125,57 @@ export default function LIndex() {
   return (
     <div>
       <Main>
-        <div className="flex items-start justify-between mb-3 w-full">
-          <div className="flex items-center">
-            <button
-              onClick={() => window.history.back()}
-              className="flex items-center text-black hover:scale-110"
-            >
-              <span className="material-symbols-outlined mr-5 text-3xl">
-                arrow_back
-              </span>
-            </button>
-
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-title-color mb-2">
-                Live Preview
-              </h1>
-              <nav
-                className="text-sm text-gray-500 mt-1"
-                aria-label="breadcrumb"
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 w-full gap-4 p-2">
+          <div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center text-black hover:scale-110"
               >
-                <ol className="flex items-center space-x-2">
-                  <li>
-                    <Link href="/brand" className="hover:underline">
-                      Brand
+                <span className="material-symbols-outlined mr-5 text-3xl">
+                  arrow_back
+                </span>
+              </button>
+
+              <div className="mb-3">
+                <h1 className="text-3xl font-bold text-title-color mb-2">
+                  Live Preview
+                </h1>
+                <nav
+                  className="text-sm text-gray-500 mt-1"
+                  aria-label="breadcrumb"
+                >
+                  <ol className="flex items-center space-x-2">
+                    <li>
+                      <Link href="/brand" className="hover:underline">
+                        Brand
+                      </Link>
+                    </li>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
+                    <li>{brand_name}</li>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
+                    <Link
+                      href="#"
+                      onClick={() => window.history.back()}
+                      className="hover:underline"
+                    >
+                      {outlet_name}
                     </Link>
-                  </li>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <li>{brand_name}</li>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <Link
-                    href="#"
-                    onClick={() => window.history.back()}
-                    className="hover:underline"
-                  >
-                    {outlet_name}
-                  </Link>
-                  <span className="material-symbols-outlined">
-                    chevron_right
-                  </span>
-                  <li className="text-gray-700 font-medium">{area_name}</li>
-                </ol>
-              </nav>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
+                    <li className="text-gray-700 font-medium">{area_name}</li>
+                  </ol>
+                </nav>
+              </div>
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="text-left md:text-right p-3">
             <span className="text-white text-md font-medium px-2.5 py-0.5 rounded-md ne-accent">
               {dayName}
             </span>
@@ -198,7 +199,7 @@ export default function LIndex() {
         </div>
 
         {mainCamera && (
-          <div>
+          <div className="p-2">
             <p className="font-bold text-black mb-3 text-2xl">
               {mainCamera.camera_name}
             </p>
@@ -244,7 +245,15 @@ export default function LIndex() {
                     <ul className="flex flex-col">
                       <li>
                         <Link
-                          href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
+                          href={{
+                            pathname: `/brand/live-preview/${mainCamera.camera_id}/settings`,
+                            query: {
+                              brand_name: brand_name,
+                              outlet_name: outlet_name,
+                              area_name: area_name,
+                              camera_name: mainCamera.camera_name,
+                            },
+                          }}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           <span className="material-symbols-outlined text-base mr-2 align-middle">

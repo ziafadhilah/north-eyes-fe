@@ -1,4 +1,8 @@
-import { CreateCameraData, EditCameraData } from "@/constants/cameraData";
+import {
+  CreateCameraData,
+  EditCameraData,
+  EditCameraSetting,
+} from "@/constants/cameraData";
 import { io, Socket } from "socket.io-client";
 import axios from "axios";
 import { useEffect, useRef } from "react";
@@ -32,6 +36,30 @@ export function editCamera(data: EditCameraData, token: string, id: string) {
       "x-authorized-key": token,
       "Content-Type": "application/json",
     },
+  });
+}
+
+export function editSettingsCamera(
+  data: EditCameraSetting,
+  token: string,
+  id: string
+) {
+  return axios.put(`${cameraUrl}/${id}`, data, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function fetchSettingsCameraByCameraId(token: string, id: string) {
+  const params = new URLSearchParams({ camera_id: id });
+  return axios.get(`${cameraUrl}/${id}`, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+    params: params,
   });
 }
 
