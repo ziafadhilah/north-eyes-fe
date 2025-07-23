@@ -2,14 +2,19 @@
 import Main from "@/components/General/Layout/Main";
 import Link from "next/link";
 // import { useRouter } from "next/navigation";
-import { useState } from "react";
 import Accordion from "@/components/General/Accordion/Accordion";
-import { motion, AnimatePresence } from "framer-motion";
+import { SettingToggle } from "@/components/General/Accordion/SettingsAccordion";
 
 export default function BrandSettingsPage() {
-  const [appronEnabled, setAppronEnabled] = useState(false);
-  const [hatEnabled, setHatEnabled] = useState(false);
-  const [level, setLevel] = useState("low");
+  const today = new Date();
+  const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
+  const dateTimeString = today.toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div>
@@ -50,310 +55,45 @@ export default function BrandSettingsPage() {
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="text-left md:text-right p-3">
             <span className="text-white text-md font-medium px-2.5 py-0.5 rounded-md ne-accent">
-              Wednesday
+              {dayName}
             </span>
             <p className="text-md font-medium text-black mt-4">
-              10:00 AM, 04 April 2025
+              {dateTimeString}
             </p>
           </div>
         </div>
         <Accordion title="Uniform">
           <div className="p-6 bg-gray-50">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-700 font-medium">Appron</span>
-              <label className="inline-flex items-center cursor-pointer relative">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-500 transition-all"></div>
-                <motion.div
-                  animate={{ x: appronEnabled ? 20 : 2 }}
-                  className="w-5 h-5 bg-white rounded-full shadow absolute top-0.5 left-0.5"
-                />
-              </label>
-            </div>
-            <AnimatePresence>
-              {appronEnabled && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <div className="ml-4">
-                    <label className="block text-gray-700 font-medium">
-                      Select Level
-                    </label>
-                    <div className="flex gap-4">
-                      {["low", "med", "high"].map((option) => (
-                        <label key={option} className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name="appron-level"
-                            value={option}
-                            checked={level === option}
-                            onChange={(e) => setLevel(e.target.value)}
-                          />
-                          <span className="capitalize">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-700 font-medium">Hat</span>
-              <label className="inline-flex items-center cursor-pointer relative">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={hatEnabled}
-                  onChange={() => setHatEnabled(!hatEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-500 transition-all"></div>
-                <motion.div
-                  animate={{ x: hatEnabled ? 20 : 2 }}
-                  className="w-5 h-5 bg-white rounded-full shadow absolute top-0.5 left-0.5"
-                />
-              </label>
-            </div>
-            <AnimatePresence>
-              {hatEnabled && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <div className="ml-4">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Select Level
-                    </label>
-                    <div className="flex gap-4">
-                      {["low", "med", "high"].map((option) => (
-                        <label key={option} className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name="appron-level"
-                            value={option}
-                            checked={level === option}
-                            onChange={(e) => setLevel(e.target.value)}
-                          />
-                          <span className="capitalize">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div className="flex items-center justify-between mb-8 rounded-lg">
-              <span className="text-gray-700 font-medium">Mask</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
+            <SettingToggle label="Appron" name="appron-level" />
+            <SettingToggle label="Hat" name="hat-level" />
+            <SettingToggle label="Mask" name="mask-level" />
           </div>
         </Accordion>
+
         <Accordion title="Grooming">
           <div className="p-6 bg-gray-50">
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Grooming</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
+            <SettingToggle label="Grooming" name="grooming-level" />
           </div>
         </Accordion>
+
         <Accordion title="Behavior">
           <div className="p-6 bg-gray-50">
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Eat</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Drink</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Smoking</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
+            <SettingToggle label="Eat" name="eat-level" />
+            <SettingToggle label="Drink" name="drink-level" />
+            <SettingToggle label="Smoking" name="smoking-level" />
           </div>
         </Accordion>
+
         <Accordion title="Others">
           <div className="p-6 bg-gray-50">
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Harrasment</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Fraud</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Using Handphone</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Idle</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Smoke</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-            <div className="flex items-center justify-between mb-4 rounded-lg">
-              <span className="text-gray-700 font-medium">Fire</span>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={appronEnabled}
-                  onChange={() => setAppronEnabled(!appronEnabled)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition-all"></div>
-                <div
-                  className={`absolute w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    appronEnabled ? "translate-x-5" : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
+            <SettingToggle label="Harrasment" name="harrasment-level" />
+            <SettingToggle label="Fraud" name="fraud-level" />
+            <SettingToggle label="Using Handphone" name="handphone-level" />
+            <SettingToggle label="Idle" name="idle-level" />
+            <SettingToggle label="Smoke" name="smoke-level" />
+            <SettingToggle label="Fire" name="fire-level" />
           </div>
         </Accordion>
       </Main>
