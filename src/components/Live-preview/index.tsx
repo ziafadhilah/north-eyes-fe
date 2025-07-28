@@ -169,11 +169,7 @@ export default function LIndex() {
                   aria-label="breadcrumb"
                 >
                   <ol className="flex items-center space-x-2">
-                    <li>
-                      <Link href="/brand" className="hover:underline">
-                        Brand
-                      </Link>
-                    </li>
+                    <li>Brand</li>
                     <span className="material-symbols-outlined">
                       chevron_right
                     </span>
@@ -181,17 +177,13 @@ export default function LIndex() {
                     <span className="material-symbols-outlined">
                       chevron_right
                     </span>
-                    <Link
-                      href="#"
-                      onClick={() => window.history.back()}
-                      className="hover:underline"
-                    >
-                      {outlet_name}
-                    </Link>
+                    <li>{outlet_name}</li>
                     <span className="material-symbols-outlined">
                       chevron_right
                     </span>
-                    <li className="text-gray-700 font-medium">{area_name}</li>
+                    <li className="text-gray-700 font-medium hover:cursor-default">
+                      {area_name}
+                    </li>
                   </ol>
                 </nav>
               </div>
@@ -208,9 +200,11 @@ export default function LIndex() {
           </div>
         </div>
 
-        <div className="ml-10 flex items-center justify-between mb-5">
-          <div className="flex gap-4">&nbsp;</div>
-          <div className="flex items-center gap-2">
+        <div className="ml-5 md:mr-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+          <div className="flex justify-start md:justify-start w-full md:w-auto">
+            &nbsp;
+          </div>
+          <div className="flex items-center gap-2 justify-start md:justify-end w-full md:w-auto">
             <button
               onClick={openModal}
               className="text-white p-2 bg-blue-600 rounded-xl shadow-sm flex items-center justify-center hover:scale-105 hover:bg-blue-500"

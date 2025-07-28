@@ -48,6 +48,7 @@ export default function BrandSettingsPage() {
       active: "on" | "off";
     }[]
   >([]);
+  const [loading, setLoading] = useState(false);
 
   const brand_name = searchParams.get("brand_name") as string;
   const outlet_name = searchParams.get("outlet_name") as string;
@@ -92,12 +93,25 @@ export default function BrandSettingsPage() {
     }
 
     try {
+      setLoading(true);
+
       const payload = { rules };
-      await editSettingsCamera(payload, token, cameraId);
-      toastr.success("Settings updated successfully.");
+      const response = await editSettingsCamera(payload, token, cameraId);
+
+      if (response.data.status === "success") {
+        toastr.success("Settings updated successfully.");
+        setTimeout(() => {
+          setLoading(false);
+          location.reload();
+        }, 1500);
+      } else {
+        toastr.error("Failed to update settings.");
+        setLoading(false);
+      }
     } catch (error) {
       console.error(error);
       toastr.error("Failed to update settings.");
+      setLoading(false);
     }
   };
 
@@ -135,8 +149,8 @@ export default function BrandSettingsPage() {
 
   return (
     <Main>
-      <div className="flex items-start justify-between mb-3 w-full">
-        <div className="flex items-center">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 w-full gap-4 p-2">
+        <div className="flex items-center gap-3 flex-wrap max-w-full">
           <button
             onClick={() => window.history.back()}
             className="flex items-center text-black hover:scale-110"
@@ -146,12 +160,12 @@ export default function BrandSettingsPage() {
             </span>
           </button>
 
-          <div className="mb-3">
+          <div className="mb-3 max-w-full">
             <h1 className="text-3xl font-bold text-title-color mb-2">
               Live Preview
             </h1>
             <nav className="text-sm text-gray-500 mt-1" aria-label="breadcrumb">
-              <ol className="flex items-center space-x-2">
+              <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 max-w-full">
                 <li>
                   <Link href="/brand" className="hover:underline">
                     Brand
@@ -160,13 +174,7 @@ export default function BrandSettingsPage() {
                 <span className="material-symbols-outlined">chevron_right</span>
                 <li>{brand_name}</li>
                 <span className="material-symbols-outlined">chevron_right</span>
-                <Link
-                  href="#"
-                  onClick={() => window.history.back()}
-                  className="hover:underline"
-                >
-                  {outlet_name}
-                </Link>
+                <li>{outlet_name}</li>
                 <span className="material-symbols-outlined">chevron_right</span>
                 <li className="text-gray-700 font-medium">{area_name}</li>
                 <span className="material-symbols-outlined">chevron_right</span>
@@ -176,7 +184,7 @@ export default function BrandSettingsPage() {
           </div>
         </div>
 
-        <div className="text-right">
+        <div className="text-left md:text-right">
           <span className="text-white text-md font-medium px-2.5 py-0.5 rounded-md ne-accent">
             {dayName}
           </span>
@@ -194,9 +202,16 @@ export default function BrandSettingsPage() {
       <div className="mt-6 flex justify-end">
         <button
           onClick={handleSubmit}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          disabled={loading}
+          className={`text-white px-4 py-2 rounded-2xl transition duration-300 ${
+            loading ? "cursor-not-allowed opacity-70" : "hover:bg-[#2e5de3]"
+          }`}
+          style={{
+            background:
+              "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
+          }}
         >
-          Submit Settings
+          {loading ? "Saving..." : "Save Settings"}
         </button>
       </div>
     </Main>

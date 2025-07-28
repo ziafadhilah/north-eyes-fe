@@ -176,11 +176,7 @@ export default function AreaPage() {
                 </h1>
                 <nav className="text-sm text-gray-500" aria-label="breadcrumb">
                   <ol className="flex items-center space-x-2">
-                    <li className="flex items-center">
-                      <Link href="/brand" className="hover:underline">
-                        Brand
-                      </Link>
-                    </li>
+                    <li className="text-gray-700 font-medium">Brand</li>
                     <span className="material-symbols-outlined">
                       chevron_right
                     </span>

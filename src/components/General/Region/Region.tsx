@@ -85,6 +85,7 @@ export default function RegionSelect({
           }}
           placeholder="Select Province"
           className="mt-1"
+          required
         />
       </div>
 
@@ -107,6 +108,7 @@ export default function RegionSelect({
             selectedProvince ? "Select City" : "Select Province first"
           }
           className="mt-1"
+          required
         />
       </div>
     </>

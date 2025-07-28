@@ -177,14 +177,10 @@ export default function OutletPage() {
                 </h1>
                 <nav className="text-sm text-gray-500" aria-label="breadcrumb">
                   <ol className="flex items-center space-x-2">
-                    <li className="flex items-center">
-                      <Link href="/brand" className="hover:underline">
-                        Brand
-                      </Link>
-                      <span className="material-symbols-outlined mx-2 text-base text-gray-400">
-                        chevron_right
-                      </span>
-                    </li>
+                    <li className="text-gray-700 font-medium">Brand</li>
+                    <span className="material-symbols-outlined">
+                      chevron_right
+                    </span>
                     <li className="text-gray-700 font-medium">{brand_name}</li>
                   </ol>
                 </nav>

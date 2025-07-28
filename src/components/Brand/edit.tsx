@@ -58,6 +58,23 @@ export default function EditBrandForm({
     }));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    // Pastikan selalu diawali dengan +62
+    if (!value.startsWith("+62")) {
+      value = "+62" + value.replace(/\D/g, ""); // hapus semua non-digit
+    } else {
+      // Hapus karakter non-digit setelah +62
+      value = "+62" + value.substring(3).replace(/\D/g, "");
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      phone: value,
+    }));
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -136,16 +153,59 @@ export default function EditBrandForm({
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.brand_name.trim())
+    if (!formData.brand_name.trim()) {
       newErrors.brand_name = "Brand Name is required";
+    } else if (/\d/.test(formData.brand_name)) {
+      newErrors.brand_name = "Brand Name cannot contain numbers";
+    } else if (formData.brand_name.length > 255) {
+      newErrors.brand_name = "Brand Name max 255 characters";
+    }
+
     if (!formData.employee_daily_point.toString().trim())
       newErrors.employee_daily_point = "Employee Daily Point is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!formData.country.trim()) newErrors.country = "Country is required";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!logoFile) {
-      newErrors.logo_url = "Logo is required";
+
+    if (formData.description && formData.description.length > 1000) {
+      newErrors.description = "Description cannot be more than 1000 characters";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
     } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Email is not valid";
+      }
+    }
+
+    if (!formData.country.trim()) newErrors.country = "Country is required";
+
+    if (!formData.address.trim()) newErrors.address = "Address is required";
+
+    if (formData.website_url.trim()) {
+      try {
+        new URL(formData.website_url);
+      } catch {
+        newErrors.website_url = "Website URL is not valid";
+      }
+    }
+
+    if (formData.founded_year) {
+      const year = new Date(formData.founded_year).getFullYear();
+      if (year < 1900) {
+        newErrors.founded_year = "Founded year cannot be before 1900";
+      }
+    }
+
+    const phoneDigits = formData.phone.replace("+62", "");
+    if (!formData.phone.startsWith("+62")) {
+      newErrors.phone = "Phone number must start with +62";
+    } else if (phoneDigits.length < 9 || phoneDigits.length > 12) {
+      newErrors.phone = "Phone number must be between 9–12 digits after +62";
+    }
+
+    if (!logoFile && !formData.logo_url) {
+      newErrors.logo_url = "Logo is required";
+    } else if (logoFile) {
       const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
       if (!allowedTypes.includes(logoFile.type)) {
         newErrors.logo_url = "Logo must be .jpg, .jpeg, or .png";
@@ -214,7 +274,7 @@ export default function EditBrandForm({
               htmlFor="logo-upload"
               className="cursor-pointer px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 inline-block"
             >
-              Logo
+              Edit Logo
             </label>
             <input
               id="logo-upload"
@@ -254,6 +314,9 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Description"
             />
+            {errors.description && (
+              <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+            )}
           </div>
 
           <div>
@@ -268,6 +331,9 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Website URL"
             />
+            {errors.website_url && (
+              <p className="text-sm text-red-600 mt-1">{errors.website_url}</p>
+            )}
           </div>
 
           <div>
@@ -284,7 +350,7 @@ export default function EditBrandForm({
                   ? "border-red-500"
                   : "border-gray-300 focus:border-blue-300"
               }`}
-              placeholder="Input Email"
+              placeholder="EG : example@gmail.com"
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-1">{errors.email}</p>
@@ -299,7 +365,7 @@ export default function EditBrandForm({
               type="text"
               name="phone"
               value={formData.phone}
-              onChange={handleChange}
+              onChange={handlePhoneChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Phone"
             />
@@ -434,7 +500,7 @@ export default function EditBrandForm({
                 "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
             }}
           >
-            {isLoading ? "Menyimpan..." : "Update"}
+            {isLoading ? "Saving..." : "Update"}
           </button>
         </div>
       </form>
