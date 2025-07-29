@@ -136,8 +136,6 @@ export default function EditBrandForm({
         employee_daily_point: formData.employee_daily_point,
       };
 
-      console.log(payload);
-
       const res = await updateBrands(payload, token, brandData.brand_id);
       if (res.data.status === "success") {
         toastr.success("Brand data has been updated.");
@@ -187,7 +185,11 @@ export default function EditBrandForm({
       }
     }
 
-    if (!formData.address.trim()) newErrors.address = "Address is required";
+    if (!formData.address.trim()) {
+      newErrors.address = "Address is required";
+    } else if (formData.address.length > 255) {
+      newErrors.address = "Address cannot be more than 255 characters";
+    }
 
     if (formData.website_url.trim()) {
       try {
@@ -202,6 +204,15 @@ export default function EditBrandForm({
       if (year < 1900) {
         newErrors.founded_year = "Founded year cannot be before 1900";
       }
+    }
+
+    if (formData.headquarter_city.length > 255) {
+      newErrors.headquarter_city =
+        "Headquarter City cannot be more than 255 characters";
+    }
+
+    if (formData.industry.length > 255) {
+      newErrors.industry = "Industry cannot be more than 255 characters";
     }
 
     const phoneDigits = formData.phone.replace("+62", "");
@@ -235,7 +246,7 @@ export default function EditBrandForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-bold text-gray-700">
-              Brand Name
+              Brand Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -256,7 +267,7 @@ export default function EditBrandForm({
 
           <div>
             <label className="block text-sm font-bold text-gray-700">
-              Employee Daily Point
+              Employee Daily Point <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -346,7 +357,7 @@ export default function EditBrandForm({
 
           <div>
             <label className="block text-sm font-bold text-gray-700">
-              Email
+              Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -377,6 +388,9 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Phone"
             />
+            {errors.phone && (
+              <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+            )}
           </div>
 
           <div>
@@ -391,6 +405,9 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Industry"
             />
+            {errors.industry && (
+              <p className="text-sm text-red-600 mt-1">{errors.industry}</p>
+            )}
           </div>
 
           <div>
@@ -424,11 +441,16 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Headquarter City"
             />
+            {errors.headquarter_city && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.headquarter_city}
+              </p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-bold text-gray-700">
-              Country
+              Country <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -450,7 +472,7 @@ export default function EditBrandForm({
 
           <div>
             <label className="block text-sm font-bold text-gray-700">
-              Address
+              Address <span className="text-red-500">*</span>
             </label>
             <input
               type="text"

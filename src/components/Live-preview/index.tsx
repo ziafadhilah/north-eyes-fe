@@ -207,7 +207,7 @@ export default function LIndex() {
           <div className="flex items-center gap-2 justify-start md:justify-end w-full md:w-auto">
             <button
               onClick={openModal}
-              className="text-white p-2 bg-blue-600 rounded-xl shadow-sm flex items-center justify-center hover:scale-105 hover:bg-blue-500"
+              className="text-white p-2 bg-blue-600 rounded-xl shadow-sm flex items-center justify-center hover:scale-102 hover:bg-blue-500"
             >
               <span className="material-symbols-outlined">add</span>
             </button>

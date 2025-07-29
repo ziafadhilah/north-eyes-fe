@@ -138,7 +138,7 @@ export default function SlugPage() {
           <div className="flex gap-4">&nbsp;</div>
           <button
             onClick={openAddModal}
-            className="text-white p-2 bg-blue-600 rounded-xl shadow-sm flex items-center justify-center hover:scale-105 hover:bg-blue-500"
+            className="text-white p-2 bg-blue-600 rounded-xl shadow-sm flex items-center justify-center hover:scale-102 hover:bg-blue-500"
           >
             <div className="flex items-center gap-1">
               <span className="material-symbols-outlined">add</span>

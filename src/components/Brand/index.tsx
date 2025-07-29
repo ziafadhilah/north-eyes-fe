@@ -189,15 +189,15 @@ export default function BrandPage() {
             <SkeletonBox className="w-full h-[300px]" />
           ) : (
             <>
-              <motion.div
-                className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
+              <button
+                onClick={openAddModal}
+                className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
               >
-                <button
-                  onClick={openAddModal}
+                <motion.div
                   className="flex flex-col items-center justify-center text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
                 >
                   <div
                     className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
@@ -209,8 +209,8 @@ export default function BrandPage() {
                     <span className="material-symbols-outlined">add</span>
                   </div>
                   <p className="font-bold text-black">Add Brand</p>
-                </button>
-              </motion.div>
+                </motion.div>
+              </button>
 
               {brands.map((data) => (
                 <motion.div
@@ -226,7 +226,7 @@ export default function BrandPage() {
                         pathname: `brand/outlet/${data.brand_id}`,
                         query: { name: data.brand_name },
                       }}
-                      className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                      className="p-4 h-[330px] w-[300px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
                     >
                       <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
                         <img
@@ -239,20 +239,16 @@ export default function BrandPage() {
                           className="w-full h-full object-cover rounded-2xl shadow-lg"
                         />
                       </div>
-
-                      {/* <div className="p-7">
-                      <img
-                        src={
-                          data.logo_url
-                            ? data.logo_url
-                            : "/static/images/ex_brand.png"
-                        }
-                        alt={data.brand_name}
-                        className="w-50 h-50 mb-3 rounded-lg shadow-2xl"
-                      />
-                    </div> */}
-                      <p className="font-bold text-black">{data.brand_name}</p>
-                      <p className="text-black">{data.address}</p>
+                      <p className="font-bold text-black">
+                        {data.brand_name.length > 20
+                          ? data.brand_name.slice(0, 20) + "..."
+                          : data.brand_name}
+                      </p>
+                      <p className="text-black">
+                        {data.address.length > 30
+                          ? data.address.slice(0, 30) + "..."
+                          : data.address}
+                      </p>
                     </Link>
 
                     <div

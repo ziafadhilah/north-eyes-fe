@@ -212,7 +212,7 @@ export default function OutletPage() {
             <>
               <button
                 onClick={openAddModal}
-                className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                className="w-full max-w-sm min-h-[250px] bg-radial-blue rounded-xl shadow flex flex-col items-center justify-center p-6 transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
               >
                 <div
                   className="rounded-2xl text-white shadow-lg w-12 h-12 flex items-center justify-center mb-3 text-2xl transition-transform duration-300 ease-in-out hover:scale-110"
@@ -236,7 +236,7 @@ export default function OutletPage() {
                         brand_name: brand_name,
                       },
                     }}
-                    className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-blue-200"
+                    className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
                   >
                     <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
                       <img

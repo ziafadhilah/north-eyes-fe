@@ -68,7 +68,7 @@ export default function RegionSelect({
     <>
       <div>
         <label className="block text-sm font-bold text-gray-700">
-          Province
+          Province <span className="text-red-500">*</span>
         </label>
         <AsyncSelect
           defaultOptions
@@ -90,7 +90,9 @@ export default function RegionSelect({
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-gray-700">City</label>
+        <label className="block text-sm font-bold text-gray-700">
+          City <span className="text-red-500">*</span>
+        </label>
         <AsyncSelect
           key={selectedProvince?.value}
           defaultOptions
