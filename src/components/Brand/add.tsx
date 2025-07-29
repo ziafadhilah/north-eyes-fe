@@ -118,6 +118,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     try {
       const payload = {
         ...formData,
+        country: "Indonesia",
         founded_year: parseInt(formData.founded_year),
         employee_daily_point: parseInt(formData.employee_daily_point),
         company_id: parseInt(company_id),
@@ -167,8 +168,6 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
         newErrors.email = "Email is not valid";
       }
     }
-
-    if (!formData.country.trim()) newErrors.country = "Country is required";
 
     if (!formData.address.trim()) newErrors.address = "Address is required";
 
@@ -433,18 +432,12 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
             <input
               type="text"
               name="country"
-              value={formData.country}
+              value="Indonesia"
               onChange={handleChange}
-              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
-                errors.country
-                  ? "border-red-500"
-                  : "border-gray-300 focus:border-blue-300"
-              }`}
+              className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring border-gray-300 focus:border-blue-300"
               placeholder="Input Country"
+              disabled
             />
-            {errors.country && (
-              <p className="text-sm text-red-600 mt-1">{errors.country}</p>
-            )}
           </div>
 
           <RegionSelect

@@ -24,7 +24,12 @@ export default function EditBrandForm({
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const [formData, setFormData] = useState({ ...brandData });
+  const [formData, setFormData] = useState({
+    ...brandData,
+    founded_year: brandData.founded_year
+      ? `${brandData.founded_year}-01-01`
+      : "",
+  });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -42,6 +47,7 @@ export default function EditBrandForm({
     setSelectedProvince(province);
     setFormData((prev) => ({
       ...prev,
+      country: "Indonesia",
       province: province.label,
       province_id: province.value,
       city: "",
@@ -124,9 +130,13 @@ export default function EditBrandForm({
     try {
       const payload = {
         ...formData,
-        founded_year: formData.founded_year,
+        founded_year: formData.founded_year
+          ? parseInt(formData.founded_year.split("-")[0])
+          : 0,
         employee_daily_point: formData.employee_daily_point,
       };
+
+      console.log(payload);
 
       const res = await updateBrands(payload, token, brandData.brand_id);
       if (res.data.status === "success") {
@@ -176,8 +186,6 @@ export default function EditBrandForm({
         newErrors.email = "Email is not valid";
       }
     }
-
-    if (!formData.country.trim()) newErrors.country = "Country is required";
 
     if (!formData.address.trim()) newErrors.address = "Address is required";
 
@@ -392,9 +400,15 @@ export default function EditBrandForm({
             <input
               type="date"
               name="founded_year"
-              value={formData.founded_year}
-              onChange={handleChange}
+              min="1900-01-01"
+              value={formData.founded_year || ""}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  founded_year: e.target.value,
+                }))
+              }
             />
           </div>
 
@@ -419,18 +433,12 @@ export default function EditBrandForm({
             <input
               type="text"
               name="country"
-              value={formData.country}
+              value="Indonesia"
               onChange={handleChange}
-              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
-                errors.country
-                  ? "border-red-500"
-                  : "border-gray-300 focus:border-blue-300"
-              }`}
+              className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring border-gray-300 focus:border-blue-300"
               placeholder="Input Country"
+              disabled
             />
-            {errors.country && (
-              <p className="text-sm text-red-600 mt-1">{errors.country}</p>
-            )}
           </div>
 
           <RegionSelect
