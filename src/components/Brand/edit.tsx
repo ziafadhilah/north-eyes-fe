@@ -160,6 +160,9 @@ export default function EditBrandForm({
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
+    const phoneDigits = formData.phone.replace("+62", "").trim();
+    const isNumeric = /^\d+$/.test(phoneDigits);
+    const isRepeated = /^(\d)\1+$/.test(phoneDigits);
 
     if (!formData.brand_name.trim()) {
       newErrors.brand_name = "Brand Name is required";
@@ -169,8 +172,12 @@ export default function EditBrandForm({
       newErrors.brand_name = "Brand Name max 255 characters";
     }
 
-    if (!formData.employee_daily_point.toString().trim())
+    if (!formData.employee_daily_point.toString().trim()) {
       newErrors.employee_daily_point = "Employee Daily Point is required";
+    } else if (formData.employee_daily_point.toString().length > 255) {
+      newErrors.employee_daily_point =
+        "Employee Daily Point max 255 characters";
+    }
 
     if (formData.description && formData.description.length > 1000) {
       newErrors.description = "Description cannot be more than 1000 characters";
@@ -201,25 +208,53 @@ export default function EditBrandForm({
 
     if (formData.founded_year) {
       const year = new Date(formData.founded_year).getFullYear();
+      const currentYear = new Date().getFullYear();
+
       if (year < 1900) {
         newErrors.founded_year = "Founded year cannot be before 1900";
+      } else if (year > currentYear) {
+        newErrors.founded_year = "Founded year cannot be in the future";
       }
     }
 
     if (formData.headquarter_city.length > 255) {
       newErrors.headquarter_city =
         "Headquarter City cannot be more than 255 characters";
+    } else if (!/^[A-Za-z\s'-]+$/.test(formData.headquarter_city)) {
+      newErrors.headquarter_city =
+        "Headquarter City must only contain letters, spaces, apostrophes, or hyphens";
     }
 
     if (formData.industry.length > 255) {
       newErrors.industry = "Industry cannot be more than 255 characters";
+    } else if (!/^[A-Za-z\s'-]+$/.test(formData.industry)) {
+      newErrors.industry =
+        "Industry must only contain letters, spaces, apostrophes, or hyphens";
     }
 
-    const phoneDigits = formData.phone.replace("+62", "");
+    if (formData.owner_name.length > 255) {
+      newErrors.owner_name = "Owner cannot be more than 255 characters";
+    } else if (!/^[A-Za-z\s]+$/.test(formData.owner_name)) {
+      newErrors.owner_name = "Owner only contain letters, spaces.";
+    }
+
     if (!formData.phone.startsWith("+62")) {
       newErrors.phone = "Phone number must start with +62";
+    } else if (!isNumeric) {
+      newErrors.phone = "Phone number must only contain digits after +62";
     } else if (phoneDigits.length < 9 || phoneDigits.length > 12) {
       newErrors.phone = "Phone number must be between 9–12 digits after +62";
+    } else if (isRepeated) {
+      newErrors.phone = "Phone number cannot be all the same digits";
+    }
+
+    if (!/^\d+$/.test(formData.postal_code)) {
+      newErrors.postal_code = "Postal code must only contain digits";
+    } else if (
+      formData.postal_code.length < 4 ||
+      formData.postal_code.length > 10
+    ) {
+      newErrors.postal_code = "Postal code must be between 4–10 digits";
     }
 
     if (!logoFile && !formData.logo_url) {
@@ -427,6 +462,9 @@ export default function EditBrandForm({
                 }))
               }
             />
+            {errors.founded_year && (
+              <p className="text-sm text-red-600 mt-1">{errors.founded_year}</p>
+            )}
           </div>
 
           <div>
@@ -503,6 +541,9 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Postal Code"
             />
+            {errors.postal_code && (
+              <p className="text-sm text-red-600 mt-1">{errors.postal_code}</p>
+            )}
           </div>
 
           <div>
@@ -517,6 +558,9 @@ export default function EditBrandForm({
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
               placeholder="Input Owner Name"
             />
+            {errors.owner_name && (
+              <p className="text-sm text-red-600 mt-1">{errors.owner_name}</p>
+            )}
           </div>
         </div>
 

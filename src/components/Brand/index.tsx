@@ -178,20 +178,12 @@ export default function BrandPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center p-2">
           {isLoading ? (
-            // <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
-            //   <div className="relative w-12 h-12 flex items-center justify-center mr-4">
-            //     <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
-            //     <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
-            //     <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
-            //   </div>
-            //   <p className="text-lg text-gray-600">Loading ...</p>
-            // </div>
             <SkeletonBox className="w-full h-[300px]" />
           ) : (
             <>
               <button
                 onClick={openAddModal}
-                className="w-full min-h-[250px] max-w-sm p-4 bg-radial-blue rounded-lg shadow-sm flex flex-col items-center justify-center text-center transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
+                className="p-4 h-[330px] w-[300px] md:w-full md:h-full cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
               >
                 <motion.div
                   className="flex flex-col items-center justify-center text-center"
@@ -226,7 +218,7 @@ export default function BrandPage() {
                         pathname: `brand/outlet/${data.brand_id}`,
                         query: { name: data.brand_name },
                       }}
-                      className="p-4 h-[330px] w-[300px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
+                      className="p-4 h-[330px] w-[300px] md:w-full md:h-full cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
                     >
                       <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
                         <img
