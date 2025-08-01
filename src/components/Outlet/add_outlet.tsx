@@ -21,6 +21,7 @@ export default function AddOutletForm({
   const [isLoading, setIsLoading] = useState(false);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
     outlet_name: "",
     logo_url: "",
@@ -46,9 +47,15 @@ export default function AddOutletForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      toastr.error("Logo format must be .jpg, .jpeg, atau .png");
+      return;
+    }
+
     const maxSizeInMB = 2;
     if (file.size > maxSizeInMB * 1024 * 1024) {
-      toastr.error(`Ukuran logo tidak boleh lebih dari ${maxSizeInMB}MB.`);
+      toastr.error(`Logo size cannot be more than ${maxSizeInMB}MB.`);
       return;
     }
 
@@ -63,47 +70,108 @@ export default function AddOutletForm({
         logo_url: uploadedUrl,
       }));
 
-      toastr.success("Logo berhasil diupload.");
+      toastr.success("Logo uploaded successfully.");
     } catch (error) {
       console.error(error);
-      toastr.error("Gagal upload logo.");
+      toastr.error("Failed to upload logo.");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
     const company_id = localStorage.getItem("company_id");
 
     if (!token || !company_id) {
-      alert("Token atau Company ID tidak ditemukan.");
+      toastr.error("Token or Company ID not found.");
       return;
     }
 
     try {
       const payload = {
         ...formData,
+        country: "Indonesia",
       };
 
       await createOutlet(payload, token);
       console.log(payload);
-      toastr.success("Data Brand Berhasil Ditambahkan.");
+      toastr.success("Outlet has been created.");
       onClose();
       setTimeout(() => window.location.reload(), 500);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toastr.error(
-          "Gagal menambahkan brand.",
+          "Failed to add outlet.",
           error.response?.data?.message || error.message
         );
       } else {
-        toastr.error("Gagal menambahkan brand.");
+        toastr.error("Failed to add outlet.");
       }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    const phoneDigits = formData.phone.replace("+62", "").trim();
+    const isNumeric = /^\d+$/.test(phoneDigits);
+    const isRepeated = /^(\d)\1+$/.test(phoneDigits);
+
+    if (!formData.outlet_name.trim()) {
+      newErrors.outlet_name = "Outlet Name is required";
+    } else if (/\d/.test(formData.outlet_name)) {
+      newErrors.outlet_name = "Outlet Name cannot contain numbers";
+    } else if (formData.outlet_name.length > 255) {
+      newErrors.outlet_name = "Outlet Name max 255 characters";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Email is not valid";
+      }
+    }
+
+    if (!formData.phone.startsWith("+62")) {
+      newErrors.phone = "Phone number must start with +62";
+    } else if (!isNumeric) {
+      newErrors.phone = "Phone number must only contain digits after +62";
+    } else if (phoneDigits.length < 9 || phoneDigits.length > 12) {
+      newErrors.phone = "Phone number must be between 9–12 digits after +62";
+    } else if (isRepeated) {
+      newErrors.phone = "Phone number cannot be all the same digits";
+    }
+
+    if (!/^\d+$/.test(formData.postal_code)) {
+      newErrors.postal_code = "Postal code must only contain digits";
+    } else if (
+      formData.postal_code.length < 4 ||
+      formData.postal_code.length > 10
+    ) {
+      newErrors.postal_code = "Postal code must be between 4–10 digits";
+    }
+
+    if (!logoFile) {
+      newErrors.logo_url = "Logo is required";
+    } else {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(logoFile.type)) {
+        newErrors.logo_url = "Logo must be .jpg, .jpeg, or .png";
+      }
+      const maxSizeInMB = 2;
+      if (logoFile.size > maxSizeInMB * 1024 * 1024) {
+        newErrors.logo_url = `Logo must be less than ${maxSizeInMB}MB`;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   useEffect(() => {
@@ -124,7 +192,7 @@ export default function AddOutletForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700">
-                Outlet Name
+                Outlet Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -134,11 +202,16 @@ export default function AddOutletForm({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Input Outlet Name"
               />
+              {errors.outlet_name && (
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.outlet_name}
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700">
-                Email
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -148,6 +221,9 @@ export default function AddOutletForm({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Input Email"
               />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -162,20 +238,27 @@ export default function AddOutletForm({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Input Phone"
               />
+              {errors.phone && (
+                <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+              )}
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700">
-                Country
+                Country <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="country"
-                value={formData.country}
+                value="Indonesia"
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring border-gray-300 focus:border-blue-300"
                 placeholder="Input Country"
+                disabled
               />
+              {errors.country && (
+                <p className="text-sm text-red-600 mt-1">{errors.country}</p>
+              )}
             </div>
 
             <RegionSelect
@@ -220,6 +303,11 @@ export default function AddOutletForm({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
                 placeholder="Input Postal Code"
               />
+              {errors.postal_code && (
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.postal_code}
+                </p>
+              )}
             </div>
 
             <div>
