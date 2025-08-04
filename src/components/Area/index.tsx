@@ -170,11 +170,14 @@ export default function AreaPage() {
                 </span>
               </button>
 
-              <div className="mb-3">
+              <div className="flex flex-col justify-center">
                 <h1 className="text-3xl font-bold text-title-color mb-1">
                   Area
                 </h1>
-                <nav className="text-sm text-gray-500" aria-label="breadcrumb">
+                <nav
+                  className="hidden lg:block text-sm text-gray-500"
+                  aria-label="breadcrumb"
+                >
                   <ol className="flex items-center space-x-2">
                     <li className="text-gray-700 font-medium">Brand</li>
                     <span className="material-symbols-outlined">

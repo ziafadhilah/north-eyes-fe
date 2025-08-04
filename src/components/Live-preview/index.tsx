@@ -160,12 +160,12 @@ export default function LIndex() {
                 </span>
               </button>
 
-              <div className="mb-3">
+              <div className="flex flex-col justify-center">
                 <h1 className="text-3xl font-bold text-title-color mb-2">
                   Live Preview
                 </h1>
                 <nav
-                  className="text-sm text-gray-500 mt-1"
+                  className="hidden lg:block text-sm text-gray-500 mt-1"
                   aria-label="breadcrumb"
                 >
                   <ol className="flex items-center space-x-2">

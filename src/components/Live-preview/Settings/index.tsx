@@ -1,7 +1,6 @@
 "use client";
 
 import Main from "@/components/General/Layout/Main";
-import Link from "next/link";
 import Accordion from "@/components/General/Accordion/Accordion";
 import { SettingToggle } from "@/components/General/Accordion/SettingsAccordion";
 import { useEffect, useState } from "react";
@@ -160,17 +159,16 @@ export default function BrandSettingsPage() {
             </span>
           </button>
 
-          <div className="mb-3 max-w-full">
+          <div className="flex flex-col justify-center">
             <h1 className="text-3xl font-bold text-title-color mb-2">
               Live Preview
             </h1>
-            <nav className="text-sm text-gray-500 mt-1" aria-label="breadcrumb">
+            <nav
+              className="hidden lg:block text-sm text-gray-500 mt-1"
+              aria-label="breadcrumb"
+            >
               <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 max-w-full">
-                <li>
-                  <Link href="/brand" className="hover:underline">
-                    Brand
-                  </Link>
-                </li>
+                <li>Brand</li>
                 <span className="material-symbols-outlined">chevron_right</span>
                 <li>{brand_name}</li>
                 <span className="material-symbols-outlined">chevron_right</span>
