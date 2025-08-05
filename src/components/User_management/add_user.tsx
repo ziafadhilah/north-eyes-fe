@@ -21,6 +21,8 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [slug, setSlug] = useState<SlugData[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -59,6 +61,10 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
     }));
   };
 
@@ -101,13 +107,31 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
 
     if (!formData.full_name.trim())
       newErrors.full_name = "Full Name is required";
+
     if (!formData.username.trim()) newErrors.username = "Username is required";
+
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!formData.password.trim()) newErrors.password = "Password is required";
+
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password min 6 characters";
+    }
+
     if (!formData.password_repeat.trim())
       newErrors.password_repeat = "Password Repeat is required";
+
     if (!formData.role) newErrors.role = "Role is required";
+
     if (!formData.slug_id) newErrors.slug_id = "Slug is required";
+
+    if (
+      formData.password &&
+      formData.password_repeat &&
+      formData.password !== formData.password_repeat
+    ) {
+      newErrors.password_repeat = "Password does not match";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -231,14 +255,31 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
               <label className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Input Password"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  placeholder="Input Password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-500"
+                >
+                  {showPassword ? (
+                    <span className="material-symbols-outlined">
+                      visibility_off
+                    </span>
+                  ) : (
+                    <span className="material-symbols-outlined">
+                      visibility
+                    </span>
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-sm text-red-600 mt-1">{errors.password}</p>
               )}
@@ -247,14 +288,31 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
               <label className="block text-sm font-medium text-gray-700">
                 Password Repeat
               </label>
-              <input
-                type="password"
-                name="password_repeat"
-                value={formData.password_repeat}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Input Password"
-              />
+              <div className="relative">
+                <input
+                  type={showRepeatPassword ? "text" : "password"}
+                  name="password_repeat"
+                  value={formData.password_repeat}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  placeholder="Input Password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-500"
+                >
+                  {showRepeatPassword ? (
+                    <span className="material-symbols-outlined">
+                      visibility_off
+                    </span>
+                  ) : (
+                    <span className="material-symbols-outlined">
+                      visibility
+                    </span>
+                  )}
+                </button>
+              </div>
               {errors.password_repeat && (
                 <p className="text-sm text-red-600 mt-1">
                   {errors.password_repeat}

@@ -158,9 +158,8 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
 
     if (!formData.employee_daily_point.trim()) {
       newErrors.employee_daily_point = "Employee Daily Point is required";
-    } else if (formData.employee_daily_point.length > 255) {
-      newErrors.employee_daily_point =
-        "Employee Daily Point max 255 characters";
+    } else if (formData.employee_daily_point.length > 10) {
+      newErrors.employee_daily_point = "Employee Daily Point max 10 characters";
     }
 
     if (formData.description && formData.description.length > 1000) {
@@ -191,14 +190,20 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     }
 
     if (formData.founded_year) {
-      const year = new Date(formData.founded_year).getFullYear();
-      const currentYear = new Date().getFullYear();
+      if (!/^\d+$/.test(formData.founded_year)) {
+        newErrors.founded_year = "Founded year must contain only numbers";
+      } else {
+        const year = parseInt(formData.founded_year);
+        const currentYear = new Date().getFullYear();
 
-      if (year < 1900) {
-        newErrors.founded_year = "Founded year cannot be before 1900";
-      } else if (year > currentYear) {
-        newErrors.founded_year = "Founded year cannot be in the future";
+        if (year < 1900) {
+          newErrors.founded_year = "Founded year cannot be before 1900";
+        } else if (year > currentYear) {
+          newErrors.founded_year = "Founded year cannot be in the future";
+        }
       }
+    } else {
+      newErrors.founded_year = "Founded year is required";
     }
 
     if (formData.headquarter_city.length > 255) {
@@ -410,7 +415,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                   ? "border-red-500"
                   : "border-gray-300 focus:border-blue-300"
               }`}
-              placeholder="EG : example@gmail.com"
+              placeholder="e.g : example@gmail.com"
             />
             {errors.email && (
               <p className="text-sm text-red-600 mt-1">{errors.email}</p>
@@ -426,7 +431,7 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="phone"
               value={formData.phone}
               onChange={handlePhoneChange}
-              placeholder="Input Phone EG : +621234567890"
+              placeholder="Input Phone e.g : +621234567890"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
             />
             {errors.phone && (
@@ -456,12 +461,26 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               Founded Year
             </label>
             <input
-              type="date"
-              min="1900-01-01"
+              type="text"
               name="founded_year"
               value={formData.founded_year}
               onChange={handleChange}
+              onKeyDown={(e) => {
+                const allowedKeys = [
+                  "Backspace",
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "Tab",
+                  "Delete",
+                ];
+                if (!/^[0-9]$/.test(e.key) && !allowedKeys.includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+              inputMode="numeric"
+              pattern="[0-9]*"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="e.g : 2025"
             />
             {errors.founded_year && (
               <p className="text-sm text-red-600 mt-1">{errors.founded_year}</p>
