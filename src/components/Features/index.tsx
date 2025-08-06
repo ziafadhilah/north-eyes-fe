@@ -7,6 +7,7 @@ import AddFeaturesForm from "./add";
 import {
   deleteFeatures,
   fetchFeatures,
+  updateFeaturesStatus,
 } from "@/service/features/featuresService";
 import { editFeatureData, featureData } from "@/constants/featuresData";
 import { useRouter } from "next/navigation";
@@ -24,6 +25,7 @@ export default function FeaturesPage() {
   const [selectedFeature, setSelectedFeature] = useState<featureData | null>(
     null
   );
+  const [isConfirmStatusOpen, setIsConfirmStatusOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -53,6 +55,10 @@ export default function FeaturesPage() {
     setFeatureToEdit(null);
   };
 
+  const closeStatusModal = () => {
+    setIsConfirmStatusOpen(false);
+  };
+
   const today = new Date();
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
   const dateTimeString = today.toLocaleString("en-US", {
@@ -69,6 +75,7 @@ export default function FeaturesPage() {
     const res = await fetchFeatures(token);
     if (res.status === 200) {
       const response = res.data.data.feature;
+      console.log(response);
       setTimeout(() => {
         setFeatures(response);
         setIsLoading(false);
@@ -93,6 +100,45 @@ export default function FeaturesPage() {
       }
     } catch (error) {
       toastr.error("Error occurred while deleting feature");
+      console.error(error);
+    }
+  };
+
+  const handleToggleStatus = async (featureData: featureData) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toastr.error("Token not found");
+      return;
+    }
+
+    const updatedStatus = !featureData.is_active;
+
+    // Siapkan payload
+    const payload = {
+      is_active: updatedStatus,
+    };
+
+    try {
+      const res = await updateFeaturesStatus(
+        payload,
+        token,
+        featureData.feature_id
+      );
+
+      if (res.data.status === "success") {
+        toastr.success("Status updated successfully");
+        setFeatures((prev) =>
+          prev.map((f) =>
+            f.feature_id === featureData.feature_id
+              ? { ...f, is_active: updatedStatus }
+              : f
+          )
+        );
+      } else {
+        toastr.error("Failed to update status");
+      }
+    } catch (error) {
+      toastr.error("Error updating status");
       console.error(error);
     }
   };
@@ -186,15 +232,25 @@ export default function FeaturesPage() {
                   >
                     <td className="py-3 px-4">{data.name}</td>
                     <td className="py-3 px-4">{data.description}</td>
-                    {data.is_active == true ? (
-                      <td className="py-3 px-4 text-green-600">Active</td>
-                    ) : (
-                      <td className="py-3 px-4 text-red-600">Inactive</td>
-                    )}
-
                     <td className="py-3 px-4">
                       <button
-                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-blue-500"
+                        onClick={() => {
+                          setSelectedFeature(data);
+                          setIsConfirmStatusOpen(true);
+                        }}
+                        className={`px-3 py-1 rounded-full font-medium text-white ${
+                          data.is_active
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-red-500 hover:bg-red-600"
+                        }`}
+                      >
+                        {data.is_active ? "Active" : "Inactive"}
+                      </button>
+                    </td>
+
+                    <td className="py-3 px-4 flex flex-row">
+                      <button
+                        className="px-3 py-1 cursor-pointer hover:bg-gray-100 text-blue-500"
                         title="View"
                         onClick={() => handleOpenDetail(data)}
                       >
@@ -203,7 +259,7 @@ export default function FeaturesPage() {
                         </span>
                       </button>
                       <button
-                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-yellow-500"
+                        className="px-3 py-1 cursor-pointer hover:bg-gray-100 text-yellow-500"
                         title="Edit"
                         onClick={() => openEditModal(data)}
                       >
@@ -212,7 +268,7 @@ export default function FeaturesPage() {
                         </span>
                       </button>
                       <button
-                        className="text-black px-3 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
+                        className="px-3 py-1 cursor-pointer hover:bg-gray-100 text-red-500"
                         title="Delete"
                         onClick={() => {
                           setFeatureToDelete(data);
@@ -291,6 +347,44 @@ export default function FeaturesPage() {
               }}
             >
               Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isConfirmStatusOpen && selectedFeature !== null}
+        onClose={closeStatusModal}
+        size="sm"
+      >
+        <div className="p-4">
+          <h2 className="text-lg font-bold mb-4">Status Change Confirmation</h2>
+          <p className="mb-6">
+            Are you sure want to{" "}
+            {selectedFeature?.is_active ? "Deactivate" : "Activate"} this
+            features?
+          </p>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => {
+                setIsConfirmStatusOpen(false);
+                setSelectedFeature(null);
+              }}
+              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                if (selectedFeature) {
+                  await handleToggleStatus(selectedFeature);
+                  setIsConfirmStatusOpen(false);
+                  setSelectedFeature(null);
+                }
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Yes, Confirm
             </button>
           </div>
         </div>

@@ -164,7 +164,6 @@ export default function SlugPage() {
             <thead className="text-gray-700 text-center">
               <tr>
                 <th className="py-3 px-4">User ID</th>
-                <th className="py-3 px-4">Slug ID</th>
                 <th className="py-3 px-4">Full Name</th>
                 <th className="py-3 px-4">Email</th>
                 <th className="py-3 px-4">Phone</th>
@@ -185,13 +184,12 @@ export default function SlugPage() {
                 users.map((data) => (
                   <tr key={data.user_id} className="border-t hover:bg-gray-50">
                     <td className="py-3 px-4">{data.user_id}</td>
-                    <td className="py-3 px-4">{data.slug_id}</td>
                     <td className="py-3 px-4">{data.full_name}</td>
                     <td className="py-3 px-4">{data.email}</td>
                     <td className="py-3 px-4">{data.phone_number}</td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 flex flex-row">
                       <button
-                        className="text-black px-3 py-1"
+                        className="cursor-pointer hover:bg-gray-100 text-blue-500 px-3 py-1"
                         title="View"
                         onClick={() => handleOpenDetail(data)}
                       >

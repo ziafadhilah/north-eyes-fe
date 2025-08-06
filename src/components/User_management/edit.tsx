@@ -1,11 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { SlugData } from "@/constants/slugData";
 import { userManagementEditData } from "@/constants/userManagementData";
+import { fetchSlug } from "@/service/slug/slugService";
 import { uploadPictureUser } from "@/service/user-management/uploadUserPictService";
 import { updateUsersManagement } from "@/service/user-management/userManagement";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 
@@ -19,7 +21,11 @@ export default function EditUserManagementForm({
   onClose,
 }: EditUserManagementFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ ...userData });
+  const [formData, setFormData] = useState({
+    ...userData,
+    role: userData.role?.toLowerCase() || "",
+  });
+  const [slug, setSlug] = useState<SlugData[]>([]);
 
   const [previewLogo, setPreviewLogo] = useState<string | null>(
     userData.profile_picture_url || null
@@ -31,6 +37,22 @@ export default function EditUserManagementForm({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const loadSlug = async () => {
+    const token = localStorage.getItem("token") || "";
+    fetchSlug(token)
+      .then((response) => {
+        if (response.data.status === "success") {
+          const responseData = response.data?.data;
+          setSlug(responseData?.slugs_data || []);
+        } else {
+          toastr.error("Error fetching slugs");
+        }
+      })
+      .catch((error) => {
+        toastr.error("Error while fetching slugs data:", error);
+      });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,6 +117,10 @@ export default function EditUserManagementForm({
       toastr.error("Gagal upload logo.");
     }
   };
+
+  useEffect(() => {
+    loadSlug();
+  }, []);
 
   return (
     <div className="relative z-10">
@@ -184,6 +210,49 @@ export default function EditUserManagementForm({
                 className="mt-2 h-24 object-contain border rounded"
               />
             )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Role
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            >
+              <option value="" disabled>
+                -- Select Role --
+              </option>
+              <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option>
+            </select>
+            {/* {errors.role && (
+              <p className="text-sm text-red-600 mt-1">{errors.role}</p>
+            )} */}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Slug
+            </label>
+            <select
+              name="slug_id"
+              value={formData.slug_id}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            >
+              <option value="" disabled>
+                -- Select Slug --
+              </option>
+              {slug.map((item) => (
+                <option key={item.slug_id} value={item.slug_id}>
+                  {item.slug_name}
+                </option>
+              ))}
+            </select>
+            {/* {errors.slug_id && (
+              <p className="text-sm text-red-600 mt-1">{errors.slug_id}</p>
+            )} */}
           </div>
         </div>
 

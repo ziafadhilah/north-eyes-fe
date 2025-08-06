@@ -1,4 +1,8 @@
-import { createFeatureData, editFeatureData } from "@/constants/featuresData";
+import {
+  createFeatureData,
+  editFeatureData,
+  editFeatureDataStatus,
+} from "@/constants/featuresData";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
 const baseUrlFE = "https://northeyes-be.ide.asia/frontend";
@@ -41,6 +45,18 @@ export function createFeatures(data: createFeatureData, token: string) {
 
 export function updateFeatures(
   data: editFeatureData,
+  token: string,
+  id: string
+) {
+  return axios.put(`${featuresUrl}/${id}`, data, {
+    headers: {
+      "x-authorized-key": token,
+    },
+  });
+}
+
+export function updateFeaturesStatus(
+  data: editFeatureDataStatus,
   token: string,
   id: string
 ) {

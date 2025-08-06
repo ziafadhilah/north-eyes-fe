@@ -18,3 +18,7 @@ export interface editFeatureData {
   is_active: boolean;
   feature_id: string;
 }
+
+export interface editFeatureDataStatus {
+  is_active: boolean;
+}

@@ -35,9 +35,21 @@ export default function AddFeaturesForm({ onClose }: AddFeaturesFormProps) {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.name.trim()) newErrors.name = "Feature name is required";
-    if (!formData.description.trim())
+    if (!formData.name.trim()) {
+      newErrors.name = "Feature name is required";
+    } else if (!/^[a-zA-Z0-9\s]+$/.test(formData.name)) {
+      newErrors.name = "Feature name cannot contain special characters";
+    } else if (formData.name.length > 255) {
+      newErrors.name = "Feature name cannot be longer than 255 characters";
+    }
+
+    if (!formData.description.trim()) {
       newErrors.description = "Description is required";
+    } else if (formData.description.length > 1000) {
+      newErrors.description =
+        "Description cannot be longer than 1000 characters";
+    }
+
     if (!formData.is_active.trim()) newErrors.is_active = "Status is required";
 
     setErrors(newErrors);

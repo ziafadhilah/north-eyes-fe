@@ -35,7 +35,7 @@ export default function FeatureDetailPage({
     <p className="p-4">Connecting...</p>
   ) : features ? (
     <div className="relative z-10">
-      <h2 className="text-xl font-bold text-black mb-4">Add Features</h2>
+      <h2 className="text-xl font-bold text-black mb-4">Detail Features</h2>
       <form className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
