@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import Link from "next/link";
 import Main from "@/components/General/Layout/Main";
@@ -14,8 +15,12 @@ import {
 } from "@/service/camera/cameraService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import { getViolation } from "@/service/camera/violationService";
+import { ViolationData } from "@/constants/violationData";
+import { useRouter } from "next/navigation";
 
 export default function LIndex() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isStreamingActive, setIsStreamingActive] = useState(false);
   const params = useParams();
@@ -30,6 +35,7 @@ export default function LIndex() {
   const [camera, setCamera] = useState<CameraData[]>([]);
   const [mainCamera, setMainCamera] = useState<CameraData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [violation, setViolation] = useState<ViolationData | null>(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [cameraToEdit, setCameraToEdit] = useState<EditCameraData | null>(null);
@@ -49,6 +55,28 @@ export default function LIndex() {
     month: "long",
     year: "numeric",
   });
+
+  const loadViolation = async () => {
+    const token = localStorage.getItem("token") || "";
+    const company_id = localStorage.getItem("company_id") || "";
+
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const res = await getViolation(token, company_id, id);
+      if (res.status === 200) {
+        setViolation(res.data);
+      } else {
+        toastr.error("Violation data not found");
+      }
+    } catch (error) {
+      console.error(error);
+      toastr.error("Failed to load violation data");
+    }
+  };
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -81,7 +109,7 @@ export default function LIndex() {
             setCamera(cameras.slice(1));
           }
         })
-        .catch((err) => console.error("Error fetching brand:", err));
+        .catch((err) => console.error("Error fetching camera:", err));
     }
   }, [id]);
 
@@ -94,10 +122,10 @@ export default function LIndex() {
         toastr.success("Camera deleted successfully");
         setTimeout(() => window.location.reload(), 1000);
       } else {
-        toastr.error("Failed to delete outlet");
+        toastr.error("Failed to delete camera");
       }
     } catch (error) {
-      toastr.error("Error occurred while deleting outlet");
+      toastr.error("Error occurred while deleting camera");
       console.error(error);
     }
   };
@@ -144,6 +172,15 @@ export default function LIndex() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [activeDropdown]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const companyId = localStorage.getItem("company_id");
+
+    if (token && companyId && id && mainCamera) {
+      loadViolation();
+    }
+  }, [id, mainCamera]);
 
   return (
     <div>
@@ -323,97 +360,99 @@ export default function LIndex() {
                     href={`/brand/live-preview/${mainCamera.camera_id}/suspect`}
                     className="w-full"
                   >
-                    <div className="h-[180px] p-4 rounded-xl border-4 flex flex-col justify-center items-center text-white text-xl font-bold bg-linear-purple">
-                      <p className="text-6xl">
-                        {mainCamera.suspect_count ?? 0}
-                      </p>
-                      <span className="text-sm font-normal text-gray-300 mt-2">
-                        Suspect
-                      </span>
-                    </div>
+                    {violation && (
+                      <div className="h-[180px] p-4 rounded-xl border-4 flex flex-col justify-center items-center text-white text-xl font-bold bg-linear-purple">
+                        <p className="text-6xl">{violation.suspect ?? "-"}</p>
+                        <span className="text-sm font-normal text-gray-300 mt-2">
+                          Suspect
+                        </span>
+                      </div>
+                    )}
                   </Link>
 
                   <Link
                     href={`/brand/live-preview/${mainCamera.camera_id}/confirmed`}
                     className="w-full"
                   >
-                    <div className="h-[180px] p-4 rounded-xl border-4 flex flex-col justify-center items-center text-white text-xl font-bold bg-linear-green">
-                      <p className="text-6xl">
-                        {mainCamera.confirmed_count ?? 0}
-                      </p>
-                      <span className="text-sm font-normal text-gray-300 mt-2">
-                        Confirmed
-                      </span>
-                    </div>
+                    {violation && (
+                      <div className="h-[180px] p-4 rounded-xl border-4 flex flex-col justify-center items-center text-white text-xl font-bold bg-linear-green">
+                        <p className="text-6xl">{violation.confirmed ?? "-"}</p>
+                        <span className="text-sm font-normal text-gray-300 mt-2">
+                          Confirmed
+                        </span>
+                      </div>
+                    )}
                   </Link>
                 </div>
-                <div className="p-4 rounded-xl shadow-xl bg-white text-black text-xl font-bold flex flex-col justify-between h-[260px]">
-                  <div className="px-5 flex justify-between items-start">
-                    <span className="text-lg">Violation</span>
-                  </div>
-                  <div className="flex justify-around h-full items-center mt-2">
-                    <div className="flex flex-col justify-center items-center gap-4">
-                      <div className="text-center">
-                        <p className="text-5xl text-blue-700">
-                          {mainCamera.uniform_violation ?? 0}
-                        </p>
-                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
-                          <span
-                            className="material-symbols-outlined"
-                            style={{ color: "#D4AF37" }}
-                          >
-                            person_apron
-                          </span>
-                          Uniform
-                        </p>
+                {violation && (
+                  <div className="p-4 rounded-xl shadow-xl bg-white text-black text-xl font-bold flex flex-col justify-between h-[260px]">
+                    <div className="px-5 flex justify-between items-start">
+                      <span className="text-lg">Violation</span>
+                    </div>
+                    <div className="flex justify-around h-full items-center mt-2">
+                      <div className="flex flex-col justify-center items-center gap-4">
+                        <div className="text-center">
+                          <p className="text-5xl text-blue-700">
+                            {violation.violations.uniform ?? "-"}
+                          </p>
+                          <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ color: "#D4AF37" }}
+                            >
+                              person_apron
+                            </span>
+                            Uniform
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-5xl text-blue-700">
+                            {violation.violations.grooming ?? "-"}
+                          </p>
+                          <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ color: "#D4AF37" }}
+                            >
+                              face_5
+                            </span>
+                            Grooming
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="text-5xl text-blue-700">
-                          {mainCamera.grooming_violation ?? 0}
-                        </p>
-                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
-                          <span
-                            className="material-symbols-outlined"
-                            style={{ color: "#D4AF37" }}
-                          >
-                            face_5
-                          </span>
-                          Grooming
-                        </p>
+                      <div className="flex flex-col justify-center items-center gap-4">
+                        <div className="text-center">
+                          <p className="text-5xl text-blue-700">
+                            {violation.violations.strangers ?? "-"}
+                          </p>
+                          <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ color: "#D4AF37" }}
+                            >
+                              directions_walk
+                            </span>
+                            Strangers
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-5xl text-blue-700">
+                            {violation.violations.behaviour ?? "-"}
+                          </p>
+                          <p className="text-md text-gray-400 flex items-center justify-center gap-1">
+                            <span
+                              className="material-symbols-outlined"
+                              style={{ color: "#D4AF37" }}
+                            >
+                              accessible_menu
+                            </span>
+                            Behavior
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-col justify-center items-center gap-4">
-                      <div className="text-center">
-                        <p className="text-5xl text-blue-700">
-                          {mainCamera.strangers_violation ?? 0}
-                        </p>
-                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
-                          <span
-                            className="material-symbols-outlined"
-                            style={{ color: "#D4AF37" }}
-                          >
-                            directions_walk
-                          </span>
-                          Strangers
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-5xl text-blue-700">
-                          {mainCamera.behavior_violation ?? 0}
-                        </p>
-                        <p className="text-md text-gray-400 flex items-center justify-center gap-1">
-                          <span
-                            className="material-symbols-outlined"
-                            style={{ color: "#D4AF37" }}
-                          >
-                            accessible_menu
-                          </span>
-                          Behavior
-                        </p>
-                      </div>
-                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
