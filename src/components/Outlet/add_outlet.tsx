@@ -43,6 +43,21 @@ export default function AddOutletForm({
     }));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    if (!value.startsWith("+62")) {
+      value = "+62" + value.replace(/\D/g, "");
+    } else {
+      value = "+62" + value.substring(3).replace(/\D/g, "");
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      phone: value,
+    }));
+  };
+
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -117,9 +132,6 @@ export default function AddOutletForm({
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    const phoneDigits = formData.phone.replace("+62", "").trim();
-    const isNumeric = /^\d+$/.test(phoneDigits);
-    const isRepeated = /^(\d)\1+$/.test(phoneDigits);
 
     if (!formData.outlet_name.trim()) {
       newErrors.outlet_name = "Outlet Name is required";
@@ -138,14 +150,17 @@ export default function AddOutletForm({
       }
     }
 
-    if (!formData.phone.startsWith("+62")) {
-      newErrors.phone = "Phone number must start with +62";
-    } else if (!isNumeric) {
-      newErrors.phone = "Phone number must only contain digits after +62";
-    } else if (phoneDigits.length < 9 || phoneDigits.length > 12) {
-      newErrors.phone = "Phone number must be between 9–12 digits after +62";
-    } else if (isRepeated) {
-      newErrors.phone = "Phone number cannot be all the same digits";
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^(\+62|62|08)[0-9]{8,13}$/.test(formData.phone)) {
+      newErrors.phone =
+        "Phone number must start with +62, 62, or 08 and contain 10–15 digits total";
+    } else if (/^(\d)\1+$/.test(formData.phone)) {
+      newErrors.phone = "Phone number cannot contain repeated digits";
+    }
+
+    if (formData.address.length > 255) {
+      newErrors.address = "Address max 255 characters";
     }
 
     if (!/^\d+$/.test(formData.postal_code)) {
@@ -186,7 +201,7 @@ export default function AddOutletForm({
 
   return (
     <>
-      <div className="relative z-10">
+      <div className="relative z-10 overflow-y-auto max-h-[90vh] p-4">
         <h2 className="text-xl font-bold text-black mb-4">Add Outlet</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -199,7 +214,11 @@ export default function AddOutletForm({
                 name="outlet_name"
                 value={formData.outlet_name}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.outlet_name
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Outlet Name"
               />
               {errors.outlet_name && (
@@ -218,8 +237,12 @@ export default function AddOutletForm({
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Input Email"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.email
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
+                placeholder="e.g : example@email.com"
               />
               {errors.email && (
                 <p className="text-sm text-red-600 mt-1">{errors.email}</p>
@@ -229,14 +252,19 @@ export default function AddOutletForm({
             <div>
               <label className="block text-sm font-bold text-gray-700">
                 Phone
+                <span className="text-gray-500">(e.g : +621234567890)</span>
               </label>
               <input
-                type="number"
+                type="text"
                 name="phone"
                 value={formData.phone}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Input Phone"
+                onChange={handlePhoneChange}
+                placeholder="Input Phone e.g : +621234567890"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.phone
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
               />
               {errors.phone && (
                 <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
@@ -286,9 +314,16 @@ export default function AddOutletForm({
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.address
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Address"
               />
+              {errors.address && (
+                <p className="text-sm text-red-600 mt-1">{errors.address}</p>
+              )}
             </div>
 
             <div>
@@ -300,7 +335,11 @@ export default function AddOutletForm({
                 name="postal_code"
                 value={formData.postal_code}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.postal_code
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Postal Code"
               />
               {errors.postal_code && (

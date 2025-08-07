@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const userNameRef = useRef<HTMLInputElement>(null);
+  const fullNameRef = useRef<HTMLInputElement>(null);
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isRegister, setIsRegister] = useState(false);
   const [identifier, setIdentifier] = useState("");
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [message, setMessage] = useState("");
   const [features, setFeatures] = useState<featureData[]>();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const loadFeatures = async () => {
     const res = await fetchFeatureFE();
@@ -82,11 +84,49 @@ export default function LoginPage() {
     }
   };
 
+  const validateRegistrationForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    } else if (!nameRegex.test(fullName)) {
+      newErrors.fullName =
+        "Full name cannot contain special characters or numbers";
+    }
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Email is not valid";
+    }
+
+    if (!phoneNumber.trim()) {
+      newErrors.phoneNumber = "Phone number is required";
+    } else if (!/^(\+62|62|08)[0-9]{8,13}$/.test(phoneNumber)) {
+      newErrors.phoneNumber =
+        "Phone number must start with +62, 62, or 08 and contain 10–15 digits total";
+    } else if (/^(\d)\1+$/.test(phoneNumber)) {
+      newErrors.phoneNumber = "Phone number cannot contain repeated digits";
+    }
+
+    if (message.length > 1000) {
+      newErrors.message = "Message must not exceed 1000 characters";
+    }
+
+    setErrors(newErrors);
+    return newErrors;
+  };
+
   const handleRegister = async () => {
-    if (!fullName || !email || !phoneNumber || !message) {
-      toastr.error("All fields must be filled for registration");
+    const validationErrors = validateRegistrationForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      Object.values(validationErrors).forEach((err) => toastr.error(err));
       return;
     }
+
     try {
       setIsLoading(true);
       const payload: RegisterData = {
@@ -134,6 +174,12 @@ export default function LoginPage() {
       userNameRef.current.focus();
     }
   }, []);
+
+  useEffect(() => {
+    if (isRegister && fullNameRef.current) {
+      fullNameRef.current.focus();
+    }
+  }, [isRegister]);
 
   return (
     <div
@@ -184,39 +230,58 @@ export default function LoginPage() {
                 <>
                   <label className="text-gray-700 text-sm">Full Name:</label>
                   <input
+                    ref={fullNameRef}
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your full name here"
-                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-2"
                   />
+                  {errors.fullName && (
+                    <p className="text-sm text-red-600 mb-2">
+                      {errors.fullName}
+                    </p>
+                  )}
 
                   <label className="text-gray-700 text-sm">Email:</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                    placeholder="e.g : example@gmail.com"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-2"
                   />
+                  {errors.email && (
+                    <p className="text-sm text-red-600 mb-2">{errors.email}</p>
+                  )}
 
                   <label className="text-gray-700 text-sm">Phone Number:</label>
                   <input
-                    type="number"
+                    type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="Input phone number"
-                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                    placeholder="e.g : +621234567890"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-2"
                   />
+                  {errors.phoneNumber && (
+                    <p className="text-sm text-red-600 mb-2">
+                      {errors.phoneNumber}
+                    </p>
+                  )}
 
                   <label className="text-gray-700 text-sm">Message:</label>
                   <textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Your message..."
-                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-2"
                     rows={4}
                   ></textarea>
+                  {errors.message && (
+                    <p className="text-sm text-red-600 mb-2">
+                      {errors.message}
+                    </p>
+                  )}
                 </>
               ) : (
                 <>
@@ -227,7 +292,7 @@ export default function LoginPage() {
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="Input your username"
-                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-5"
+                    className="mt-2 p-2 text-gray-600 border border-gray-300 rounded-xl w-full bg-white mb-2"
                   />
 
                   <label className="text-gray-700 text-sm">Password:</label>

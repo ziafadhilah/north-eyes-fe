@@ -95,22 +95,40 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
         profile_picture_url: uploadedUrl,
       }));
 
-      toastr.success("Logo berhasil diupload.");
+      toastr.success("Image uploaded.");
     } catch (error) {
       console.error(error);
-      toastr.error("Gagal upload logo.");
+      toastr.error("Failed to upload.");
     }
   };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
+    const nameRegex = /^[a-zA-Z\s]+$/;
 
-    if (!formData.full_name.trim())
+    if (!formData.full_name.trim()) {
       newErrors.full_name = "Full Name is required";
+    } else if (nameRegex.test(formData.full_name)) {
+      newErrors.full_name = "Full Name must only contain letters and spaces";
+    }
 
     if (!formData.username.trim()) newErrors.username = "Username is required";
 
-    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Email is not valid";
+      }
+    }
+
+    if (!formData.phone_number.trim()) {
+      newErrors.phone_number = "Phone number is required";
+    } else if (!/^(\+62|62|08)[0-9]{8,13}$/.test(formData.phone_number)) {
+      newErrors.phone_number =
+        "Phone number must start with +62, 62, or 08 and contain 10–15 digits total";
+    }
 
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
@@ -191,7 +209,7 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Full Name
+                Full Name <span className="text-red-500">*</span>
               </label>
               <input
                 ref={autoFocusRef}
@@ -199,7 +217,11 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
                 name="full_name"
                 value={formData.full_name}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.full_name
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Full Name"
               />
               {errors.full_name && (
@@ -208,14 +230,18 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Username
+                Username <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.username
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Username"
               />
               {errors.username && (
@@ -224,14 +250,18 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Email
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.email
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Email"
               />
               {errors.email && (
@@ -240,20 +270,29 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Phone
+                Phone <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.phone_number
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
                 placeholder="Input Phone"
               />
+              {errors.phone_number && (
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.phone_number}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -261,7 +300,11 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                    errors.password
+                      ? "border-red-500"
+                      : "border-gray-300 focus:border-blue-300"
+                  }`}
                   placeholder="Input Password"
                 />
                 <button
@@ -286,7 +329,7 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Password Repeat
+                Password Repeat <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -294,7 +337,11 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
                   name="password_repeat"
                   value={formData.password_repeat}
                   onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                  className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                    errors.password_repeat
+                      ? "border-red-500"
+                      : "border-gray-300 focus:border-blue-300"
+                  }`}
                   placeholder="Input Password"
                 />
                 <button
@@ -362,13 +409,17 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Role
+                Role <span className="text-red-500">*</span>
               </label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.role
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
               >
                 <option value="" disabled>
                   -- Select Role --
@@ -382,13 +433,17 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Slug
+                Slug <span className="text-red-500">*</span>
               </label>
               <select
                 name="slug_id"
                 value={formData.slug_id}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+                className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                  errors.slug_id
+                    ? "border-red-500"
+                    : "border-gray-300 focus:border-blue-300"
+                }`}
               >
                 <option value="" disabled>
                   -- Select Slug --

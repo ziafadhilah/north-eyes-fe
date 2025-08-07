@@ -51,23 +51,6 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
     }));
   };
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    // Pastikan selalu diawali dengan +62
-    if (!value.startsWith("+62")) {
-      value = "+62" + value.replace(/\D/g, ""); // hapus semua non-digit
-    } else {
-      // Hapus karakter non-digit setelah +62
-      value = "+62" + value.substring(3).replace(/\D/g, "");
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      phone: value,
-    }));
-  };
-
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -144,9 +127,6 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    const phoneDigits = formData.phone.replace("+62", "").trim();
-    const isNumeric = /^\d+$/.test(phoneDigits);
-    const isRepeated = /^(\d)\1+$/.test(phoneDigits);
 
     if (!formData.brand_name.trim()) {
       newErrors.brand_name = "Brand Name is required";
@@ -223,27 +203,31 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
 
     if (formData.owner_name.length > 255) {
       newErrors.owner_name = "Owner cannot be more than 255 characters";
-    } else if (!/^[A-Za-z\s]+$/.test(formData.owner_name)) {
-      newErrors.owner_name = "Owner only contain letters, spaces.";
-    }
-
-    if (!formData.phone.startsWith("+62")) {
-      newErrors.phone = "Phone number must start with +62";
-    } else if (!isNumeric) {
-      newErrors.phone = "Phone number must only contain digits after +62";
-    } else if (phoneDigits.length < 9 || phoneDigits.length > 12) {
-      newErrors.phone = "Phone number must be between 9–12 digits after +62";
-    } else if (isRepeated) {
-      newErrors.phone = "Phone number cannot be all the same digits";
-    }
-
-    if (!/^\d+$/.test(formData.postal_code)) {
-      newErrors.postal_code = "Postal code must only contain digits";
     } else if (
-      formData.postal_code.length < 4 ||
-      formData.postal_code.length > 10
+      formData.owner_name.trim() !== "" &&
+      !/^[A-Za-z\s]+$/.test(formData.owner_name)
     ) {
-      newErrors.postal_code = "Postal code must be between 4–10 digits";
+      newErrors.owner_name = "Owner must only contain letters and spaces";
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^(\+62|62|08)[0-9]{8,13}$/.test(formData.phone)) {
+      newErrors.phone =
+        "Phone number must start with +62, 62, or 08 and contain 10–15 digits total";
+    } else if (/^(\d)\1+$/.test(formData.phone)) {
+      newErrors.phone = "Phone number cannot contain repeated digits";
+    }
+
+    if (formData.postal_code.trim() !== "") {
+      if (!/^\d+$/.test(formData.postal_code)) {
+        newErrors.postal_code = "Postal code must only contain digits";
+      } else if (
+        formData.postal_code.length < 4 ||
+        formData.postal_code.length > 10
+      ) {
+        newErrors.postal_code = "Postal code must be between 4–10 digits";
+      }
     }
 
     if (!logoFile) {
@@ -330,7 +314,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
             />
             <label
               htmlFor="logo-upload"
-              className="mt-1 flex items-center justify-center h-30 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 transition"
+              className={`mt-1 flex items-center justify-center h-30 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 transition ${
+                errors.logo_url
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
             >
               {previewLogo ? (
                 <img
@@ -372,7 +360,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
                 }))
               }
               rows={4}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Description"
             />
             {errors.description && (
@@ -424,15 +416,22 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
 
           <div>
             <label className="block text-sm font-bold text-gray-700">
-              Phone <span className="text-gray-500">(EG : +621234567890)</span>
+              Phone{" "}
+              <span className="text-red-500">
+                * <i className="text-gray-500">(e.g : +621234567890)</i>
+              </span>
             </label>
             <input
               type="text"
               name="phone"
               value={formData.phone}
-              onChange={handlePhoneChange}
+              onChange={handleChange}
               placeholder="Input Phone e.g : +621234567890"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
             />
             {errors.phone && (
               <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
@@ -448,7 +447,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="industry"
               value={formData.industry}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Industry"
             />
             {errors.industry && (
@@ -479,7 +482,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               }}
               inputMode="numeric"
               pattern="[0-9]*"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="e.g : 2025"
             />
             {errors.founded_year && (
@@ -496,7 +503,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="headquarter_city"
               value={formData.headquarter_city}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Headquarter City"
             />
             {errors.headquarter_city && (
@@ -567,7 +578,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="postal_code"
               value={formData.postal_code}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.postal_code
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Postal Code"
             />
             {errors.postal_code && (
@@ -584,7 +599,11 @@ export default function AddBrandForm({ onClose }: AddBrandFormProps) {
               name="owner_name"
               value={formData.owner_name}
               onChange={handleChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.owner_name
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
               placeholder="Input Owner Name"
             />
             {errors.owner_name && (
