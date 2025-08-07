@@ -15,16 +15,52 @@ type EditSlugFormProps = {
 export default function EditSlugForm({ slugData, onClose }: EditSlugFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ ...slugData });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "slug") {
+      let newValue = value.replace(/\s+/g, "-");
+      newValue = newValue.replace(/[^a-zA-Z0-9\-./:]/g, "");
+      newValue = newValue.toLowerCase();
+
+      setFormData((prev) => ({ ...prev, slug: newValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    const slugNameRegex = /^[a-zA-Z0-9-_ ]+$/;
+
+    if (!formData.slug_name) {
+      newErrors.slug_name = "Slug name is required";
+    } else if (!slugNameRegex.test(formData.slug_name)) {
+      newErrors.slug_name = "Slug name cannot contain special characters";
+    }
+
+    if (!formData.slug) {
+      newErrors.slug = "Slug URL is required";
+    } else {
+      try {
+        new URL(formData.slug);
+      } catch (err) {
+        newErrors.slug = "Slug must be a valid URL (e.g. https://example.com)";
+        console.error(err);
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
@@ -78,6 +114,9 @@ export default function EditSlugForm({ slugData, onClose }: EditSlugFormProps) {
               onChange={handleChange}
               required
             />
+            {errors.slug_name && (
+              <p className="text-sm text-red-600 mt-1">{errors.slug_name}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -91,6 +130,9 @@ export default function EditSlugForm({ slugData, onClose }: EditSlugFormProps) {
               onChange={handleChange}
               required
             />
+            {errors.slug && (
+              <p className="text-sm text-red-600 mt-1">{errors.slug}</p>
+            )}
           </div>
         </div>
         <div className="text-right">

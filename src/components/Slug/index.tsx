@@ -177,7 +177,7 @@ export default function SlugPage() {
                       <button
                         title="Detail"
                         onClick={() => handleOpenDetail(data)}
-                        className="text-blue-600 px-3 py-1 transition transition-transform duration-300 ease-in-out hover:scale-130"
+                        className="text-blue-600 px-3 py-1 transition-transform duration-300 ease-in-out hover:scale-130"
                       >
                         <span className="material-symbols-outlined">
                           visibility
@@ -186,7 +186,7 @@ export default function SlugPage() {
                       <button
                         title="Edit"
                         onClick={() => openEditModal(data)}
-                        className="text-yellow-500 px-3 py-1 transition transition-transform duration-300 ease-in-out hover:scale-130"
+                        className="text-yellow-500 px-3 py-1 transition-transform duration-300 ease-in-out hover:scale-130"
                       >
                         <span className="material-symbols-outlined">
                           draft_orders
@@ -198,7 +198,7 @@ export default function SlugPage() {
                           setSlugToDelete(data);
                           setIsConfirmDeleteOpen(true);
                         }}
-                        className="text-red-500 px-3 py-1 transition transition-transform duration-300 ease-in-out hover:scale-130"
+                        className="text-red-500 px-3 py-1 transition-transform duration-300 ease-in-out hover:scale-130"
                       >
                         <span className="material-symbols-outlined">
                           delete

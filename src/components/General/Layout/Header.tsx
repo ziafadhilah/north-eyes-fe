@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import { logoutUser } from "@/service/login/authService";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import toastr from "toastr";
@@ -21,10 +22,23 @@ export default function Header({
     setCompanyPhoto(localStorage.getItem("photo_url"));
   }, []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    toastr.success("Logout Successful");
-    router.replace("/login");
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token") || "";
+
+    try {
+      if (token) {
+        const res = await logoutUser(token);
+        console.log(res);
+        if (res.status === 200) {
+          localStorage.clear();
+          router.push("/login");
+        }
+      }
+      toastr.success("Logout Successful");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toastr.warning("Logout failed on server, clearing local data anyway");
+    }
   };
 
   useEffect(() => {

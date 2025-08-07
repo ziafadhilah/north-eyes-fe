@@ -79,6 +79,7 @@ export default function SlugPage() {
 
       if (response.data.status === "success") {
         const responseData = response.data.data;
+        console.log(responseData);
         setTimeout(() => {
           setUsers(responseData.users || []);
           setTotalPages(responseData.pages || 1);

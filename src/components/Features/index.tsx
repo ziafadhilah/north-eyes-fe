@@ -15,6 +15,7 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import FeatureDetailPage from "./detail";
 import EditFeatureForm from "./edit";
+import { SkeletonBox } from "../General/Skleton/Skleton";
 
 export default function FeaturesPage() {
   const router = useRouter();
@@ -218,10 +219,7 @@ export default function FeaturesPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="py-3 px-4 text-center">
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span>Loading... Please wait</span>
-                    </div>
+                    <SkeletonBox className="w-full h-[300px]" />
                   </td>
                 </tr>
               ) : features.length > 0 ? (

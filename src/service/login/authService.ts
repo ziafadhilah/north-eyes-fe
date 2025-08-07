@@ -1,5 +1,10 @@
 // services/authService.ts
 
+import axios from "axios";
+const baseUrl = process.env.NEXT_PUBLIC_EXTERNAL_API_URL;
+const logoutUrl = "users/logout";
+const fullUrl = `${baseUrl}/${logoutUrl}`;
+
 export interface LoginResponse {
   status: string;
   message: string;
@@ -32,3 +37,15 @@ export const loginUser = async (
     throw new Error("Failed to connect to server. Please try again.");
   }
 };
+
+export function logoutUser(token: string) {
+  return axios.post(
+    fullUrl,
+    {},
+    {
+      headers: {
+        "x-authorized-key": token,
+      },
+    }
+  );
+}
