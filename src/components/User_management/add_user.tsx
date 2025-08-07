@@ -108,7 +108,7 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
 
     if (!formData.full_name.trim()) {
       newErrors.full_name = "Full Name is required";
-    } else if (nameRegex.test(formData.full_name)) {
+    } else if (!nameRegex.test(formData.full_name)) {
       newErrors.full_name = "Full Name must only contain letters and spaces";
     }
 
