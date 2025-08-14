@@ -151,14 +151,14 @@ export default function SlugPage() {
 
         <div className="w-full overflow-x-auto border rounded-lg shadow-sm bg-white p-2">
           <table className="w-full text-sm text-left text-gray-700 min-w-[700px]">
-            <thead className="text-gray-700 text-center">
+            <thead className="text-gray-700">
               <tr>
                 <th className="py-3 px-4">Slug Name</th>
                 <th className="py-3 px-4">Slug</th>
                 <th className="py-3 px-4">Action</th>
               </tr>
             </thead>
-            <tbody className="text-center">
+            <tbody className="">
               {isLoading ? (
                 <tr>
                   <td colSpan={3} className="py-3 px-4 text-center">
@@ -173,7 +173,7 @@ export default function SlugPage() {
                   <tr key={data.slug_id} className="border-t hover:bg-gray-50">
                     <td className="py-3 px-4">{data.slug_name}</td>
                     <td className="py-3 px-4">{data.slug}</td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 flex flex-row">
                       <button
                         title="Detail"
                         onClick={() => handleOpenDetail(data)}

@@ -282,7 +282,7 @@ export default function AddUserForm({ onClose }: AddUserFormProps) {
                     ? "border-red-500"
                     : "border-gray-300 focus:border-blue-300"
                 }`}
-                placeholder="Input Phone"
+                placeholder="e.g : +6281234567890"
               />
               {errors.phone_number && (
                 <p className="text-sm text-red-600 mt-1">

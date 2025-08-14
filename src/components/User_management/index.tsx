@@ -162,16 +162,15 @@ export default function SlugPage() {
 
         <div className="w-full overflow-x-auto border rounded-lg shadow-sm bg-white p-2">
           <table className="w-full text-sm text-left text-gray-700 min-w-[700px]">
-            <thead className="text-gray-700 text-center">
+            <thead className="text-gray-700">
               <tr>
-                <th className="py-3 px-4">User ID</th>
                 <th className="py-3 px-4">Full Name</th>
                 <th className="py-3 px-4">Email</th>
                 <th className="py-3 px-4">Phone</th>
                 <th className="py-3 px-4">Action</th>
               </tr>
             </thead>
-            <tbody className="text-center">
+            <tbody className="">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="py-3 px-4 text-center">
@@ -184,7 +183,6 @@ export default function SlugPage() {
               ) : users.length > 0 ? (
                 users.map((data) => (
                   <tr key={data.user_id} className="border-t hover:bg-gray-50">
-                    <td className="py-3 px-4">{data.user_id}</td>
                     <td className="py-3 px-4">{data.full_name}</td>
                     <td className="py-3 px-4">{data.email}</td>
                     <td className="py-3 px-4">{data.phone_number}</td>

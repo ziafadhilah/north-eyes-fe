@@ -69,6 +69,13 @@ export default function EditUserManagementForm({
       newErrors.full_name = "Full name cannot exceed 255 characters";
     }
 
+    if (!formData.phone_number.trim()) {
+      newErrors.phone_number = "Phone number is required";
+    } else if (!/^(\+62|62|08)[0-9]{8,13}$/.test(formData.phone_number)) {
+      newErrors.phone_number =
+        "Phone number must start with +62, 62, or 08 and contain 10–15 digits total";
+    }
+
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
     } else if (formData.username.length < 3) {

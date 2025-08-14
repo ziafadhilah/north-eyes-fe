@@ -207,7 +207,7 @@ export default function FeaturesPage() {
 
         <div className="w-full overflow-x-auto border rounded-lg shadow-sm bg-white p-2">
           <table className="w-full text-sm text-left text-gray-700 min-w-[700px]">
-            <thead className="text-gray-700 text-center">
+            <thead className="text-gray-700">
               <tr>
                 <th className="py-3 px-4">Name</th>
                 <th className="py-3 px-4">Description</th>
@@ -215,7 +215,7 @@ export default function FeaturesPage() {
                 <th className="py-3 px-4">Action</th>
               </tr>
             </thead>
-            <tbody className="text-center">
+            <tbody className="">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="py-3 px-4 text-center">
