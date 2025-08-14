@@ -163,13 +163,15 @@ export default function AddOutletForm({
       newErrors.address = "Address max 255 characters";
     }
 
-    if (!/^\d+$/.test(formData.postal_code)) {
-      newErrors.postal_code = "Postal code must only contain digits";
-    } else if (
-      formData.postal_code.length < 4 ||
-      formData.postal_code.length > 10
-    ) {
-      newErrors.postal_code = "Postal code must be between 4–10 digits";
+    if (formData.postal_code.trim() !== "") {
+      if (!/^\d+$/.test(formData.postal_code)) {
+        newErrors.postal_code = "Postal code must only contain digits";
+      } else if (
+        formData.postal_code.length < 4 ||
+        formData.postal_code.length > 10
+      ) {
+        newErrors.postal_code = "Postal code must be between 4–10 digits";
+      }
     }
 
     if (!logoFile) {
@@ -210,6 +212,7 @@ export default function AddOutletForm({
                 Outlet Name <span className="text-red-500">*</span>
               </label>
               <input
+                ref={autoFocusRef}
                 type="text"
                 name="outlet_name"
                 value={formData.outlet_name}
@@ -233,7 +236,7 @@ export default function AddOutletForm({
                 Email <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -252,7 +255,7 @@ export default function AddOutletForm({
             <div>
               <label className="block text-sm font-bold text-gray-700">
                 Phone
-                <span className="text-gray-500">(e.g : +621234567890)</span>
+                <span className="text-gray-500"> (e.g : +621234567890)</span>
               </label>
               <input
                 type="text"
@@ -351,7 +354,7 @@ export default function AddOutletForm({
 
             <div>
               <label className="block text-sm font-bold text-gray-700">
-                Logo
+                Logo <span className="text-red-500">*</span>
               </label>
 
               <input
@@ -386,6 +389,10 @@ export default function AddOutletForm({
                 <p className="text-sm text-gray-600 mt-1">
                   File: {logoFile.name} ({(logoFile.size / 1024).toFixed(2)} KB)
                 </p>
+              )}
+
+              {errors.logo_url && (
+                <p className="text-sm text-red-600 mt-1">{errors.logo_url}</p>
               )}
             </div>
           </div>

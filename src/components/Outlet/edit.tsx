@@ -7,6 +7,7 @@ import axios from "axios";
 import { EditOutletData } from "@/constants/outletData";
 import { updateOutlet } from "@/service/outlet/outletService";
 import { uploadLogoOutlet } from "@/service/outlet/uploadOutletService";
+import RegionSelect, { OptionType } from "../General/Region/Region";
 
 type EditOutletFormProps = {
   outletData: EditOutletData;
@@ -23,15 +24,62 @@ export default function EditOutletForm({
   const [previewLogo, setPreviewLogo] = useState<string | null>(
     outletData.logo_url || null
   );
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({ ...outletData });
+
+  const [selectedProvince, setSelectedProvince] = useState<OptionType | null>({
+    value: outletData.province_id,
+    label: outletData.province,
+  });
+
+  const [selectedRegency, setSelectedRegency] = useState<OptionType | null>({
+    value: outletData.regency_id,
+    label: outletData.city,
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleProvinceChange = (province: OptionType) => {
+    setSelectedProvince(province);
+    setFormData((prev) => ({
+      ...prev,
+      country: "Indonesia",
+      province: province.label,
+      province_id: province.value,
+      city: "",
+      regency_id: 0,
+    }));
+  };
+
+  const handleRegencyChange = (regency: OptionType) => {
+    setSelectedRegency(regency);
+    setFormData((prev) => ({
+      ...prev,
+      city: regency.label,
+      regency_id: regency.value,
+    }));
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    if (!value.startsWith("+62")) {
+      value = "+62" + value.replace(/\D/g, "");
+    } else {
+      value = "+62" + value.substring(3).replace(/\D/g, "");
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      phone: value,
+    }));
   };
 
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,15 +103,16 @@ export default function EditOutletForm({
         logo_url: uploadedUrl,
       }));
 
-      toastr.success("Logo berhasil diupload.");
+      toastr.success("Logo uploaded successfully.");
     } catch (error) {
       console.error(error);
-      toastr.error("Gagal upload logo.");
+      toastr.error("Failed to upload logo.");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     setIsLoading(true);
 
     const token = localStorage.getItem("token");
@@ -103,55 +152,202 @@ export default function EditOutletForm({
     }
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.outlet_name.trim()) {
+      newErrors.outlet_name = "Outlet Name is required";
+    } else if (/\d/.test(formData.outlet_name)) {
+      newErrors.outlet_name = "Outlet Name cannot contain numbers";
+    } else if (formData.outlet_name.length > 255) {
+      newErrors.outlet_name = "Outlet Name max 255 characters";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Email is not valid";
+      }
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^(\+62|62|08)[0-9]{8,13}$/.test(formData.phone)) {
+      newErrors.phone =
+        "Phone number must start with +62, 62, or 08 and contain 10–15 digits total";
+    } else if (/^(\d)\1+$/.test(formData.phone)) {
+      newErrors.phone = "Phone number cannot contain repeated digits";
+    }
+
+    if (formData.address.length > 255) {
+      newErrors.address = "Address max 255 characters";
+    }
+
+    if (formData.postal_code.trim() !== "") {
+      if (!/^\d+$/.test(formData.postal_code)) {
+        newErrors.postal_code = "Postal code must only contain digits";
+      } else if (
+        formData.postal_code.length < 4 ||
+        formData.postal_code.length > 10
+      ) {
+        newErrors.postal_code = "Postal code must be between 4–10 digits";
+      }
+    }
+
+    if (!logoFile && !formData.logo_url) {
+      newErrors.logo_url = "Logo is required";
+    } else if (logoFile) {
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(logoFile.type)) {
+        newErrors.logo_url = "Logo must be .jpg, .jpeg, or .png";
+      }
+      const maxSizeInMB = 2;
+      if (logoFile.size > maxSizeInMB * 1024 * 1024) {
+        newErrors.logo_url = `Logo must be less than ${maxSizeInMB}MB`;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   return (
     <div className="relative z-10 overflow-y-auto max-h-[90vh] p-4">
       <h2 className="text-xl font-bold text-black mb-4">Edit Outlet</h2>
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {(
-            [
-              { label: "Outlet Name", name: "outlet_name" },
-              { label: "Email", name: "email" },
-              { label: "Phone", name: "phone" },
-              { label: "Address", name: "address" },
-              { label: "City", name: "city" },
-              { label: "Province", name: "province" },
-              { label: "Postal Code", name: "postal_code" },
-              { label: "Country", name: "country" },
-            ] as { label: string; name: keyof typeof formData; type?: string }[]
-          ).map(({ label, name, type = "text" }) => (
-            <div key={name}>
-              <label className="block text-sm font-medium text-gray-700">
-                {label}
-              </label>
-              {type === "year-select" ? (
-                <div key={name}>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {label}
-                  </label>
-                  <input
-                    type={type}
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                    placeholder={`Input ${label}`}
-                    required
-                  />
-                </div>
-              ) : (
-                <input
-                  type={type}
-                  name={name}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-                  placeholder={`Input ${label}`}
-                  required
-                />
-              )}
-            </div>
-          ))}
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Outlet Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="outlet_name"
+              value={formData.outlet_name}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.outlet_name
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Outlet Name"
+            />
+            {errors.outlet_name && (
+              <p className="text-sm text-red-600 mt-1">{errors.outlet_name}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.email
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="e.g : example@email.com"
+            />
+            {errors.email && (
+              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Phone
+              <span className="text-gray-500"> (e.g : +621234567890)</span>
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              placeholder="Input Phone e.g : +621234567890"
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.phone
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+            />
+            {errors.phone && (
+              <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Country <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="country"
+              value="Indonesia"
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring border-gray-300 focus:border-blue-300"
+              placeholder="Input Country"
+              disabled
+            />
+            {errors.country && (
+              <p className="text-sm text-red-600 mt-1">{errors.country}</p>
+            )}
+          </div>
+
+          <RegionSelect
+            initialProvince={selectedProvince}
+            initialRegency={selectedRegency}
+            onProvinceChange={handleProvinceChange}
+            onRegencyChange={handleRegencyChange}
+          />
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Address
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.address
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Address"
+            />
+            {errors.address && (
+              <p className="text-sm text-red-600 mt-1">{errors.address}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700">
+              Postal Code
+            </label>
+            <input
+              type="number"
+              name="postal_code"
+              value={formData.postal_code}
+              onChange={handleChange}
+              className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring ${
+                errors.postal_code
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-300"
+              }`}
+              placeholder="Input Postal Code"
+            />
+            {errors.postal_code && (
+              <p className="text-sm text-red-600 mt-1">{errors.postal_code}</p>
+            )}
+          </div>
           <div>
             <label
               htmlFor="logo-upload"
@@ -178,6 +374,9 @@ export default function EditOutletForm({
                 File: {logoFile.name} ({(logoFile.size / 1024).toFixed(2)} KB)
               </p>
             )}
+            {errors.logo_url && (
+              <p className="text-sm text-red-600 mt-1">{errors.logo_url}</p>
+            )}
           </div>
         </div>
 
@@ -191,7 +390,7 @@ export default function EditOutletForm({
                 "linear-gradient(251.41deg, #1A2A6C -0.61%, #2671FF 74.68%)",
             }}
           >
-            {isLoading ? "Menyimpan..." : "Update"}
+            {isLoading ? "Saving" : "Update"}
           </button>
         </div>
       </form>

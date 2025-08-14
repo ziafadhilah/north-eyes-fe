@@ -123,7 +123,7 @@ export default function EditBrandForm({
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Token tidak ditemukan.");
+      toastr.error("Token not found.");
       return;
     }
 
@@ -348,6 +348,9 @@ export default function EditBrandForm({
               <p className="text-sm text-gray-600 mt-1">
                 File: {logoFile.name} ({(logoFile.size / 1024).toFixed(2)} KB)
               </p>
+            )}
+            {errors.logo_url && (
+              <p className="text-sm text-red-600 mt-1">{errors.logo_url}</p>
             )}
           </div>
 

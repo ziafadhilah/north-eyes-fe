@@ -11,12 +11,13 @@ import Main from "@/components/General/Layout/Main";
 import Modal from "@/components/General/Modal/Modal";
 import AddOutletForm from "./add_outlet";
 import Link from "next/link";
-import { OutletData } from "@/constants/outletData";
+import { EditOutletData, OutletData } from "@/constants/outletData";
 import OutletDetailPage from "./detail";
 import EditOutletForm from "./edit";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import Pagination from "@/components/General/Pagination/Pagination";
+import { SkeletonBox } from "@/components/General/Skleton/Skleton";
 
 export default function OutletPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -35,7 +36,7 @@ export default function OutletPage() {
   const closeDetailModal = () => setIsDetailModalOpen(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [outletToEdit, setOutletToEdit] = useState<OutletData | null>(null);
+  const [outletToEdit, setOutletToEdit] = useState<EditOutletData | null>(null);
 
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [outletToDelete, setOutletToDelete] = useState<OutletData | null>(null);
@@ -136,7 +137,7 @@ export default function OutletPage() {
     }
   };
 
-  const openEditModal = (outlet: OutletData) => {
+  const openEditModal = (outlet: EditOutletData) => {
     setOutletToEdit(outlet);
     setActiveDropdown(null);
     setIsEditModalOpen(true);
@@ -203,14 +204,7 @@ export default function OutletPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center p-2">
           {isLoading ? (
-            <div className="flex items-center justify-center w-full h-[60vh] col-span-full">
-              <div className="relative w-12 h-12 flex items-center justify-center mr-4">
-                <div className="absolute inset-0 border-4 border-blue-400/60 border-t-transparent rounded-full animate-spin"></div>
-                <div className="absolute inset-0 border-4 border-blue-300/30 border-t-transparent rounded-full animate-slow-spin"></div>
-                <div className="w-3 h-3 bg-blue-400 rounded-full shadow-md animate-ping"></div>
-              </div>
-              <p className="text-lg text-gray-600">Loading ...</p>
-            </div>
+            <SkeletonBox className="w-full h-[300px]" />
           ) : (
             <>
               <button
