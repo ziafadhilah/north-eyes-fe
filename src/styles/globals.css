@@ -127,6 +127,15 @@
   border-radius: 10px;
 }
 
+.bg-true {
+  background: #dbe7fe;
+}
+
+.bg-false {
+  background: linear-gradient(90deg, #073daa 0%, #1a2a6c 100%);
+  color: white;
+}
+
 @keyframes fade-in {
   0% {
     opacity: 0;

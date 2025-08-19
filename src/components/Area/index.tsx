@@ -247,6 +247,7 @@ export default function AreaPage() {
                         outlet_name: outlet_name,
                         brand_name: brand_name,
                         area_name: data.area_name,
+                        outlet_id: id,
                       },
                     }}
                     className="p-4 min-h-[250px] cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"

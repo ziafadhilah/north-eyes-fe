@@ -15,7 +15,7 @@ import {
 } from "@/service/camera/cameraService";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { getViolation } from "@/service/camera/violationService";
+import { getViolationCount } from "@/service/camera/violationService";
 import { ViolationData } from "@/constants/violationData";
 import { useRouter } from "next/navigation";
 
@@ -28,6 +28,7 @@ export default function LIndex() {
   const id = params?.id as string;
   const brand_name = searchParams.get("brand_name") as string;
   const outlet_name = searchParams.get("outlet_name") as string;
+  const outlet_id = searchParams.get("outlet_id") as string;
   const area_name = searchParams.get("area_name") as string;
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -56,7 +57,7 @@ export default function LIndex() {
     year: "numeric",
   });
 
-  const loadViolation = async () => {
+  const loadViolationCount = async () => {
     const token = localStorage.getItem("token") || "";
     const company_id = localStorage.getItem("company_id") || "";
 
@@ -66,7 +67,7 @@ export default function LIndex() {
     }
 
     try {
-      const res = await getViolation(token, company_id, id);
+      const res = await getViolationCount(token, company_id, outlet_id);
       if (res.status === 200) {
         setViolation(res.data);
       } else {
@@ -179,7 +180,7 @@ export default function LIndex() {
     const companyId = localStorage.getItem("company_id");
 
     if (token && companyId && id && mainCamera) {
-      loadViolation();
+      loadViolationCount();
     }
   }, [id, mainCamera]);
 
@@ -345,20 +346,20 @@ export default function LIndex() {
                     </ul>
                   </div>
                 )}
-                {/* <Link
-                  href={`/brand/live-preview/${mainCamera.camera_id}/settings`}
-                  className="absolute top-3 right-3 bg-teal-600 p-2 rounded-full shadow-md hover:bg-teal-500 flex items-center justify-center"
-                  title="Settings"
-                >
-                  <span className="material-symbols-outlined text-white">
-                    settings
-                  </span>
-                </Link> */}
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex gap-3">
                   <Link
-                    href={`/brand/live-preview/${mainCamera.camera_id}/suspect`}
+                    href={{
+                      pathname: `/brand/live-preview/${mainCamera.camera_id}/suspect`,
+                      query: {
+                        brand_name: brand_name,
+                        outlet_name: outlet_name,
+                        area_name: area_name,
+                        camera_name: mainCamera.camera_name,
+                        outlet_id: outlet_id,
+                      },
+                    }}
                     className="w-full"
                   >
                     {violation && (
