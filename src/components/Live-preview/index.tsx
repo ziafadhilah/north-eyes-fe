@@ -373,7 +373,16 @@ export default function LIndex() {
                   </Link>
 
                   <Link
-                    href={`/brand/live-preview/${mainCamera.camera_id}/confirmed`}
+                    href={{
+                      pathname: `/brand/live-preview/${mainCamera.camera_id}/confirmed`,
+                      query: {
+                        brand_name: brand_name,
+                        outlet_name: outlet_name,
+                        area_name: area_name,
+                        camera_name: mainCamera.camera_name,
+                        outlet_id: outlet_id,
+                      },
+                    }}
                     className="w-full"
                   >
                     {violation && (

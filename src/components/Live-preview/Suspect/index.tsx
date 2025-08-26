@@ -50,12 +50,12 @@ export default function SuspectPage() {
 
     try {
       const res = await getViolationList(token, company_id, outlet_id);
-      console.log(res);
       if (res.status === 200) {
         const allData: ViolationDataList[] = res.data.data.data;
         const filtered = allData.filter((item) => item.is_valid === false);
         setViolation(filtered);
         setOriginalViolation(filtered);
+        console.log(filtered);
       } else {
         toastr.error("Violation data not found");
       }
@@ -161,7 +161,7 @@ export default function SuspectPage() {
           <h1 className="text-2xl font-bold mb-4">
             Suspect{" "}
             <span className="text-white text-sm me-2 text-center font-medium px-2.5 py-1 rounded-md ne-accent">
-              200
+              {violation.length}
             </span>
           </h1>
 
@@ -174,7 +174,6 @@ export default function SuspectPage() {
                 onChange={(e) => {
                   const checked = e.target.checked;
                   setAutoValid(checked);
-
                   setViolation((prev) =>
                     prev.map((v) => {
                       const updated = { ...v, is_valid: checked };
@@ -198,9 +197,20 @@ export default function SuspectPage() {
                 </h2>
                 <input
                   type="checkbox"
-                  className="accent-blue-600 w-6 h-6"
-                  checked={isChanged(originalViolation[index], item)}
-                  readOnly
+                  className={`accent-blue-600 w-6 h-6 ${
+                    isChanged(originalViolation[index], item)
+                      ? "ring-2 ring-yellow-400"
+                      : ""
+                  }`}
+                  checked={item.is_valid}
+                  onChange={(e) =>
+                    setViolation((prev) =>
+                      prev.map((v, i) => {
+                        if (i !== index) return v;
+                        return { ...v, is_valid: e.target.checked };
+                      })
+                    )
+                  }
                 />
               </div>
 
