@@ -2,33 +2,25 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Main from "@/components/General/Layout/Main";
-import {
-  EditViolationDataList,
-  ViolationDataList,
-} from "@/constants/violationData";
-import {
-  getViolationList,
-  updateViolationList,
-} from "@/service/camera/violationService";
+import { ViolationDataList } from "@/constants/violationData";
+import { getViolationList } from "@/service/camera/violationService";
 import Link from "next/link";
 import { useSearchParams, useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 
-export default function SuspectPage() {
+export default function ConfirmedPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
   const id = params?.id;
   const outlet_id = searchParams.get("outlet_id") as string;
   const area_name = searchParams.get("area_name") as string;
-  const [autoValid, setAutoValid] = useState(false);
+  const is_confirmed = searchParams.get("is_confirmed") as string;
+  // const [setAutoValid] = useState(false);
 
   const [violation, setViolation] = useState<ViolationDataList[]>([]);
-  const [originalViolation, setOriginalViolation] = useState<
-    ViolationDataList[]
-  >([]);
 
   const today = new Date();
   const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
@@ -41,70 +33,70 @@ export default function SuspectPage() {
   });
 
   const getViolationData = async () => {
-    const token = localStorage.getItem("token") || "";
-    const company_id = localStorage.getItem("company_id") || "";
+    const token = localStorage.getItem("token");
+    const company_id = localStorage.getItem("company_id");
+
     if (!token) {
       router.push("/login");
       return;
     }
 
+    if (!company_id) {
+      toastr.error("Company information missing. Please login again.");
+      return;
+    }
+
     try {
-      const res = await getViolationList(token, company_id, outlet_id);
-      console.log(res);
-      if (res.status === 200) {
-        const allData: ViolationDataList[] = res.data.data.data;
-        const filtered = allData.filter((item) => item.is_valid === true);
-        setViolation(filtered);
-        setOriginalViolation(filtered);
+      const res = await getViolationList(
+        token,
+        company_id,
+        outlet_id,
+        is_confirmed
+      );
+
+      const allData: ViolationDataList[] = res?.data?.data?.data ?? [];
+
+      if (res?.status === 200 && Array.isArray(allData)) {
+        setViolation(allData);
+        // set autoValid if every item is_valid === true
+        // const allValid =
+        //   allData.length > 0 && allData.every((it) => !!it.is_valid);
+        // setAutoValid(allValid);
       } else {
-        toastr.error("Violation data not found");
+        toastr.error("Violation data not found or invalid response");
       }
     } catch (error) {
-      console.error(error);
+      console.error("getViolationData error:", error);
       toastr.error("Failed to load violation data");
     }
   };
-
-  const handleSubmit = async () => {
-    const token = localStorage.getItem("token") || "";
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      const payload: EditViolationDataList[] = violation.map((v) => ({
-        violation_id: v.violation_id,
-        is_valid: v.is_valid,
-        // type: v.type,
-        note: v.note ?? "",
-      }));
-
-      await updateViolationList(token, payload);
-
-      toastr.success("All changes submitted successfully");
-      setTimeout(() => window.location.reload(), 500);
-    } catch (error) {
-      console.error(error);
-      toastr.error("Failed to submit changes");
-    }
-  };
-
-  // helper untuk cek perubahan
-  const isChanged = (orig: ViolationDataList, curr: ViolationDataList) => {
-    return (
-      orig.is_valid !== curr.is_valid || (orig.note || "") !== (curr.note || "")
-    );
+  const updateViolationAt = (
+    index: number,
+    patch: Partial<ViolationDataList>
+  ) => {
+    setViolation((prev) => {
+      const next = prev.map((v, i) => (i === index ? { ...v, ...patch } : v));
+      // const allValid = next.length > 0 && next.every((it) => !!it.is_valid);
+      // setAutoValid(allValid);
+      return next;
+    });
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const companyId = localStorage.getItem("company_id");
 
-    if (token && companyId && id) {
-      getViolationData();
+    if (!token) {
+      router.push("/login");
+      return;
     }
-  }, [id]);
+
+    if (companyId && id) {
+      getViolationData();
+    } else if (!companyId) {
+      toastr.error("Company information missing");
+    }
+  }, [id, outlet_id, is_confirmed]);
 
   return (
     <div>
@@ -141,6 +133,52 @@ export default function SuspectPage() {
                   <span className="material-symbols-outlined">
                     chevron_right
                   </span>
+
+                  {searchParams.get("brand_name") ? (
+                    <>
+                      <li>
+                        <Link
+                          href={{
+                            pathname: "/brand",
+                            query: {
+                              brand_name: searchParams.get("brand_name"),
+                            },
+                          }}
+                          className="hover:underline text-gray-700 font-medium"
+                        >
+                          {searchParams.get("brand_name")}
+                        </Link>
+                      </li>
+                      <span className="material-symbols-outlined">
+                        chevron_right
+                      </span>
+                    </>
+                  ) : null}
+
+                  {searchParams.get("outlet_name") ? (
+                    <>
+                      <li>
+                        <Link
+                          href={{
+                            pathname: `/brand/live-preview/${id}`,
+                            query: {
+                              outlet_name: searchParams.get("outlet_name"),
+                              brand_name: searchParams.get("brand_name"),
+                              area_name: searchParams.get("area_name"),
+                              outlet_id: searchParams.get("outlet_id"),
+                            },
+                          }}
+                          className="hover:underline text-gray-700 font-medium"
+                        >
+                          {searchParams.get("outlet_name")}
+                        </Link>
+                      </li>
+                      <span className="material-symbols-outlined">
+                        chevron_right
+                      </span>
+                    </>
+                  ) : null}
+
                   <li className="text-gray-700 font-medium">Live View</li>
                 </ol>
               </nav>
@@ -165,7 +203,7 @@ export default function SuspectPage() {
             </span>
           </h1>
 
-          <div className="text-right">
+          {/* <div className="text-right">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -174,43 +212,66 @@ export default function SuspectPage() {
                 onChange={(e) => {
                   const checked = e.target.checked;
                   setAutoValid(checked);
-
                   setViolation((prev) =>
-                    prev.map((v) => {
-                      const updated = { ...v, is_valid: checked };
-                      return updated;
-                    })
+                    prev.map((v) => ({ ...v, is_valid: checked }))
                   );
                 }}
+                readOnly
               />
               <h1 className="text-black text-md">Auto Valid</h1>
             </label>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
           {violation?.map((item, index) => (
-            <div key={index} className="rounded-lg shadow-md p-4 bg-white">
+            <div
+              key={item.violation_id ?? index}
+              className="rounded-lg shadow-md p-4 bg-white"
+            >
               <div className="flex items-center justify-between mb-2">
                 <h2 className="font-bold">
-                  OD{" "}
-                  <span className="text-yellow-600 uppercase">
-                    {item.violation_id}
-                  </span>
+                  {item.type}{" "}
+                  <span className="text-yellow-600">Case #{index + 101}</span>
                 </h2>
                 <input
                   type="checkbox"
-                  className="accent-blue-600 w-6 h-6"
-                  checked={isChanged(originalViolation[index], item)}
-                  readOnly
+                  className="accent-green-600 w-5 h-5"
+                  checked={item.is_confirmed ?? false}
+                  onChange={(e) =>
+                    updateViolationAt(index, { is_confirmed: e.target.checked })
+                  }
+                  disabled
                 />
               </div>
 
-              <img
-                src={item.image ?? "/static/images/bg_login.png"}
-                alt="Violation"
-                className="w-full h-60 object-cover rounded-md mb-3"
-              />
+              {(() => {
+                const t = (item.type || "").toString().trim().toUpperCase();
+                const videoUrl = item.video ? item.video.toString().trim() : "";
+                const imageUrl = item.image ? item.image.toString().trim() : "";
+
+                if (t === "AD" && videoUrl) {
+                  return (
+                    <video
+                      className="w-full h-60 object-cover rounded-md mb-3"
+                      controls
+                      preload="metadata"
+                      poster={imageUrl || "/static/images/bg_login.png"}
+                    >
+                      <source src={videoUrl} />
+                      Your browser does not support the video tag.
+                    </video>
+                  );
+                }
+
+                return (
+                  <img
+                    src={imageUrl || "/static/images/bg_login.png"}
+                    alt="Violation"
+                    className="w-full h-60 object-cover rounded-md mb-3"
+                  />
+                );
+              })()}
 
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold">Violation</span>
@@ -224,15 +285,8 @@ export default function SuspectPage() {
                     className={`px-2 py-1 rounded-md text-xs font-semibold ${
                       item.is_valid ? "bg-false" : "bg-true"
                     }`}
-                    onClick={() =>
-                      setViolation((prev) =>
-                        prev.map((v, i) => {
-                          if (i !== index) return v;
-                          const updated = { ...v, is_valid: true };
-                          return updated;
-                        })
-                      )
-                    }
+                    onClick={() => updateViolationAt(index, { is_valid: true })}
+                    disabled
                   >
                     Valid
                   </button>
@@ -242,14 +296,9 @@ export default function SuspectPage() {
                       item.is_valid === false ? "bg-false" : "bg-true"
                     }`}
                     onClick={() =>
-                      setViolation((prev) =>
-                        prev.map((v, i) => {
-                          if (i !== index) return v;
-                          const updated = { ...v, is_valid: false };
-                          return updated;
-                        })
-                      )
+                      updateViolationAt(index, { is_valid: false })
                     }
+                    disabled
                   >
                     Invalid
                   </button>
@@ -263,25 +312,73 @@ export default function SuspectPage() {
 
               <div className="flex justify-between items-center mb-2">
                 <span>
-                  {new Date(item.created_at).toLocaleString("en-GB", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
+                  {(() => {
+                    const created = item.created_at
+                      ? new Date(item.created_at)
+                      : null;
+                    return created && !isNaN(created.getTime())
+                      ? created.toLocaleString("en-GB", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })
+                      : "-";
+                  })()}
                 </span>
                 <div className="flex gap-1 text-xs justify-content-end">
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setViolation((prev) =>
+                        prev.map((v, i) =>
+                          i !== index ? v : { ...v, level: 1 }
+                        )
+                      )
+                    }
+                    disabled
+                    className={`px-2 py-1 rounded ${
+                      item.level === 1 ? "bg-false" : "bg-true"
+                    }`}
+                  >
                     Low
-                  </span>
-                  <span className="bg-orange-100 text-orange-800 px-2 py-0.5 rounded">
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setViolation((prev) =>
+                        prev.map((v, i) =>
+                          i !== index ? v : { ...v, level: 2 }
+                        )
+                      )
+                    }
+                    disabled
+                    className={`px-2 py-1 rounded ${
+                      item.level === 2 ? "bg-false" : "bg-true"
+                    }`}
+                  >
                     Med
-                  </span>
-                  <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded">
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setViolation((prev) =>
+                        prev.map((v, i) =>
+                          i !== index ? v : { ...v, level: 3 }
+                        )
+                      )
+                    }
+                    className={`px-2 py-1 rounded ${
+                      item.level === 3 ? "bg-false" : "bg-true"
+                    }`}
+                    disabled
+                  >
                     High
-                  </span>
+                  </button>
                 </div>
               </div>
 
@@ -297,22 +394,18 @@ export default function SuspectPage() {
                   type="text"
                   value={item.note || ""}
                   placeholder="Add Note"
-                  onChange={(e) =>
-                    setViolation((prev) =>
-                      prev.map((v, i) => {
-                        if (i !== index) return v;
-                        const updated = { ...v, note: e.target.value };
-                        return updated;
-                      })
-                    )
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    updateViolationAt(index, { note: e.target.value })
                   }
+                  disabled
+                  readOnly
                   className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
           ))}
         </div>
-        <div className="text-right mt-3">
+        {/* <div className="text-right mt-3">
           <button
             type="button"
             onClick={handleSubmit}
@@ -324,7 +417,7 @@ export default function SuspectPage() {
           >
             Submit
           </button>
-        </div>
+        </div> */}
       </Main>
     </div>
   );

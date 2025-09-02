@@ -17,8 +17,10 @@ export interface ViolationDataList {
   detected_info: string;
   image: string;
   is_valid: boolean;
+  is_confirmed: boolean;
   note: string;
   type: string;
+  level?: number;
   updated_at: string;
   video: string;
   violation_id: string;
@@ -28,6 +30,8 @@ export interface ViolationDataList {
 export interface EditViolationDataList {
   violation_id: string;
   is_valid: boolean;
+  is_confirmed?: boolean;
+  level?: number;
   // type: string;
   note: string;
 }

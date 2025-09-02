@@ -28,11 +28,13 @@ export function getViolationCount(
 export function getViolationList(
   token: string,
   company_id: string,
-  outlet_id: string
+  outlet_id: string,
+  is_confirmed: string
 ) {
   const params = new URLSearchParams({
     company_id: company_id,
     outlet_id: outlet_id,
+    is_confirmed: is_confirmed,
   });
   return axios.get(violationUrl, {
     headers: {

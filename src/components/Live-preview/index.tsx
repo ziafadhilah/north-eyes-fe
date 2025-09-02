@@ -358,6 +358,7 @@ export default function LIndex() {
                         area_name: area_name,
                         camera_name: mainCamera.camera_name,
                         outlet_id: outlet_id,
+                        is_confirmed: false,
                       },
                     }}
                     className="w-full"
@@ -381,6 +382,7 @@ export default function LIndex() {
                         area_name: area_name,
                         camera_name: mainCamera.camera_name,
                         outlet_id: outlet_id,
+                        is_confirmed: true,
                       },
                     }}
                     className="w-full"
