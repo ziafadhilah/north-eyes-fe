@@ -21,8 +21,11 @@ export default function SuspectPage() {
   const searchParams = useSearchParams();
   const params = useParams();
   const id = params?.id;
+  const brand_name = searchParams.get("brand_name") as string;
+  const outlet_name = searchParams.get("outlet_name") as string;
   const outlet_id = searchParams.get("outlet_id") as string;
   const area_name = searchParams.get("area_name") as string;
+  const area_id = searchParams.get("area_id") as string;
   const is_confirmed = searchParams.get("is_confirmed") as string;
   const [autoValid, setAutoValid] = useState(false);
 
@@ -77,7 +80,6 @@ export default function SuspectPage() {
     }
   };
 
-  // Helper to update a single violation and keep autoValid in sync
   const updateViolationAt = (
     index: number,
     patch: Partial<ViolationDataList>
@@ -150,7 +152,13 @@ export default function SuspectPage() {
           <div className="flex items-center">
             <Link
               href={{
-                pathname: `/brand/live-preview/${id}`,
+                pathname: `/brand/live-preview/${area_id}`,
+                query: {
+                  brand_name,
+                  outlet_name,
+                  outlet_id,
+                  area_name,
+                },
               }}
             >
               <span
@@ -178,7 +186,34 @@ export default function SuspectPage() {
                   <span className="material-symbols-outlined">
                     chevron_right
                   </span>
-                  <li className="text-gray-700 font-medium">Live View</li>
+                  <li>
+                    <Link href="/brand" className="hover:underline">
+                      {brand_name}
+                    </Link>
+                  </li>
+                  <span className="material-symbols-outlined">
+                    chevron_right
+                  </span>
+                  <li>
+                    <Link href="/brand" className="hover:underline">
+                      {outlet_name}
+                    </Link>
+                  </li>
+                  <span className="material-symbols-outlined">
+                    chevron_right
+                  </span>
+                  <li>
+                    <Link
+                      href={`/brand/live-preview/${id}`}
+                      className="hover:underline"
+                    >
+                      {area_name}
+                    </Link>
+                  </li>
+                  <span className="material-symbols-outlined">
+                    chevron_right
+                  </span>
+                  <li className="text-gray-700 font-medium">Suspect</li>
                 </ol>
               </nav>
             </div>

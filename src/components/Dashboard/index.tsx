@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-// import Main from "@/components/General/Layout/Main";
 import {
   BarChart,
   Bar,
@@ -19,50 +19,13 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-
-type BarDataItem = {
-  name: string;
-  users: number;
-};
-
-interface CustomBarProps {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  payload?: BarDataItem;
-}
-
-const barData: BarDataItem[] = [
-  { name: "Jan", users: 400 },
-  { name: "Feb", users: 300 },
-  { name: "Mar", users: 500 },
-  { name: "Apr", users: 200 },
-  { name: "May", users: 700 },
-];
-
-const pieData = [
-  { name: "Chrome", value: 600 },
-  { name: "Firefox", value: 300 },
-  { name: "Safari", value: 100 },
-];
-
-const maxValue = Math.max(...barData.map((item) => item.users));
-
-const CustomBarShape = ({
-  x = 0,
-  y = 0,
-  width = 0,
-  height = 0,
-  payload,
-}: CustomBarProps) => {
-  const isMax = payload?.users === maxValue;
-  const fill = isMax ? "url(#gradientMax)" : "#DBE7FE";
-  return <rect x={x} y={y} width={width} height={height} fill={fill} rx={4} />;
-};
+import {
+  getViolationChart,
+  getViolationDiagram,
+} from "@/service/camera/violationService";
+import { ChartData, DiagramData } from "@/constants/dashboardData";
 
 const pieColors = ["#B0D8D8", "#FFDD6D", "#B8BDD1"];
-
 const ITEMS_PER_PAGE = 10;
 
 export default function DashboardPage() {
@@ -74,6 +37,40 @@ export default function DashboardPage() {
   >({});
   const [selectedBrand, setSelectedBrand] = useState("BrandA");
   const [currentPage, setCurrentPage] = useState(1);
+  const [diagramData, setDiagramData] = useState<DiagramData | null>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+
+  const violationChart = async () => {
+    const token = localStorage.getItem("token");
+    const company_id = localStorage.getItem("company_id");
+    if (!token || !company_id) {
+      router.push("/login");
+      return;
+    }
+    getViolationChart(token, company_id).then((res) => {
+      if (res?.status === 200) {
+        setChartData(res.data);
+      } else {
+        console.error("Error fetching violation chart data");
+      }
+    });
+  };
+
+  const violationDiagram = async () => {
+    const token = localStorage.getItem("token");
+    const company_id = localStorage.getItem("company_id");
+    if (!token || !company_id) {
+      router.push("/login");
+      return;
+    }
+    getViolationDiagram(token, company_id).then((res) => {
+      if (res?.status === 200) {
+        setDiagramData(res.data);
+      } else {
+        console.error("Error fetching violation diagram data");
+      }
+    });
+  };
 
   useEffect(() => {
     const generateData = () => {
@@ -96,17 +93,11 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    // const TIMEOUT = 2000;
     const TIMEOUT = 10 * 60 * 1000;
     let timeoutId: NodeJS.Timeout;
 
     const logout = () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user_id");
-      localStorage.removeItem("company");
-      localStorage.removeItem("company_id");
-      localStorage.removeItem("photo_url");
-      localStorage.removeItem("lastActivity");
+      localStorage.clear();
 
       toastr.options = {
         timeOut: 10000,
@@ -153,7 +144,9 @@ export default function DashboardPage() {
       router.push("/login");
       return;
     }
-  });
+    violationChart();
+    violationDiagram();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1200);
@@ -234,25 +227,16 @@ export default function DashboardPage() {
                   </h2>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart
-                      data={barData}
+                      data={chartData?.data.brands.map((b) => ({
+                        name: b.brand_name,
+                        users: b.total_violation,
+                      }))}
                       margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
                     >
-                      <defs>
-                        <linearGradient
-                          id="gradientMax"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop offset="0%" stopColor="#1A2A6C" />
-                          <stop offset="100%" stopColor="#2671FF" />
-                        </linearGradient>
-                      </defs>
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
-                      <Bar dataKey="users" shape={CustomBarShape} />
+                      <Bar dataKey="users" fill="#2671FF" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -278,7 +262,32 @@ export default function DashboardPage() {
                       margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
                     >
                       <Pie
-                        data={pieData}
+                        data={
+                          diagramData?.data.categories
+                            ? [
+                                {
+                                  name: "Behaviour",
+                                  value:
+                                    diagramData.data.categories.behaviour.count,
+                                },
+                                {
+                                  name: "Grooming",
+                                  value:
+                                    diagramData.data.categories.grooming.count,
+                                },
+                                {
+                                  name: "Strangers",
+                                  value:
+                                    diagramData.data.categories.strangers.count,
+                                },
+                                {
+                                  name: "Uniform",
+                                  value:
+                                    diagramData.data.categories.uniform.count,
+                                },
+                              ]
+                            : []
+                        }
                         dataKey="value"
                         nameKey="name"
                         cx="50%"
@@ -286,12 +295,15 @@ export default function DashboardPage() {
                         outerRadius={120}
                         label
                       >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={pieColors[index % pieColors.length]}
-                          />
-                        ))}
+                        {diagramData?.data.categories &&
+                          ["behaviour", "grooming", "strangers", "uniform"].map(
+                            (entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={pieColors[index % pieColors.length]}
+                              />
+                            )
+                          )}
                       </Pie>
                       <Tooltip />
                     </PieChart>
@@ -300,6 +312,7 @@ export default function DashboardPage() {
               </motion.div>
             )}
           </div>
+          {/* Employee List */}
           {isLoading ? (
             <SkeletonBox className="w-full h-[300px] rounded-full mt-6" />
           ) : (

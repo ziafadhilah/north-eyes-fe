@@ -55,3 +55,29 @@ export function updateViolationList(
     },
   });
 }
+
+export function getViolationChart(token: string, company_id: string) {
+  const params = new URLSearchParams({
+    company_id: company_id,
+  });
+  return axios.get(`${violationUrl}/chart-by-brand`, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+    params: params,
+  });
+}
+
+export function getViolationDiagram(token: string, company_id: string) {
+  const params = new URLSearchParams({
+    company_id: company_id,
+  });
+  return axios.get(`${violationUrl}/violation-diagram`, {
+    headers: {
+      "x-authorized-key": token,
+      "Content-Type": "application/json",
+    },
+    params: params,
+  });
+}
