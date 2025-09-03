@@ -48,7 +48,7 @@ export default function DashboardPage() {
       return;
     }
     getViolationChart(token, company_id).then((res) => {
-      if (res?.status === 200) {
+      if (res?.data.status === "success") {
         setChartData(res.data);
       } else {
         console.error("Error fetching violation chart data");
@@ -64,7 +64,7 @@ export default function DashboardPage() {
       return;
     }
     getViolationDiagram(token, company_id).then((res) => {
-      if (res?.status === 200) {
+      if (res?.data.status === "success") {
         setDiagramData(res.data);
       } else {
         console.error("Error fetching violation diagram data");

@@ -220,7 +220,7 @@ export default function BrandPage() {
                       }}
                       className="p-4 h-[330px] w-[300px] md:w-full md:h-full cursor-pointer rounded-lg shadow-sm flex flex-col items-center justify-center text-center bg-radial-blue transition-transform duration-300 ease-in-out hover:scale-102 hover:bg-blue-200"
                     >
-                      <div className="aspect-square w-full px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
+                      <div className="aspect-square w-full flex items-center justify-center px-4 py-4 md:px-4 md:py-4 lg:px-4 lg:py-4 overflow-hidden mb-3">
                         <img
                           src={
                             data.logo_url
